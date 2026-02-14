@@ -34,5 +34,5 @@ jobs:
 
       - name: Lint GitHub workflows
         run: |
-          curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- v1.7.10
+          curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- 1.7.10
           ./actionlint
