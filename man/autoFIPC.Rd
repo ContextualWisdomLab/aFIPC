@@ -42,7 +42,7 @@ autoFIPC(newformXData = ..., oldformYData = ...,
 
 \item{empiricalhist}{do you want to use empirical histogram method when tryEM = TRUE? default is FALSE}
 
-\item{...}{}
+\item{...}{Additional arguments reserved for future extensions.}
 }
 \description{
 automated fixed item parameter linking

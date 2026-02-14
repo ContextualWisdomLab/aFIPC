@@ -12,3 +12,5 @@
 ^CONTRIBUTING\.md$
 ^docs$
 ^docs/.*
+^registered_agents\.json$
+^task_agent_mapping\.json$
