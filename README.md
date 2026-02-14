@@ -27,6 +27,13 @@ preserve numerical behavior while modernizing repository operations
   - `CONTRIBUTING.md`
   - `.github/SECURITY.md`
 
+## Collaboration workflow
+
+- Pull request template: `.github/PULL_REQUEST_TEMPLATE.md`
+- Issue templates: `.github/ISSUE_TEMPLATE/`
+- Code ownership: `.github/CODEOWNERS`
+- Code quality checks: `.github/workflows/code-quality.yml`
+
 ## Local package check
 
 ```bash

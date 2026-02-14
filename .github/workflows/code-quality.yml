@@ -1,0 +1,38 @@
+name: Code Quality
+
+on:
+  push:
+    branches: ["master", "main"]
+  pull_request:
+    branches: ["master", "main"]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@5ef0c079ce82195b2a36a210272d6b661572d83e
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Lint workflow YAML
+        run: |
+          python3 -m pip install --user yamllint
+          python3 -m yamllint .yamllint.yml .github/dependabot.yml .github/workflows/*.yml
+
+      - name: Lint markdown docs
+        run: |
+          npm install -g markdownlint-cli2@0.18.1
+          markdownlint-cli2 README.md AGENTS.md ARCHITECTURE.md CLAUDE.md CONTRIBUTING.md .github/**/*.md docs/**/*.md
+
+      - name: Lint GitHub workflows
+        run: |
+          curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- v1.7.10
+          ./actionlint

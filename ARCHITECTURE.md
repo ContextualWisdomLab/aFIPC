@@ -15,6 +15,9 @@ metadata and CI are wired, and which parts are safe to evolve.
 - `packrat/` - Historical dependency lock/vendor directory
 - `.github/workflows/` - CI + security automation
 - `.github/SECURITY.md` - Vulnerability reporting policy
+- `.github/PULL_REQUEST_TEMPLATE.md` - PR review checklist template
+- `.github/ISSUE_TEMPLATE/` - structured issue intake templates
+- `.github/CODEOWNERS` - code ownership map for reviews
 - `.github/dependabot.yml` - Automated Actions dependency updates
 - `README.md` - User/developer entrypoint
 - `CONTRIBUTING.md` - Contribution process and verification baseline
@@ -49,6 +52,7 @@ R objects (data frame/matrix/model), and outputs are returned as an R list.
 ### 3.3 Automation Layer
 
 - `r.yml`: R CMD check workflow
+- `code-quality.yml`: Markdown/YAML/workflow quality checks
 - `codeql.yml`: Code scanning workflow for Actions language
 - `dependency-review.yml`: dependency policy gate on pull requests
 - `scorecard.yml`: supply-chain posture check and SARIF upload

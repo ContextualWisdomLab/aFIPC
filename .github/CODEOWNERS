@@ -1,0 +1,7 @@
+* @seonghobae
+
+# Core algorithm area (high-risk)
+R/aFIPC.R @seonghobae
+
+# CI and governance files
+.github/** @seonghobae
