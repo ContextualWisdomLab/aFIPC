@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   analysis:
+    if: ${{ github.event.repository.private == false }}
     name: Scorecard analysis
     runs-on: ubuntu-latest
     permissions:
