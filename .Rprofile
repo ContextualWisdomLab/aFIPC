@@ -1,3 +1,6 @@
-#### -- Packrat Autoloader (version 0.4.8-36) -- ####
-source("packrat/init.R")
+#### -- Packrat Autoloader (legacy, opt-in) -- ####
+if (identical(tolower(Sys.getenv("AFIPC_ENABLE_PACKRAT", "false")), "true") &&
+    file.exists("packrat/init.R")) {
+  source("packrat/init.R")
+}
 #### -- End Packrat Autoloader -- ####

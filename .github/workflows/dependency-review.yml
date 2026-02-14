@@ -1,0 +1,29 @@
+name: Dependency Review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@5ef0c079ce82195b2a36a210272d6b661572d83e
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@46a3c492319c890177366b6ef46d6b4f89743ed4
+        with:
+          fail-on-severity: high
+          deny-licenses: GPL-2.0,GPL-3.0,AGPL-3.0,LGPL-2.1,LGPL-3.0

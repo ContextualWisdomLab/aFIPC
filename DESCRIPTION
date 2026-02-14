@@ -1,12 +1,13 @@
 Package: aFIPC
 Type: Package
-Title: automated Fixed Item Parameter Linking
+Title: Automated Fixed Item Parameter Linking
 Version: 0.1.0
 Author: Seongho Bae
 Maintainer: Seongho Bae <seongho@kw.ac.kr>
-Description: Do automated fixed item parameter linking for
-    test linking under item response theory paradigm
-    with mirt package estimates
+Authors@R: person(given = "Seongho", family = "Bae", role = c("aut", "cre"),
+    email = "seongho@kw.ac.kr")
+Description: Automates fixed item parameter linking for test linking under
+    the item response theory paradigm using mirt package estimates.
 License: GPL-3 | file LICENSE
 Imports: mirt
 Encoding: UTF-8

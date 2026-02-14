@@ -1,4 +1,14 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^packrat/
+^packrat$
+^packrat/.*
 ^\.Rprofile$
+^\.github$
+^\.github/.*
+^\.yamllint\.yml$
+^AGENTS\.md$
+^ARCHITECTURE\.md$
+^CLAUDE\.md$
+^CONTRIBUTING\.md$
+^docs$
+^docs/.*
