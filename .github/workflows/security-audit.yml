@@ -30,7 +30,7 @@ jobs:
 
       - name: Run secret scan (gitleaks)
         run: |
-          ./gitleaks detect --source . --no-git --redact --exit-code 1
+          ./gitleaks detect --source . --no-git --redact --config .gitleaks.toml --exit-code 1
 
       - name: Validate workflows
         run: |

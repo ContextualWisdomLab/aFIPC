@@ -1,0 +1,9 @@
+title = "aFIPC gitleaks configuration"
+
+[allowlist]
+description = "Ignore historical vendored dependencies and local build artifacts"
+paths = [
+  '''packrat/.*''',
+  '''\.Rcheck/.*''',
+  '''\.git/.*'''
+]

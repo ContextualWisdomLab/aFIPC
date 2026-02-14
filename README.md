@@ -34,6 +34,7 @@ preserve numerical behavior while modernizing repository operations
 - Code ownership: `.github/CODEOWNERS`
 - Code quality checks: `.github/workflows/code-quality.yml`
 - Security checks (private-safe): `.github/workflows/security-audit.yml`
+- Secret-scan policy config: `.gitleaks.toml`
 
 ## Local package check
 
