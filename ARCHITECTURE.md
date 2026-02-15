@@ -19,6 +19,8 @@ metadata and CI are wired, and which parts are safe to evolve.
 - `.github/ISSUE_TEMPLATE/` - structured issue intake templates
 - `.github/CODEOWNERS` - code ownership map for reviews
 - `.github/dependabot.yml` - Automated Actions dependency updates
+- `docs/coderabbit/review-commands.md` - CodeRabbit command quick reference
+- `docs/operations/maintenance-runbook.md` - recurring maintainer operations checklist
 - `README.md` - User/developer entrypoint
 - `CONTRIBUTING.md` - Contribution process and verification baseline
 - `AGENTS.md`, `CLAUDE.md` - Agent operation guardrails
@@ -79,7 +81,9 @@ package metadata, and CI workflow definitions in Git.
 ## 7. Security Considerations
 
 - Actions are pinned to full commit SHAs.
-- Code scanning and dependency review are enabled in CI.
+- Private-repo-safe checks are enforced with `security-audit.yml` and required checks.
+- CodeQL/dependency-review workflows are present but skipped when platform
+  features are unavailable.
 - No secrets are required for package checks.
 
 ## 8. Development & Testing Environment
@@ -101,7 +105,7 @@ package metadata, and CI workflow definitions in Git.
 - Project Name: aFIPC
 - Repository URL: `https://github.com/seonghobae/aFIPC`
 - Primary Contact: Seongho Bae
-- Date of Last Update: 2026-02-14
+- Date of Last Update: 2026-02-15
 
 ## 11. Glossary / Acronyms
 
