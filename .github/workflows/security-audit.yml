@@ -24,10 +24,11 @@ jobs:
 
       - name: Install gitleaks
         run: |
-          curl -sSLo gitleaks.tar.gz "https://github.com/gitleaks/gitleaks/releases/download/v8.24.2/gitleaks_8.24.2_linux_x64.tar.gz"
+          GITLEAKS_FILE="gitleaks_8.24.2_linux_x64.tar.gz"
+          curl -sSLo "$GITLEAKS_FILE" "https://github.com/gitleaks/gitleaks/releases/download/v8.24.2/$GITLEAKS_FILE"
           curl -sSLo gitleaks_checksums.txt "https://github.com/gitleaks/gitleaks/releases/download/v8.24.2/gitleaks_8.24.2_checksums.txt"
-          grep "gitleaks_8.24.2_linux_x64.tar.gz" gitleaks_checksums.txt | sha256sum -c -
-          tar -xzf gitleaks.tar.gz gitleaks
+          grep "$GITLEAKS_FILE" gitleaks_checksums.txt | sha256sum -c -
+          tar -xzf "$GITLEAKS_FILE" gitleaks
           chmod +x gitleaks
 
       - name: Run secret scan (gitleaks)
@@ -37,10 +38,11 @@ jobs:
       - name: Validate workflows
         run: |
           ACTIONLINT_VERSION="1.7.10"
+          ACTIONLINT_FILE="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
           ACTIONLINT_BASE_URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
-          curl -sSLo actionlint.tar.gz "${ACTIONLINT_BASE_URL}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          curl -sSLo "$ACTIONLINT_FILE" "${ACTIONLINT_BASE_URL}/${ACTIONLINT_FILE}"
           curl -sSLo actionlint_checksums.txt "${ACTIONLINT_BASE_URL}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
-          grep "actionlint_1.7.10_linux_amd64.tar.gz" actionlint_checksums.txt | sha256sum -c -
-          tar -xzf actionlint.tar.gz actionlint
+          grep "$ACTIONLINT_FILE" actionlint_checksums.txt | sha256sum -c -
+          tar -xzf "$ACTIONLINT_FILE" actionlint
           chmod +x actionlint
           ./actionlint
