@@ -1,0 +1,48 @@
+name: Security Audit (private-safe)
+
+on:
+  push:
+    branches: ["master", "main"]
+  pull_request:
+    branches: ["master", "main"]
+
+permissions:
+  contents: read
+
+jobs:
+  secret-and-workflow-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@5ef0c079ce82195b2a36a210272d6b661572d83e
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Install gitleaks
+        run: |
+          GITLEAKS_FILE="gitleaks_8.24.2_linux_x64.tar.gz"
+          curl -sSLo "$GITLEAKS_FILE" "https://github.com/gitleaks/gitleaks/releases/download/v8.24.2/$GITLEAKS_FILE"
+          curl -sSLo gitleaks_checksums.txt "https://github.com/gitleaks/gitleaks/releases/download/v8.24.2/gitleaks_8.24.2_checksums.txt"
+          grep "$GITLEAKS_FILE" gitleaks_checksums.txt | sha256sum -c -
+          tar -xzf "$GITLEAKS_FILE" gitleaks
+          chmod +x gitleaks
+
+      - name: Run secret scan (gitleaks)
+        run: |
+          ./gitleaks detect --source . --no-git --redact --config .gitleaks.toml --exit-code 1
+
+      - name: Validate workflows
+        run: |
+          ACTIONLINT_VERSION="1.7.10"
+          ACTIONLINT_FILE="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          ACTIONLINT_BASE_URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
+          curl -sSLo "$ACTIONLINT_FILE" "${ACTIONLINT_BASE_URL}/${ACTIONLINT_FILE}"
+          curl -sSLo actionlint_checksums.txt "${ACTIONLINT_BASE_URL}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
+          grep "$ACTIONLINT_FILE" actionlint_checksums.txt | sha256sum -c -
+          tar -xzf "$ACTIONLINT_FILE" actionlint
+          chmod +x actionlint
+          ./actionlint

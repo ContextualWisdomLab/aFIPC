@@ -53,6 +53,7 @@ R objects (data frame/matrix/model), and outputs are returned as an R list.
 
 - `r.yml`: R CMD check workflow
 - `code-quality.yml`: Markdown/YAML/workflow quality checks
+- `security-audit.yml`: private-repo-compatible secret and workflow audit
 - `codeql.yml`: Code scanning workflow for Actions language
 - `dependency-review.yml`: dependency policy gate on pull requests
 - `scorecard.yml`: supply-chain posture check and SARIF upload
