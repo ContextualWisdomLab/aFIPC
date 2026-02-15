@@ -35,6 +35,8 @@ preserve numerical behavior while modernizing repository operations
 - Code quality checks: `.github/workflows/code-quality.yml`
 - Security checks (private-safe): `.github/workflows/security-audit.yml`
 - Secret-scan policy config: `.gitleaks.toml`
+- CodeRabbit command reference: `docs/coderabbit/review-commands.md`
+- Maintainer operations runbook: `docs/operations/maintenance-runbook.md`
 
 ## Local package check
 

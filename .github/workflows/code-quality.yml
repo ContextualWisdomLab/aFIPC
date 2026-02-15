@@ -34,5 +34,12 @@ jobs:
 
       - name: Lint GitHub workflows
         run: |
-          curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- 1.7.10
+          ACTIONLINT_VERSION="1.7.10"
+          ACTIONLINT_FILE="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          ACTIONLINT_BASE_URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
+          curl -sSLo "$ACTIONLINT_FILE" "${ACTIONLINT_BASE_URL}/${ACTIONLINT_FILE}"
+          curl -sSLo actionlint_checksums.txt "${ACTIONLINT_BASE_URL}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
+          grep "$ACTIONLINT_FILE" actionlint_checksums.txt | sha256sum -c -
+          tar -xzf "$ACTIONLINT_FILE" actionlint
+          chmod +x actionlint
           ./actionlint
