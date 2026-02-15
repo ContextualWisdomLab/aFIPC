@@ -104,7 +104,7 @@ autoFIPC <-
               prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
             )
           if (!grepl("^[0-9]+$", n)) {
-            return(readinteger())
+            return(checkoldformBILOGprior())
           }
 
           return(as.integer(n))
