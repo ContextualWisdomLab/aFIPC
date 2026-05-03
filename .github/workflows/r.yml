@@ -30,19 +30,19 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Set up R
-        uses: r-lib/actions/setup-r@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
+        uses: r-lib/actions/setup-r@a51a8012b0aab7c32ef9d19bf54da93f3254335e
         with:
           r-version: release
           use-public-rspm: true
 
       - name: Set up R package dependencies
-        uses: r-lib/actions/setup-r-dependencies@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
+        uses: r-lib/actions/setup-r-dependencies@a51a8012b0aab7c32ef9d19bf54da93f3254335e
         with:
           extra-packages: any::rcmdcheck
           needs: check
 
       - name: Run R CMD check
-        uses: r-lib/actions/check-r-package@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
+        uses: r-lib/actions/check-r-package@a51a8012b0aab7c32ef9d19bf54da93f3254335e
         with:
           args: 'c("--no-manual", "--as-cran")'
           error-on: '"error"'
