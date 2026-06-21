@@ -676,15 +676,9 @@ autoFIPC <-
         print(CommonItemList_NOIPD)
 
         ActualoldFormCommonItem <-
-          vector(length = length(CommonItemList_NOIPD))
+          as.character(unlist(IPDItemList[1, CommonItemList_NOIPD]))
         ActualnewFormCommonItem <-
-          vector(length = length(CommonItemList_NOIPD))
-        for (i in 1:length(CommonItemList_NOIPD)) {
-          ActualoldFormCommonItem[i] <-
-            as.character(IPDItemList[CommonItemList_NOIPD][1, i])
-          ActualnewFormCommonItem[i] <-
-            as.character(IPDItemList[CommonItemList_NOIPD][2, i])
-        }
+          as.character(unlist(IPDItemList[2, CommonItemList_NOIPD]))
 
         message('ActualoldFormCommonItem: ', ActualoldFormCommonItem)
         message('ActualnewFormCommonItem: ', ActualnewFormCommonItem)
