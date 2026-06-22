@@ -100,7 +100,7 @@ autoFIPC <-
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
-          if (!interactive()) stop("oldformBILOGprior must be provided in non-interactive mode")
+          if (!interactive()) return(1L)
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
@@ -312,7 +312,7 @@ autoFIPC <-
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
-          if (!interactive()) stop("newformBILOGprior must be provided in non-interactive mode")
+          if (!interactive()) return(1L)
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
@@ -553,13 +553,13 @@ autoFIPC <-
         if (
           (length(grep(
             paste0('^', newformCommonItemNames[i], '$'),
-            colnames(newformXDataK[colnames(newFormModel@Data$data)])
+            colnames(newFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
           )) ==
             1) ==
             TRUE &&
             (length(grep(
               paste0('^', oldformCommonItemNames[i], '$'),
-              colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+              colnames(oldFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
             )) ==
               1) ==
               TRUE
@@ -705,26 +705,26 @@ autoFIPC <-
       if (
         (length(grep(
           paste0('^', newformCommonItemNames[i], '$'),
-          colnames(newformXDataK[colnames(newFormModel@Data$data)])
+          colnames(newFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
         )) ==
           1) ==
           TRUE &&
           (length(grep(
             paste0('^', oldformCommonItemNames[i], '$'),
-            colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+            colnames(oldFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
           )) ==
             1) ==
             TRUE &&
           (length(levels(as.factor(
             newFormModel@Data$data[, grep(
               paste0('^', newformCommonItemNames[i], '$'),
-              colnames(newformXDataK[colnames(newFormModel@Data$data)])
+              colnames(newFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
             )]
           ))) ==
             length(levels(as.factor(
               oldFormModel@Data$data[, grep(
                 paste0('^', oldformCommonItemNames[i], '$'),
-                colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+                colnames(oldFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
               )]
             ))))
       ) {
@@ -850,7 +850,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
+          ncol(newFormModel@Data$data), # ⚡ Bolt: avoid copying large dataframe just to get column count
           '\n',
           'MEAN = F1'
         ))
@@ -863,7 +863,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
+          ncol(newFormModel@Data$data), # ⚡ Bolt: avoid copying large dataframe just to get column count
           '\n'
         ))
     }
