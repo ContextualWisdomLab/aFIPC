@@ -553,13 +553,13 @@ autoFIPC <-
         if (
           (length(grep(
             paste0('^', newformCommonItemNames[i], '$'),
-            colnames(newFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
+            colnames(newformXDataK[colnames(newFormModel@Data$data)])
           )) ==
             1) ==
             TRUE &&
             (length(grep(
               paste0('^', oldformCommonItemNames[i], '$'),
-              colnames(oldFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
+              colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
             )) ==
               1) ==
               TRUE
@@ -705,26 +705,26 @@ autoFIPC <-
       if (
         (length(grep(
           paste0('^', newformCommonItemNames[i], '$'),
-          colnames(newFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
+          colnames(newformXDataK[colnames(newFormModel@Data$data)])
         )) ==
           1) ==
           TRUE &&
           (length(grep(
             paste0('^', oldformCommonItemNames[i], '$'),
-            colnames(oldFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
+            colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
           )) ==
             1) ==
             TRUE &&
           (length(levels(as.factor(
             newFormModel@Data$data[, grep(
               paste0('^', newformCommonItemNames[i], '$'),
-              colnames(newFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
+              colnames(newformXDataK[colnames(newFormModel@Data$data)])
             )]
           ))) ==
             length(levels(as.factor(
               oldFormModel@Data$data[, grep(
                 paste0('^', oldformCommonItemNames[i], '$'),
-                colnames(oldFormModel@Data$data) # ⚡ Bolt: avoid copying large dataframe just to extract column names
+                colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
               )]
             ))))
       ) {
@@ -850,7 +850,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newFormModel@Data$data), # ⚡ Bolt: avoid copying large dataframe just to get column count
+          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
           '\n',
           'MEAN = F1'
         ))
@@ -863,7 +863,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newFormModel@Data$data), # ⚡ Bolt: avoid copying large dataframe just to get column count
+          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
           '\n'
         ))
     }
