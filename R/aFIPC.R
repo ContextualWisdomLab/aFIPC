@@ -74,12 +74,13 @@ autoFIPC <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
     checkCorrect <- function() {
-      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-      if (!grepl("^[0-9]+$", n)) {
-        return(checkCorrect())
+      if (!interactive()) stop("Interactive session required for checking correct items")
+      repeat {
+        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
+        if (grepl("^[0-9]+$", n)) {
+          return(as.integer(n))
+        }
       }
-
-      return(as.integer(n))
     }
     confirm <- checkCorrect()
     if (confirm != 1) {
@@ -99,15 +100,16 @@ autoFIPC <-
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checkoldformBILOGprior())
+          if (!interactive()) stop("Interactive session required for oldform BILOG prior")
+          repeat {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
+              )
+            if (grepl("^[0-9]+$", n)) {
+              return(as.integer(n))
+            }
           }
-
-          return(as.integer(n))
         }
         oldformBILOGprior <- checkoldformBILOGprior()
         if (oldformBILOGprior == 1) {
@@ -310,15 +312,16 @@ autoFIPC <-
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checknewformBILOGprior())
+          if (!interactive()) stop("Interactive session required for newform BILOG prior")
+          repeat {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
+              )
+            if (grepl("^[0-9]+$", n)) {
+              return(as.integer(n))
+            }
           }
-
-          return(as.integer(n))
         }
         newformBILOGprior <- checknewformBILOGprior()
         if (newformBILOGprior == 1) {
