@@ -1,0 +1,4 @@
+## 2024-06-24 - [Infinite Recursion DoS in Interactive Prompts]
+**Vulnerability:** Unbounded recursion in interactive prompt functions (`checkCorrect`, `checkoldformBILOGprior`, `checknewformBILOGprior` in `R/aFIPC.R`) can lead to C stack overflow (Denial of Service) when executed in non-interactive environments where `readline()` returns empty or non-numeric inputs continuously.
+**Learning:** Legacy CLI scripts often assume interactive terminal sessions. Using recursion for input validation without bounds or environment checks (`interactive()`) causes crashes when run via automated scripts or CI pipelines.
+**Prevention:** Always verify `interactive()` before invoking `readline()`. Implement bounded loops or recursion limits (e.g., max attempts) for user input retries to fail gracefully rather than crashing with stack overflows.

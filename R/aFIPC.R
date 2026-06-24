@@ -73,10 +73,14 @@ autoFIPC <-
     correspondItems <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
-    checkCorrect <- function() {
+    checkCorrect <- function(attempts = 3) {
+      if (!interactive()) {
+        stop("Interactive session required for confirmation")
+      }
+      if (attempts <= 0) stop("Too many invalid attempts")
       n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
       if (!grepl("^[0-9]+$", n)) {
-        return(checkCorrect())
+        return(checkCorrect(attempts - 1))
       }
 
       return(as.integer(n))
@@ -98,13 +102,17 @@ autoFIPC <-
       # if Data is data.frame
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
-        checkoldformBILOGprior <- function() {
+        checkoldformBILOGprior <- function(attempts = 3) {
+          if (!interactive()) {
+            stop("Interactive session required for oldform BILOG prior configuration")
+          }
+          if (attempts <= 0) stop("Too many invalid attempts")
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
             )
           if (!grepl("^[0-9]+$", n)) {
-            return(checkoldformBILOGprior())
+            return(checkoldformBILOGprior(attempts - 1))
           }
 
           return(as.integer(n))
@@ -309,13 +317,17 @@ autoFIPC <-
     } else {
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
-        checknewformBILOGprior <- function() {
+        checknewformBILOGprior <- function(attempts = 3) {
+          if (!interactive()) {
+            stop("Interactive session required for newform BILOG prior configuration")
+          }
+          if (attempts <= 0) stop("Too many invalid attempts")
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
             )
           if (!grepl("^[0-9]+$", n)) {
-            return(checknewformBILOGprior())
+            return(checknewformBILOGprior(attempts - 1))
           }
 
           return(as.integer(n))
