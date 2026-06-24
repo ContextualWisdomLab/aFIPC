@@ -1,0 +1,4 @@
+## 2024-06-24 - DoS Risk via Infinite Recursion in Non-Interactive Environments
+**Vulnerability:** The legacy `checkCorrect`, `checkoldformBILOGprior`, and `checknewformBILOGprior` functions used `readline()` inside recursive calls without checking if the environment was interactive. In automated/non-interactive environments, `readline()` returns `""`, which causes the functions to infinitely recurse and consume all resources, leading to a Denial of Service (DoS) risk.
+**Learning:** Legacy R code often assumes interactive use. When these functions are executed by automated CI pipelines or background processes, `readline()` returns immediately with an empty string, creating an infinite loop if the response fails validation and triggers recursion.
+**Prevention:** Always use `if (!interactive()) return(default_value)` in any recursive functions that prompt for user input via `readline()`.
