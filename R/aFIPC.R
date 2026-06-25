@@ -546,20 +546,12 @@ autoFIPC <-
       IPDItemNamesNewForm <- vector()
 
       # IPD target item checking
+      new_cols_subset <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
+      old_cols_subset <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
       for (i in 1:length(oldformCommonItemNames)) {
         if (
-          (length(grep(
-            paste0('^', newformCommonItemNames[i], '$'),
-            colnames(newformXDataK[colnames(newFormModel@Data$data)])
-          )) ==
-            1) ==
-            TRUE &&
-            (length(grep(
-              paste0('^', oldformCommonItemNames[i], '$'),
-              colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-            )) ==
-              1) ==
-              TRUE
+          newformCommonItemNames[i] %in% new_cols_subset &&
+          oldformCommonItemNames[i] %in% old_cols_subset
         ) {
           IPDItemCount <- IPDItemCount + 1
           IPDItemNamesOldForm[IPDItemCount] <-
@@ -698,32 +690,18 @@ autoFIPC <-
       }
     }
 
+    new_cols_subset2 <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
+    old_cols_subset2 <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
     for (i in 1:length(oldformCommonItemNames)) {
       if (
-        (length(grep(
-          paste0('^', newformCommonItemNames[i], '$'),
-          colnames(newformXDataK[colnames(newFormModel@Data$data)])
-        )) ==
-          1) ==
-          TRUE &&
-          (length(grep(
-            paste0('^', oldformCommonItemNames[i], '$'),
-            colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-          )) ==
-            1) ==
-            TRUE &&
-          (length(levels(as.factor(
-            newFormModel@Data$data[, grep(
-              paste0('^', newformCommonItemNames[i], '$'),
-              colnames(newformXDataK[colnames(newFormModel@Data$data)])
-            )]
-          ))) ==
-            length(levels(as.factor(
-              oldFormModel@Data$data[, grep(
-                paste0('^', oldformCommonItemNames[i], '$'),
-                colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-              )]
-            ))))
+        newformCommonItemNames[i] %in% new_cols_subset2 &&
+        oldformCommonItemNames[i] %in% old_cols_subset2 &&
+        (length(unique(na.omit(
+          newFormModel@Data$data[, newformCommonItemNames[i]]
+        ))) ==
+          length(unique(na.omit(
+            oldFormModel@Data$data[, oldformCommonItemNames[i]]
+          ))))
       ) {
         message(
           'applying ',
