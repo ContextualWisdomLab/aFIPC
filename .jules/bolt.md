@@ -1,0 +1,3 @@
+## 2024-06-26 - Avoiding redundant MAP estimation (fscores) in aFIPC.R
+**Learning:** Calculating `fscores()` with `method='MAP'` is an expensive iterative estimation process for IRT models. The legacy code was performing this calculation twice per model: once implicitly via `fscores(..., method='MAP')` inside the `mirt::expected.test()` argument, and again immediately afterward to save the `Theta` values to variables.
+**Action:** Always look for opportunities to compute expensive, deterministic values once and reuse them. Specifically for `mirt` workflows, save the result of `fscores()` to a variable *before* calling downstream functions like `expected.test()` that require it, halving the MAP estimation overhead.

@@ -987,27 +987,27 @@ autoFIPC <-
     #   stop('Estimation failed. Please check test quality.')
     # }
 
+    # calculate theta (bolt: perform this before expected.test to avoid duplicate fscores computation)
+    ThetaOldform <- fscores(oldFormModel, method = 'MAP')
+    ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
+    ThetaNewform <- fscores(newFormModel, method = 'MAP')
+
     # calculate expected score
     ExpectedScoreOldform <-
       mirt::expected.test(
         x = oldFormModel,
-        Theta = fscores(oldFormModel, method = 'MAP')
+        Theta = ThetaOldform
       )
     ExpectedScoreLinkedform <-
       mirt::expected.test(
         x = LinkedModel,
-        Theta = fscores(LinkedModel, method = 'MAP')
+        Theta = ThetaLinkedform
       )
     ExpectedScoreNewform <-
       mirt::expected.test(
         x = newFormModel,
-        Theta = fscores(newFormModel, method = 'MAP')
+        Theta = ThetaNewform
       )
-
-    # calculate theta
-    ThetaOldform <- fscores(oldFormModel, method = 'MAP')
-    ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
-    ThetaNewform <- fscores(newFormModel, method = 'MAP')
 
     # save results as object
     modelReturn <- new.env()
