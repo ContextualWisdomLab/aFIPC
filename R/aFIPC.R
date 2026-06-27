@@ -74,12 +74,15 @@ autoFIPC <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
     checkCorrect <- function() {
-      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-      if (!grepl("^[0-9]+$", n)) {
-        return(checkCorrect())
+      attempts <- 0
+      while (attempts < 5) {
+        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
+        if (grepl("^[0-9]+$", n)) {
+          return(as.integer(n))
+        }
+        attempts <- attempts + 1
       }
-
-      return(as.integer(n))
+      stop("Too many invalid input attempts")
     }
     confirm <- checkCorrect()
     if (confirm != 1) {
@@ -99,15 +102,18 @@ autoFIPC <-
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checkoldformBILOGprior())
+          attempts <- 0
+          while (attempts < 5) {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
+              )
+            if (grepl("^[0-9]+$", n)) {
+              return(as.integer(n))
+            }
+            attempts <- attempts + 1
           }
-
-          return(as.integer(n))
+          stop("Too many invalid input attempts")
         }
         oldformBILOGprior <- checkoldformBILOGprior()
         if (oldformBILOGprior == 1) {
@@ -310,15 +316,18 @@ autoFIPC <-
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checknewformBILOGprior())
+          attempts <- 0
+          while (attempts < 5) {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
+              )
+            if (grepl("^[0-9]+$", n)) {
+              return(as.integer(n))
+            }
+            attempts <- attempts + 1
           }
-
-          return(as.integer(n))
+          stop("Too many invalid input attempts")
         }
         newformBILOGprior <- checknewformBILOGprior()
         if (newformBILOGprior == 1) {
