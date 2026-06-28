@@ -75,8 +75,8 @@ autoFIPC <-
 
     checkCorrect <- function() {
       n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-      if (!grepl("^[0-9]+$", n)) {
-        return(checkCorrect())
+      while (!grepl("^[0-9]+$", n)) {
+        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
       }
 
       return(as.integer(n))
@@ -103,8 +103,11 @@ autoFIPC <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
             )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checkoldformBILOGprior())
+          while (!grepl("^[0-9]+$", n)) {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
+              )
           }
 
           return(as.integer(n))
@@ -314,8 +317,11 @@ autoFIPC <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
             )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checknewformBILOGprior())
+          while (!grepl("^[0-9]+$", n)) {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
+              )
           }
 
           return(as.integer(n))
