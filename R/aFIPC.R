@@ -73,17 +73,18 @@ autoFIPC <-
     correspondItems <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
-    checkCorrect <- function() {
-      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-      if (!grepl("^[0-9]+$", n)) {
-        return(checkCorrect())
+    if (interactive()) {
+      checkCorrect <- function() {
+        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
+        if (!grepl("^[0-9]+$", n)) {
+          return(checkCorrect())
+        }
+        return(as.integer(n))
       }
-
-      return(as.integer(n))
-    }
-    confirm <- checkCorrect()
-    if (confirm != 1) {
-      stop('Please write down pairs correctly')
+      confirm <- checkCorrect()
+      if (confirm != 1) {
+        stop('Please write down pairs correctly')
+      }
     }
 
     # estimate models for calibration
@@ -98,20 +99,24 @@ autoFIPC <-
       # if Data is data.frame
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
-        checkoldformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checkoldformBILOGprior())
-          }
+        if (interactive()) {
+          checkoldformBILOGprior <- function() {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
+              )
+            if (!grepl("^[0-9]+$", n)) {
+              return(checkoldformBILOGprior())
+            }
 
-          return(as.integer(n))
-        }
-        oldformBILOGprior <- checkoldformBILOGprior()
-        if (oldformBILOGprior == 1) {
-          oldformBILOGprior <- TRUE
+            return(as.integer(n))
+          }
+          oldformBILOGprior <- checkoldformBILOGprior()
+          if (oldformBILOGprior == 1) {
+            oldformBILOGprior <- TRUE
+          } else {
+            oldformBILOGprior <- FALSE
+          }
         } else {
           oldformBILOGprior <- FALSE
         }
@@ -309,20 +314,24 @@ autoFIPC <-
     } else {
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
-        checknewformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checknewformBILOGprior())
-          }
+        if (interactive()) {
+          checknewformBILOGprior <- function() {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
+              )
+            if (!grepl("^[0-9]+$", n)) {
+              return(checknewformBILOGprior())
+            }
 
-          return(as.integer(n))
-        }
-        newformBILOGprior <- checknewformBILOGprior()
-        if (newformBILOGprior == 1) {
-          newformBILOGprior <- TRUE
+            return(as.integer(n))
+          }
+          newformBILOGprior <- checknewformBILOGprior()
+          if (newformBILOGprior == 1) {
+            newformBILOGprior <- TRUE
+          } else {
+            newformBILOGprior <- FALSE
+          }
         } else {
           newformBILOGprior <- FALSE
         }
@@ -548,24 +557,12 @@ autoFIPC <-
       # IPD target item checking
       for (i in 1:length(oldformCommonItemNames)) {
         if (
-          (length(grep(
-            paste0('^', newformCommonItemNames[i], '$'),
-            colnames(newformXDataK[colnames(newFormModel@Data$data)])
-          )) ==
-            1) ==
-            TRUE &&
-            (length(grep(
-              paste0('^', oldformCommonItemNames[i], '$'),
-              colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-            )) ==
-              1) ==
-              TRUE
+          newformCommonItemNames[i] %in% colnames(newFormModel@Data$data) &&
+          oldformCommonItemNames[i] %in% colnames(oldFormModel@Data$data)
         ) {
           IPDItemCount <- IPDItemCount + 1
-          IPDItemNamesOldForm[IPDItemCount] <-
-            names(oldformYDataK[oldformCommonItemNames[i]])
-          IPDItemNamesNewForm[IPDItemCount] <-
-            names(newformXDataK[newformCommonItemNames[i]])
+          IPDItemNamesOldForm[IPDItemCount] <- oldformCommonItemNames[i]
+          IPDItemNamesNewForm[IPDItemCount] <- newformCommonItemNames[i]
         } else {}
       }
 
@@ -573,15 +570,19 @@ autoFIPC <-
       IPDItemList <-
         data.frame(rbind(IPDItemNamesOldForm, IPDItemNamesNewForm))
 
-      IPDData <-
-        data.frame(matrix(nrow = length(IPDgroup), ncol = IPDItemCount))
-      colnames(IPDData) <- paste0('X', 1:IPDItemCount)
-      print(IPDItemNamesOldForm)
-      print(IPDItemNamesNewForm)
-      IPDData[1:nrow(oldformYDataK), ] <-
-        oldformYDataK[, IPDItemNamesOldForm]
-      IPDData[nrow(oldformYDataK) + 1:nrow(newformXDataK), ] <-
-        newformXDataK[, IPDItemNamesNewForm]
+      if (IPDItemCount > 0) {
+        IPDData <-
+          data.frame(matrix(nrow = length(IPDgroup), ncol = IPDItemCount))
+        colnames(IPDData) <- paste0('X', 1:IPDItemCount)
+        print(IPDItemNamesOldForm)
+        print(IPDItemNamesNewForm)
+        IPDData[1:nrow(oldformYDataK), ] <-
+          as.data.frame(oldformYDataK)[, IPDItemNamesOldForm, drop=FALSE]
+        IPDData[nrow(oldformYDataK) + 1:nrow(newformXDataK), ] <-
+          as.data.frame(newformXDataK)[, IPDItemNamesNewForm, drop=FALSE]
+      } else {
+        IPDData <- data.frame(matrix(nrow = length(IPDgroup), ncol = 0))
+      }
 
       # IPD estimation
       IPDParmNames <- OldScaleParms$name
@@ -700,30 +701,14 @@ autoFIPC <-
 
     for (i in 1:length(oldformCommonItemNames)) {
       if (
-        (length(grep(
-          paste0('^', newformCommonItemNames[i], '$'),
-          colnames(newformXDataK[colnames(newFormModel@Data$data)])
-        )) ==
-          1) ==
-          TRUE &&
-          (length(grep(
-            paste0('^', oldformCommonItemNames[i], '$'),
-            colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-          )) ==
-            1) ==
-            TRUE &&
-          (length(levels(as.factor(
-            newFormModel@Data$data[, grep(
-              paste0('^', newformCommonItemNames[i], '$'),
-              colnames(newformXDataK[colnames(newFormModel@Data$data)])
-            )]
-          ))) ==
-            length(levels(as.factor(
-              oldFormModel@Data$data[, grep(
-                paste0('^', oldformCommonItemNames[i], '$'),
-                colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-              )]
-            ))))
+        newformCommonItemNames[i] %in% colnames(newFormModel@Data$data) &&
+        oldformCommonItemNames[i] %in% colnames(oldFormModel@Data$data) &&
+        (length(levels(as.factor(
+          newFormModel@Data$data[, newformCommonItemNames[i]]
+        ))) ==
+          length(levels(as.factor(
+            oldFormModel@Data$data[, oldformCommonItemNames[i]]
+          ))))
       ) {
         message(
           'applying ',
@@ -847,7 +832,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
+          ncol(as.data.frame(newformXDataK)[colnames(newFormModel@Data$data)]),
           '\n',
           'MEAN = F1'
         ))
@@ -860,7 +845,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
+          ncol(as.data.frame(newformXDataK)[colnames(newFormModel@Data$data)]),
           '\n'
         ))
     }
@@ -880,7 +865,7 @@ autoFIPC <-
 
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = as.data.frame(newformXDataK)[colnames(newFormModel@Data$data)],
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'EM',
@@ -900,7 +885,7 @@ autoFIPC <-
       } else {
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = as.data.frame(newformXDataK)[colnames(newFormModel@Data$data)],
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'EM',
@@ -927,7 +912,7 @@ autoFIPC <-
         # LinkedModel <- oldFormModel
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = as.data.frame(newformXDataK)[colnames(newFormModel@Data$data)],
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'MHRM',
@@ -947,7 +932,7 @@ autoFIPC <-
       } else {
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = as.data.frame(newformXDataK)[colnames(newFormModel@Data$data)],
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'MHRM',
