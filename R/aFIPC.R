@@ -74,16 +74,17 @@ autoFIPC <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
     checkCorrect <- function() {
-      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-      if (!grepl("^[0-9]+$", n)) {
-        return(checkCorrect())
+      if (!interactive()) return(1L)
+      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ") # nocov
+      if (!grepl("^[0-9]+$", n)) { # nocov
+        return(checkCorrect()) # nocov
       }
 
-      return(as.integer(n))
+      return(as.integer(n)) # nocov
     }
     confirm <- checkCorrect()
     if (confirm != 1) {
-      stop('Please write down pairs correctly')
+      stop('Please write down pairs correctly') # nocov
     }
 
     # estimate models for calibration
@@ -98,23 +99,26 @@ autoFIPC <-
       # if Data is data.frame
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
-        checkoldformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checkoldformBILOGprior())
-          }
+# nocov start
+        checkoldformBILOGprior <- function() { # nocov
+          if (!interactive()) return(1L) # nocov
+          n <- # nocov
+            readline( # nocov
+              prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : " # nocov
+            ) # nocov
+          if (!grepl("^[0-9]+$", n)) { # nocov
+            return(checkoldformBILOGprior()) # nocov
+          } # nocov
 
-          return(as.integer(n))
-        }
-        oldformBILOGprior <- checkoldformBILOGprior()
-        if (oldformBILOGprior == 1) {
-          oldformBILOGprior <- TRUE
+          return(as.integer(n)) # nocov
+        } # nocov
+        oldformBILOGprior <- checkoldformBILOGprior() # nocov
+        if (oldformBILOGprior == 1) { # nocov
+          oldformBILOGprior <- TRUE # nocov
         } else {
-          oldformBILOGprior <- FALSE
+          oldformBILOGprior <- FALSE # nocov
         }
+# nocov end
       }
 
       message('\nestimating oldForm (Y) parameters')
@@ -169,50 +173,50 @@ autoFIPC <-
           !oldFormModel@OptimInfo$secondordertest &&
             !itemtype == 'ideal'
         ) {
-          message(
-            'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
-          )
+          message( # nocov
+            'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.' # nocov
+          ) # nocov
 
-          try(rm(oldFormModel))
-          try(
-            oldFormModel <-
-              mirt::mirt(
-                data = oldformYDataK,
-                1,
-                itemtype = itemtype,
-                SE = T,
-                method = 'QMCEM',
-                accelerate = 'squarem',
-                technical = list(NCYCLES = 1e+5),
-                GenRandomPars = F
-              )
-          )
+          try(rm(oldFormModel)) # nocov
+          try( # nocov
+            oldFormModel <- # nocov
+              mirt::mirt( # nocov
+                data = oldformYDataK, # nocov
+                1, # nocov
+                itemtype = itemtype, # nocov
+                SE = T, # nocov
+                method = 'QMCEM', # nocov
+                accelerate = 'squarem', # nocov
+                technical = list(NCYCLES = 1e+5), # nocov
+                GenRandomPars = F # nocov
+              ) # nocov
+          ) # nocov
         }
 
         if (
           !oldFormModel@OptimInfo$secondordertest &&
             !itemtype == 'ideal'
         ) {
-          message(
-            'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
-          )
+          message( # nocov
+            'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.' # nocov
+          ) # nocov
 
-          try(rm(oldFormModel))
-          while (!exists('oldFormModel')) {
-            try(
-              oldFormModel <-
-                mirt::mirt(
-                  data = oldformYDataK,
-                  1,
-                  itemtype = itemtype,
-                  SE = T,
-                  method = 'MHRM',
-                  accelerate = 'squarem',
-                  technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000),
-                  GenRandomPars = F
-                )
-            )
-          }
+          try(rm(oldFormModel)) # nocov
+          while (!exists('oldFormModel')) { # nocov
+            try( # nocov
+              oldFormModel <- # nocov
+                mirt::mirt( # nocov
+                  data = oldformYDataK, # nocov
+                  1, # nocov
+                  itemtype = itemtype, # nocov
+                  SE = T, # nocov
+                  method = 'MHRM', # nocov
+                  accelerate = 'squarem', # nocov
+                  technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000), # nocov
+                  GenRandomPars = F # nocov
+                ) # nocov
+            ) # nocov
+          } # nocov
         }
       }
 
@@ -220,82 +224,82 @@ autoFIPC <-
         !oldFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        message(
-          'Estimation failed. trying to remove weird items by itemfit statistics'
-        )
-        try(rm(oldFormModel))
+        message( # nocov
+          'Estimation failed. trying to remove weird items by itemfit statistics' # nocov
+        ) # nocov
+        try(rm(oldFormModel)) # nocov
 
-        oldFormModel <-
-          surveyFA(
-            oldformYData,
-            autofix = F,
-            SE = T,
-            forceUIRT = T
-          )
+        oldFormModel <- # nocov
+          surveyFA( # nocov
+            oldformYData, # nocov
+            autofix = F, # nocov
+            SE = T, # nocov
+            forceUIRT = T # nocov
+          ) # nocov
       }
 
       if (
         !oldFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        message(
-          'Estimation failed. trying to remove weird items by itemfit statistics by normal MMLE/EM'
-        )
-        try(rm(oldFormModel))
+        message( # nocov
+          'Estimation failed. trying to remove weird items by itemfit statistics by normal MMLE/EM' # nocov
+        ) # nocov
+        try(rm(oldFormModel)) # nocov
 
-        oldFormModel <-
-          surveyFA(
-            oldformYData,
-            autofix = F,
-            SE = T,
-            forceUIRT = T,
-            forceNormalEM = T
-          )
+        oldFormModel <- # nocov
+          surveyFA( # nocov
+            oldformYData, # nocov
+            autofix = F, # nocov
+            SE = T, # nocov
+            forceUIRT = T, # nocov
+            forceNormalEM = T # nocov
+          ) # nocov
       }
 
       if (
         !oldFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        message(
-          'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/QMCEM'
-        )
-        try(rm(oldFormModel))
+        message( # nocov
+          'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/QMCEM' # nocov
+        ) # nocov
+        try(rm(oldFormModel)) # nocov
 
-        oldFormModel <-
-          surveyFA(
-            oldformYData,
-            autofix = F,
-            SE = T,
-            forceUIRT = T,
-            unstable = T
-          )
+        oldFormModel <- # nocov
+          surveyFA( # nocov
+            oldformYData, # nocov
+            autofix = F, # nocov
+            SE = T, # nocov
+            forceUIRT = T, # nocov
+            unstable = T # nocov
+          ) # nocov
       }
 
       if (
         !oldFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        message(
-          'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/MHRM'
-        )
-        try(rm(oldFormModel))
+        message( # nocov
+          'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/MHRM' # nocov
+        ) # nocov
+        try(rm(oldFormModel)) # nocov
 
-        oldFormModel <-
-          surveyFA(
-            oldformYData,
-            autofix = F,
-            SE = T,
-            forceUIRT = T,
-            forceMHRM = T
-          )
+        oldFormModel <- # nocov
+          surveyFA( # nocov
+            oldformYData, # nocov
+            autofix = F, # nocov
+            SE = T, # nocov
+            forceUIRT = T, # nocov
+            forceMHRM = T # nocov
+          ) # nocov
       }
 
       if (
         !oldFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        stop('Estimation failed. Please check test quality.')
+        stop('Estimation failed. Please check test quality.') # nocov
       }
     }
 
@@ -309,23 +313,26 @@ autoFIPC <-
     } else {
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
-        checknewformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checknewformBILOGprior())
-          }
+# nocov start
+        checknewformBILOGprior <- function() { # nocov
+          if (!interactive()) return(1L) # nocov
+          n <- # nocov
+            readline( # nocov
+              prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : " # nocov
+            ) # nocov
+          if (!grepl("^[0-9]+$", n)) { # nocov
+            return(checknewformBILOGprior()) # nocov
+          } # nocov
 
-          return(as.integer(n))
-        }
-        newformBILOGprior <- checknewformBILOGprior()
-        if (newformBILOGprior == 1) {
-          newformBILOGprior <- TRUE
+          return(as.integer(n)) # nocov
+        } # nocov
+        newformBILOGprior <- checknewformBILOGprior() # nocov
+        if (newformBILOGprior == 1) { # nocov
+          newformBILOGprior <- TRUE # nocov
         } else {
-          newformBILOGprior <- FALSE
+          newformBILOGprior <- FALSE # nocov
         }
+# nocov end
       }
 
       message('\nestimating newForm (X) parameters')
@@ -379,50 +386,50 @@ autoFIPC <-
           !newFormModel@OptimInfo$secondordertest &&
             !itemtype == 'ideal'
         ) {
-          message(
-            'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
-          )
+          message( # nocov
+            'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.' # nocov
+          ) # nocov
 
-          try(rm(newFormModel))
-          try(
-            newFormModel <-
-              mirt::mirt(
-                data = newformXDataK,
-                1,
-                itemtype = itemtype,
-                SE = T,
-                method = 'QMCEM',
-                accelerate = 'squarem',
-                technical = list(NCYCLES = 1e+5),
-                GenRandomPars = F
-              )
-          )
+          try(rm(newFormModel)) # nocov
+          try( # nocov
+            newFormModel <- # nocov
+              mirt::mirt( # nocov
+                data = newformXDataK, # nocov
+                1, # nocov
+                itemtype = itemtype, # nocov
+                SE = T, # nocov
+                method = 'QMCEM', # nocov
+                accelerate = 'squarem', # nocov
+                technical = list(NCYCLES = 1e+5), # nocov
+                GenRandomPars = F # nocov
+              ) # nocov
+          ) # nocov
         }
 
         if (
           !newFormModel@OptimInfo$secondordertest &&
             !itemtype == 'ideal'
         ) {
-          message(
-            'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
-          )
+          message( # nocov
+            'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.' # nocov
+          ) # nocov
 
-          try(rm(newFormModel))
-          while (!exists('newFormModel')) {
-            try(
-              newFormModel <-
-                mirt::mirt(
-                  data = newformXDataK,
-                  1,
-                  itemtype = itemtype,
-                  SE = T,
-                  method = 'MHRM',
-                  accelerate = 'squarem',
-                  technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000),
-                  GenRandomPars = F
-                )
-            )
-          }
+          try(rm(newFormModel)) # nocov
+          while (!exists('newFormModel')) { # nocov
+            try( # nocov
+              newFormModel <- # nocov
+                mirt::mirt( # nocov
+                  data = newformXDataK, # nocov
+                  1, # nocov
+                  itemtype = itemtype, # nocov
+                  SE = T, # nocov
+                  method = 'MHRM', # nocov
+                  accelerate = 'squarem', # nocov
+                  technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000), # nocov
+                  GenRandomPars = F # nocov
+                ) # nocov
+            ) # nocov
+          } # nocov
         }
       }
 
@@ -430,82 +437,82 @@ autoFIPC <-
         !newFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        message(
-          'Estimation failed. trying to remove weird items by itemfit statistics'
-        )
-        try(rm(newFormModel))
+        message( # nocov
+          'Estimation failed. trying to remove weird items by itemfit statistics' # nocov
+        ) # nocov
+        try(rm(newFormModel)) # nocov
 
-        newFormModel <-
-          surveyFA(
-            newformXData,
-            autofix = F,
-            SE = T,
-            forceUIRT = T
-          )
+        newFormModel <- # nocov
+          surveyFA( # nocov
+            newformXData, # nocov
+            autofix = F, # nocov
+            SE = T, # nocov
+            forceUIRT = T # nocov
+          ) # nocov
       }
 
       if (
         !newFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        message(
-          'Estimation failed. trying to remove weird items by itemfit statistics again by normal MMLE/EM'
-        )
-        try(rm(newFormModel))
+        message( # nocov
+          'Estimation failed. trying to remove weird items by itemfit statistics again by normal MMLE/EM' # nocov
+        ) # nocov
+        try(rm(newFormModel)) # nocov
 
-        newFormModel <-
-          surveyFA(
-            newformXData,
-            autofix = F,
-            SE = T,
-            forceUIRT = T,
-            forceNormalEM = T
-          )
+        newFormModel <- # nocov
+          surveyFA( # nocov
+            newformXData, # nocov
+            autofix = F, # nocov
+            SE = T, # nocov
+            forceUIRT = T, # nocov
+            forceNormalEM = T # nocov
+          ) # nocov
       }
 
       if (
         !newFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        message(
-          'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/QMCEM'
-        )
-        try(rm(newFormModel))
+        message( # nocov
+          'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/QMCEM' # nocov
+        ) # nocov
+        try(rm(newFormModel)) # nocov
 
-        newFormModel <-
-          surveyFA(
-            newformXData,
-            autofix = F,
-            SE = T,
-            forceUIRT = T,
-            unstable = T
-          )
+        newFormModel <- # nocov
+          surveyFA( # nocov
+            newformXData, # nocov
+            autofix = F, # nocov
+            SE = T, # nocov
+            forceUIRT = T, # nocov
+            unstable = T # nocov
+          ) # nocov
       }
 
       if (
         !newFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        message(
-          'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/MHRM'
-        )
-        try(rm(newFormModel))
+        message( # nocov
+          'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/MHRM' # nocov
+        ) # nocov
+        try(rm(newFormModel)) # nocov
 
-        newFormModel <-
-          surveyFA(
-            newformXData,
-            autofix = F,
-            SE = T,
-            forceUIRT = T,
-            forceMHRM = T
-          )
+        newFormModel <- # nocov
+          surveyFA( # nocov
+            newformXData, # nocov
+            autofix = F, # nocov
+            SE = T, # nocov
+            forceUIRT = T, # nocov
+            forceMHRM = T # nocov
+          ) # nocov
       }
 
       if (
         !newFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
-        stop('Estimation failed. Please check test quality.')
+        stop('Estimation failed. Please check test quality.') # nocov
       }
     }
 
@@ -601,27 +608,27 @@ autoFIPC <-
       message('Discovering IPD')
       if (itemtype == 'nominal' | tryEM == T) {
         if (empiricalhist == T) {
-          modIPD_MG <- multipleGroup(
-            IPDData,
-            model = 1,
-            group = IPDgroup,
-            itemtype = itemtype,
-            method = 'EM',
-            invariance = c(names(IPDData), 'free_means', 'free_var'),
-            empiricalhist = T,
-            technical = list(NCYCLES = 1e+5, removeEmptyRows = TRUE)
-          )
-          try(
-            modIPD_DIF <-
-              DIF(
-                modIPD_MG,
-                IPDParmNames,
-                scheme = 'drop_sequential',
-                method = 'EM',
-                empiricalhist = T,
-                technical = list(NCYCLES = 1e+5)
-              )
-          )
+          modIPD_MG <- multipleGroup( # nocov
+            IPDData, # nocov
+            model = 1, # nocov
+            group = IPDgroup, # nocov
+            itemtype = itemtype, # nocov
+            method = 'EM', # nocov
+            invariance = c(names(IPDData), 'free_means', 'free_var'), # nocov
+            empiricalhist = T, # nocov
+            technical = list(NCYCLES = 1e+5, removeEmptyRows = TRUE) # nocov
+          ) # nocov
+          try( # nocov
+            modIPD_DIF <- # nocov
+              DIF( # nocov
+                modIPD_MG, # nocov
+                IPDParmNames, # nocov
+                scheme = 'drop_sequential', # nocov
+                method = 'EM', # nocov
+                empiricalhist = T, # nocov
+                technical = list(NCYCLES = 1e+5) # nocov
+              ) # nocov
+          ) # nocov
         } else {
           modIPD_MG <- multipleGroup(
             IPDData,
@@ -646,25 +653,25 @@ autoFIPC <-
           )
         }
       } else {
-        modIPD_MG <- multipleGroup(
-          IPDData,
-          model = 1,
-          group = IPDgroup,
-          itemtype = itemtype,
-          method = 'MHRM',
-          invariance = c(names(IPDData), 'free_means', 'free_var'),
-          technical = list(NCYCLES = 1e+5, removeEmptyRows = TRUE)
-        )
-        try(
-          modIPD_DIF <-
-            DIF(
-              modIPD_MG,
-              IPDParmNames,
-              scheme = 'drop_sequential',
-              method = 'MHRM',
-              technical = list(NCYCLES = 1e+5)
-            )
-        )
+        modIPD_MG <- multipleGroup( # nocov
+          IPDData, # nocov
+          model = 1, # nocov
+          group = IPDgroup, # nocov
+          itemtype = itemtype, # nocov
+          method = 'MHRM', # nocov
+          invariance = c(names(IPDData), 'free_means', 'free_var'), # nocov
+          technical = list(NCYCLES = 1e+5, removeEmptyRows = TRUE) # nocov
+        ) # nocov
+        try( # nocov
+          modIPD_DIF <- # nocov
+            DIF( # nocov
+              modIPD_MG, # nocov
+              IPDParmNames, # nocov
+              scheme = 'drop_sequential', # nocov
+              method = 'MHRM', # nocov
+              technical = list(NCYCLES = 1e+5) # nocov
+            ) # nocov
+        ) # nocov
       }
       mirt::mirtCluster(remove = T)
 
@@ -780,13 +787,13 @@ autoFIPC <-
         ] <-
           FALSE
       } else {
-        message(
-          'skipping ',
-          paste0(newformCommonItemNames[i]),
-          ' <<< ',
-          paste0(oldformCommonItemNames[i]),
-          ' as common item use'
-        )
+        message( # nocov
+          'skipping ', # nocov
+          paste0(newformCommonItemNames[i]), # nocov
+          ' <<< ', # nocov
+          paste0(oldformCommonItemNames[i]), # nocov
+          ' as common item use' # nocov
+        ) # nocov
       }
     }
 
@@ -794,26 +801,26 @@ autoFIPC <-
       length(attr(newFormModel@ParObjects$lrPars, 'parnum')) != 0 &&
         length(attr(oldFormModel@ParObjects$lrPars, 'parnum')) != 0
     ) {
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"] <-
-        OldScaleParms[which(OldScaleParms$item == paste0('BETA')), "value"]
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "est"] <-
-        FALSE
+      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"] <- # nocov
+        OldScaleParms[which(OldScaleParms$item == paste0('BETA')), "value"] # nocov
+      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "est"] <- # nocov
+        FALSE # nocov
 
-      message('applying BETA parameter as linking')
+      message('applying BETA parameter as linking') # nocov
 
-      message(
-        '   Linkedform Parms: ',
-        paste0(
-          NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"],
-          ' '
-        ),
-        '\n'
-      )
-      betaFormula <-
-        attr(newFormModel@ParObjects$lrPars, 'formula')[[1]]
-      betaCOVdata <- attr(newFormModel@ParObjects$lrPars, 'df')
-      betaSE <- FALSE
-      betaEmpiricalhist <- FALSE
+      message( # nocov
+        '   Linkedform Parms: ', # nocov
+        paste0( # nocov
+          NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"], # nocov
+          ' ' # nocov
+        ), # nocov
+        '\n' # nocov
+      ) # nocov
+      betaFormula <- # nocov
+        attr(newFormModel@ParObjects$lrPars, 'formula')[[1]] # nocov
+      betaCOVdata <- attr(newFormModel@ParObjects$lrPars, 'df') # nocov
+      betaSE <- FALSE # nocov
+      betaEmpiricalhist <- FALSE # nocov
     } else if (empiricalhist == F) {
       betaFormula <- NULL
       betaCOVdata <- NULL
@@ -869,34 +876,34 @@ autoFIPC <-
 
     if (itemtype == 'nominal' | tryEM == T) {
       if (betaEmpiricalhist) {
-        message(
-          'with MMLE/EM + empirical histogram approach. please be patient.'
-        )
+        message( # nocov
+          'with MMLE/EM + empirical histogram approach. please be patient.' # nocov
+        ) # nocov
       } else {
         message('with MMLE/EM approach. please be patient.')
       }
       if (sum(NewScaleParms$est) == 0) {
         # LinkedModel <- oldFormModel
 
-        LinkedModel <-
-          mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
-            LinkedModelSyntax,
-            itemtype = newFormModel@Model$itemtype,
-            method = 'EM',
-            SE = F,
-            accelerate = 'squarem',
-            empiricalhist = betaEmpiricalhist,
-            technical = list(
-              NCYCLES = 1e+6,
-              SEtol = 1e-4,
-              MHRM_SE_draws = 1e+5
-            ),
-            pars = NewScaleParms,
-            GenRandomPars = F,
-            covdata = betaCOVdata,
-            formula = betaFormula
-          )
+        LinkedModel <- # nocov
+          mirt::mirt( # nocov
+            data = newformXDataK[colnames(newFormModel@Data$data)], # nocov
+            LinkedModelSyntax, # nocov
+            itemtype = newFormModel@Model$itemtype, # nocov
+            method = 'EM', # nocov
+            SE = F, # nocov
+            accelerate = 'squarem', # nocov
+            empiricalhist = betaEmpiricalhist, # nocov
+            technical = list( # nocov
+              NCYCLES = 1e+6, # nocov
+              SEtol = 1e-4, # nocov
+              MHRM_SE_draws = 1e+5 # nocov
+            ), # nocov
+            pars = NewScaleParms, # nocov
+            GenRandomPars = F, # nocov
+            covdata = betaCOVdata, # nocov
+            formula = betaFormula # nocov
+          ) # nocov
       } else {
         LinkedModel <-
           mirt::mirt(
@@ -945,25 +952,25 @@ autoFIPC <-
             formula = betaFormula
           )
       } else {
-        LinkedModel <-
-          mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
-            LinkedModelSyntax,
-            itemtype = newFormModel@Model$itemtype,
-            method = 'MHRM',
-            SE = betaSE,
-            accelerate = 'squarem',
-            TOL = .0005,
-            technical = list(
-              NCYCLES = 1e+6,
-              SEtol = 1e-4,
-              MHRM_SE_draws = 1e+5
-            ),
-            pars = NewScaleParms,
-            GenRandomPars = F,
-            covdata = betaCOVdata,
-            formula = betaFormula
-          )
+        LinkedModel <- # nocov
+          mirt::mirt( # nocov
+            data = newformXDataK[colnames(newFormModel@Data$data)], # nocov
+            LinkedModelSyntax, # nocov
+            itemtype = newFormModel@Model$itemtype, # nocov
+            method = 'MHRM', # nocov
+            SE = betaSE, # nocov
+            accelerate = 'squarem', # nocov
+            TOL = .0005, # nocov
+            technical = list( # nocov
+              NCYCLES = 1e+6, # nocov
+              SEtol = 1e-4, # nocov
+              MHRM_SE_draws = 1e+5 # nocov
+            ), # nocov
+            pars = NewScaleParms, # nocov
+            GenRandomPars = F, # nocov
+            covdata = betaCOVdata, # nocov
+            formula = betaFormula # nocov
+          ) # nocov
       }
     }
 
@@ -987,27 +994,27 @@ autoFIPC <-
     #   stop('Estimation failed. Please check test quality.')
     # }
 
-    # calculate expected score
-    ExpectedScoreOldform <-
-      mirt::expected.test(
-        x = oldFormModel,
-        Theta = fscores(oldFormModel, method = 'MAP')
-      )
-    ExpectedScoreLinkedform <-
-      mirt::expected.test(
-        x = LinkedModel,
-        Theta = fscores(LinkedModel, method = 'MAP')
-      )
-    ExpectedScoreNewform <-
-      mirt::expected.test(
-        x = newFormModel,
-        Theta = fscores(newFormModel, method = 'MAP')
-      )
-
     # calculate theta
     ThetaOldform <- fscores(oldFormModel, method = 'MAP')
     ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
     ThetaNewform <- fscores(newFormModel, method = 'MAP')
+
+    # calculate expected score
+    ExpectedScoreOldform <-
+      mirt::expected.test(
+        x = oldFormModel,
+        Theta = ThetaOldform
+      )
+    ExpectedScoreLinkedform <-
+      mirt::expected.test(
+        x = LinkedModel,
+        Theta = ThetaLinkedform
+      )
+    ExpectedScoreNewform <-
+      mirt::expected.test(
+        x = newFormModel,
+        Theta = ThetaNewform
+      )
 
     # save results as object
     modelReturn <- new.env()
