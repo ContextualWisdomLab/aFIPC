@@ -1,6 +1,7 @@
 #' automated fixed item parameter linking
 #'
 #' @import mirt
+#' @importFrom stats na.omit
 #' @param newformXData new form data X
 #' @param oldformYData old form (base form) data Y
 #' @param newformCommonItemNames Common item variable names in new form data
@@ -22,7 +23,7 @@
 #' @export
 #'
 #' @examples
-#' \donotrun{
+#' \dontrun{
 #' autoFIPC() ## FIXME
 #' }
 autoFIPC <-
@@ -548,18 +549,8 @@ autoFIPC <-
       # IPD target item checking
       for (i in 1:length(oldformCommonItemNames)) {
         if (
-          (length(grep(
-            paste0('^', newformCommonItemNames[i], '$'),
-            colnames(newformXDataK[colnames(newFormModel@Data$data)])
-          )) ==
-            1) ==
-            TRUE &&
-            (length(grep(
-              paste0('^', oldformCommonItemNames[i], '$'),
-              colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-            )) ==
-              1) ==
-              TRUE
+          newformCommonItemNames[i] %in% colnames(newFormModel@Data$data) &&
+          oldformCommonItemNames[i] %in% colnames(oldFormModel@Data$data)
         ) {
           IPDItemCount <- IPDItemCount + 1
           IPDItemNamesOldForm[IPDItemCount] <-
@@ -700,30 +691,10 @@ autoFIPC <-
 
     for (i in 1:length(oldformCommonItemNames)) {
       if (
-        (length(grep(
-          paste0('^', newformCommonItemNames[i], '$'),
-          colnames(newformXDataK[colnames(newFormModel@Data$data)])
-        )) ==
-          1) ==
-          TRUE &&
-          (length(grep(
-            paste0('^', oldformCommonItemNames[i], '$'),
-            colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-          )) ==
-            1) ==
-            TRUE &&
-          (length(levels(as.factor(
-            newFormModel@Data$data[, grep(
-              paste0('^', newformCommonItemNames[i], '$'),
-              colnames(newformXDataK[colnames(newFormModel@Data$data)])
-            )]
-          ))) ==
-            length(levels(as.factor(
-              oldFormModel@Data$data[, grep(
-                paste0('^', oldformCommonItemNames[i], '$'),
-                colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
-              )]
-            ))))
+        newformCommonItemNames[i] %in% colnames(newFormModel@Data$data) &&
+        oldformCommonItemNames[i] %in% colnames(oldFormModel@Data$data) &&
+        length(unique(na.omit(newFormModel@Data$data[, newformCommonItemNames[i]]))) ==
+        length(unique(na.omit(oldFormModel@Data$data[, oldformCommonItemNames[i]])))
       ) {
         message(
           'applying ',

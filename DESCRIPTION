@@ -8,7 +8,8 @@ Authors@R: person(given = "Seongho", family = "Bae", role = c("aut", "cre"),
 Description: Automates fixed item parameter linking for test linking under
     the item response theory paradigm using mirt package estimates.
 License: GPL-3 | file LICENSE
-Imports: mirt
+Imports: mirt,
+    stats
 Suggests: testthat (>= 3.0.0)
 Encoding: UTF-8
 Config/testthat/edition: 3

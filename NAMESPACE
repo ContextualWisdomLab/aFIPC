@@ -2,3 +2,4 @@
 
 export(autoFIPC)
 import(mirt)
+importFrom(stats,na.omit)
