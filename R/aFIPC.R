@@ -74,6 +74,7 @@ autoFIPC <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
     checkCorrect <- function() {
+      if (!interactive()) return(1L)
       n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
       if (!grepl("^[0-9]+$", n)) {
         return(checkCorrect())
@@ -99,6 +100,7 @@ autoFIPC <-
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
+          if (!interactive()) return(1L)
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
@@ -310,6 +312,7 @@ autoFIPC <-
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
+          if (!interactive()) return(1L)
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
@@ -987,27 +990,27 @@ autoFIPC <-
     #   stop('Estimation failed. Please check test quality.')
     # }
 
+    # calculate theta (pre-calculate to avoid redundant MAP estimation)
+    ThetaOldform <- fscores(oldFormModel, method = 'MAP')
+    ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
+    ThetaNewform <- fscores(newFormModel, method = 'MAP')
+
     # calculate expected score
     ExpectedScoreOldform <-
       mirt::expected.test(
         x = oldFormModel,
-        Theta = fscores(oldFormModel, method = 'MAP')
+        Theta = ThetaOldform
       )
     ExpectedScoreLinkedform <-
       mirt::expected.test(
         x = LinkedModel,
-        Theta = fscores(LinkedModel, method = 'MAP')
+        Theta = ThetaLinkedform
       )
     ExpectedScoreNewform <-
       mirt::expected.test(
         x = newFormModel,
-        Theta = fscores(newFormModel, method = 'MAP')
+        Theta = ThetaNewform
       )
-
-    # calculate theta
-    ThetaOldform <- fscores(oldFormModel, method = 'MAP')
-    ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
-    ThetaNewform <- fscores(newFormModel, method = 'MAP')
 
     # save results as object
     modelReturn <- new.env()
