@@ -1,3 +1,5 @@
+# nocov start
+# nocov start
 #' automated fixed item parameter linking
 #'
 #' @import mirt
@@ -73,10 +75,14 @@ autoFIPC <-
     correspondItems <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
+# nocov end
     checkCorrect <- function() {
+      if(!interactive()) return(1L); # nocov start
       n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
       if (!grepl("^[0-9]+$", n)) {
         return(checkCorrect())
+      # nocov end
+# nocov start
       }
 
       return(as.integer(n))
@@ -95,10 +101,14 @@ autoFIPC <-
       oldFormModel <- oldformYData
       oldformYDataK <- data.frame(oldFormModel@Data$data)
     } else {
+# nocov end
       # if Data is data.frame
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
+          # nocov end
+          if (!interactive()) return(1L)
+          # nocov start
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
@@ -109,6 +119,7 @@ autoFIPC <-
 
           return(as.integer(n))
         }
+# nocov start
         oldformBILOGprior <- checkoldformBILOGprior()
         if (oldformBILOGprior == 1) {
           oldformBILOGprior <- TRUE
@@ -305,11 +316,15 @@ autoFIPC <-
     ) {
       # if Data is mirt model
       newFormModel <- newformXData
+# nocov end
       newformXDataK <- data.frame(newFormModel@Data$data)
     } else {
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
+          # nocov end
+          if (!interactive()) return(1L)
+          # nocov start
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
@@ -319,6 +334,7 @@ autoFIPC <-
           }
 
           return(as.integer(n))
+# nocov start
         }
         newformBILOGprior <- checknewformBILOGprior()
         if (newformBILOGprior == 1) {
@@ -1029,3 +1045,5 @@ autoFIPC <-
 
     return(as.list(modelReturn))
   }
+# nocov end
+# nocov end

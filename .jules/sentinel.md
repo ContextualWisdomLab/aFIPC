@@ -1,0 +1,4 @@
+## 2024-06-28 - Infinite Recursion DoS Risk in non-interactive environments
+**Vulnerability:** The code `R/aFIPC.R` uses `readline()` prompting inside recursive functions `checkCorrect()`, `checkoldformBILOGprior()`, and `checknewformBILOGprior()`. When run in a non-interactive environment without checking `interactive()`, `readline()` fails or returns an empty string/EOF, which is not matching the `grepl("^[0-9]+$", n)` condition, causing an infinite recursive loop. This results in a Denial of Service (stack overflow or CPU consumption).
+**Learning:** Legacy scripts often contain interactive prompts (like `readline()`) that aren't properly guarded for automated or headless environments.
+**Prevention:** Always wrap interactive prompts with `if(!interactive()) return(default_value)` to ensure automated processes can continue safely, or use command-line arguments instead of interactive prompts.
