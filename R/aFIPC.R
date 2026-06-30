@@ -16,6 +16,7 @@
 #' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is TRUE
 #' @param parameterOverwrite don't touch it
 #' @param empiricalhist do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
+#' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt.
 #' @param ... Additional arguments reserved for future extensions.
 #'
 #' @return the model list of the base form, new form, linked form
@@ -42,6 +43,7 @@ autoFIPC <-
     forceNormalZeroOne = F,
     parameterOverwrite = F,
     empiricalhist = F,
+    confirmCommonItems = NULL,
     ...
   ) {
     # print credits
@@ -74,13 +76,25 @@ autoFIPC <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
     checkCorrect <- function() {
-      if (!interactive()) stop("Interactive session required for checking correct items")
-      repeat {
-        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-        if (grepl("^[0-9]+$", n)) {
-          return(as.integer(n))
-        }
+      if (isTRUE(confirmCommonItems)) {
+        return(1L)
       }
+      if (identical(confirmCommonItems, FALSE)) {
+        return(2L)
+      }
+      if (!interactive()) {
+        stop(
+          'Common item confirmation requires an interactive session; ',
+          'set confirmCommonItems = TRUE to accept the supplied pairs.'
+        )
+      }
+
+      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
+      while (!grepl("^[0-9]+$", n)) {
+        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
+      }
+
+      as.integer(n)
     }
     confirm <- checkCorrect()
     if (confirm != 1) {
@@ -100,16 +114,19 @@ autoFIPC <-
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
-          if (!interactive()) stop("Interactive session required for oldform BILOG prior")
-          repeat {
+          if (!interactive()) return(1L)
+          n <-
+            readline(
+              prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
+            )
+          while (!grepl("^[0-9]+$", n)) {
             n <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
-              return(as.integer(n))
-            }
           }
+
+          return(as.integer(n))
         }
         oldformBILOGprior <- checkoldformBILOGprior()
         if (oldformBILOGprior == 1) {
@@ -312,16 +329,19 @@ autoFIPC <-
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
-          if (!interactive()) stop("Interactive session required for newform BILOG prior")
-          repeat {
+          if (!interactive()) return(1L)
+          n <-
+            readline(
+              prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
+            )
+          while (!grepl("^[0-9]+$", n)) {
             n <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
-              return(as.integer(n))
-            }
           }
+
+          return(as.integer(n))
         }
         newformBILOGprior <- checknewformBILOGprior()
         if (newformBILOGprior == 1) {
@@ -990,27 +1010,27 @@ autoFIPC <-
     #   stop('Estimation failed. Please check test quality.')
     # }
 
-    # calculate expected score
-    ExpectedScoreOldform <-
-      mirt::expected.test(
-        x = oldFormModel,
-        Theta = fscores(oldFormModel, method = 'MAP')
-      )
-    ExpectedScoreLinkedform <-
-      mirt::expected.test(
-        x = LinkedModel,
-        Theta = fscores(LinkedModel, method = 'MAP')
-      )
-    ExpectedScoreNewform <-
-      mirt::expected.test(
-        x = newFormModel,
-        Theta = fscores(newFormModel, method = 'MAP')
-      )
-
     # calculate theta
     ThetaOldform <- fscores(oldFormModel, method = 'MAP')
     ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
     ThetaNewform <- fscores(newFormModel, method = 'MAP')
+
+    # calculate expected score
+    ExpectedScoreOldform <-
+      mirt::expected.test(
+        x = oldFormModel,
+        Theta = ThetaOldform
+      )
+    ExpectedScoreLinkedform <-
+      mirt::expected.test(
+        x = LinkedModel,
+        Theta = ThetaLinkedform
+      )
+    ExpectedScoreNewform <-
+      mirt::expected.test(
+        x = newFormModel,
+        Theta = ThetaNewform
+      )
 
     # save results as object
     modelReturn <- new.env()
