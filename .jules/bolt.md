@@ -9,3 +9,7 @@
 ## 2026-06-30 - Avoid factor allocation for response-category counts
 **Learning:** `levels(as.factor(x))` allocates a factor just to count response categories, which is unnecessary in repeated common-item loops.
 **Action:** Use `length(na.omit(unique(x)))` for category-count comparisons while preserving the existing exact item-name matching.
+
+## 2026-06-30 - Preserve NA handling when removing factor conversions
+**Learning:** `levels(as.factor(x))` excludes missing responses from the category count, so a faster replacement must not count `NA` as an extra response category.
+**Action:** Keep `na.omit(unique(x))` rather than plain `unique(x)` in response-category comparisons.
