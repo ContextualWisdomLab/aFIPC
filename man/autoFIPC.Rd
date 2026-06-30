@@ -9,7 +9,8 @@ autoFIPC(newformXData = ..., oldformYData = ...,
   itemtype = "3PL", newformBILOGprior = NULL, oldformBILOGprior = NULL,
   tryFitwholeNewItems = T, tryFitwholeOldItems = T, checkIPD = T,
   tryEM = T, freeMEAN = T, forceNormalZeroOne = F,
-  parameterOverwrite = F, empiricalhist = F, ...)
+  parameterOverwrite = F, empiricalhist = F, confirmCommonItems = NULL,
+  ...)
 }
 \arguments{
 \item{newformXData}{new form data X}
@@ -41,6 +42,8 @@ autoFIPC(newformXData = ..., oldformYData = ...,
 \item{parameterOverwrite}{don't touch it}
 
 \item{empiricalhist}{do you want to use empirical histogram method when tryEM = TRUE? default is FALSE}
+
+\item{confirmCommonItems}{set TRUE to accept the supplied common-item pairs without an interactive prompt.}
 
 \item{...}{Additional arguments reserved for future extensions.}
 }
