@@ -7,6 +7,6 @@ test_that("autoFIPC raises error in non-interactive session for inputs", {
       newformCommonItemNames = c('A'),
       oldformCommonItemNames = c('A')
     ),
-    "Interactive session required for checking correct items"
+    "Common item confirmation requires an interactive session"
   )
 })
