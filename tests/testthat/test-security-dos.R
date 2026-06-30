@@ -1,12 +1,4 @@
-test_that("autoFIPC input functions do not infinite loop in non-interactive mode", {
-  # We test the internal functions behavior if possible, or verify error is thrown
-
-  # checkCorrect is internal to autoFIPC, so we mock interactive() if needed,
-  # but in testthat, interactive() is already FALSE.
-  # Calling autoFIPC with missing or invalid args that trigger the prompts
-  # should now fail with "Non-interactive session or too many invalid attempts"
-  # instead of infinite recursion.
-
+test_that("autoFIPC common-item confirmation does not recurse in non-interactive mode", {
   expect_error(
     aFIPC::autoFIPC(
       newformXData = data.frame(item1=c(1,0,1)),
@@ -15,6 +7,6 @@ test_that("autoFIPC input functions do not infinite loop in non-interactive mode
       oldformCommonItemNames = c("item1"),
       itemtype = '3PL'
     ),
-    "Non-interactive session or too many invalid attempts"
+    "Common item confirmation requires an interactive session"
   )
 })
