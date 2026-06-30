@@ -12,3 +12,8 @@
 **Vulnerability:** The code uses `readline()` in `R/aFIPC.R` to prompt the user. In non-interactive environments (e.g., CI/CD, automation scripts, agents), this can block execution or leave the process consuming resources.
 **Learning:** `readline()` should only be used when `interactive()` is true. Interactive prompts are insecure and unstable in automated contexts because they block execution unconditionally.
 **Prevention:** Always wrap `readline()` logic in an `if (interactive())` check or provide sensible defaults for non-interactive execution.
+
+## 2024-06-30 - Prevent Infinite Loop DoS in User Prompts
+**Vulnerability:** The code used `readline()` inside an unbounded `while` loop to validate user inputs. In environments where standard input is continuously piped or automated incorrectly, `readline()` repeatedly returns invalid inputs (like `""`), causing the loop to run infinitely. This leads to 100% CPU utilization and eventual service denial (DoS).
+**Learning:** Even when `interactive()` safeguards are present, user-provided loops over `readline()` are dangerous without an upper bound, as inputs can still be automated or maliciously piped in interactive-like environments.
+**Prevention:** Always include a `max_retries` counter (e.g., 5) and break or `stop()` when the limit is reached to prevent unbounded looping.

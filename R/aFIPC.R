@@ -89,8 +89,12 @@ autoFIPC <-
         )
       }
 
+      max_retries <- 5
+      retries <- 0
       n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
       while (!grepl("^[0-9]+$", n)) {
+        retries <- retries + 1
+        if (retries >= max_retries) stop("Too many invalid inputs, preventing infinite loop.")
         n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
       }
 
@@ -115,11 +119,15 @@ autoFIPC <-
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
           if (!interactive()) return(1L)
+          max_retries <- 5
+          retries <- 0
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
             )
           while (!grepl("^[0-9]+$", n)) {
+            retries <- retries + 1
+            if (retries >= max_retries) stop("Too many invalid inputs, preventing infinite loop.")
             n <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
@@ -330,11 +338,15 @@ autoFIPC <-
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
           if (!interactive()) return(1L)
+          max_retries <- 5
+          retries <- 0
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
             )
           while (!grepl("^[0-9]+$", n)) {
+            retries <- retries + 1
+            if (retries >= max_retries) stop("Too many invalid inputs, preventing infinite loop.")
             n <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "

@@ -1,6 +1,6 @@
 test_that("autoFIPC handles non-interactive sessions securely to prevent DoS (checkCorrect)", {
   expect_error(
-    autoFIPC(
+    aFIPC::autoFIPC(
       newformXData = matrix(0, nrow=10, ncol=10),
       oldformYData = matrix(0, nrow=10, ncol=10),
       newformCommonItemNames = c("Item1"),
