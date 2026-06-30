@@ -1,3 +1,21 @@
+.fit_mhrm_with_retries <- function(model_name, max_retries, fit) {
+  for (attempt in seq_len(max_retries)) {
+    result <- try(fit(), silent = TRUE)
+    if (!inherits(result, "try-error")) {
+      return(result)
+    }
+  }
+
+  stop(
+    "Estimation failed for ",
+    model_name,
+    " after ",
+    max_retries,
+    " MHRM retries. Please check test quality.",
+    call. = FALSE
+  )
+}
+
 #' automated fixed item parameter linking
 #'
 #' @import mirt
@@ -184,8 +202,9 @@ autoFIPC <-
 
       if (tryFitwholeOldItems == T) {
         if (
+          exists("oldFormModel") &&
           !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+            itemtype != 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
@@ -208,17 +227,20 @@ autoFIPC <-
         }
 
         if (
+          exists("oldFormModel") &&
           !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+            itemtype != 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
 
-          try(rm(oldFormModel))
-          while (!exists('oldFormModel')) {
-            try(
-              oldFormModel <-
+          max_retries <- 3L
+          oldFormModel <-
+            .fit_mhrm_with_retries(
+              "oldFormModel",
+              max_retries,
+              function() {
                 mirt::mirt(
                   data = oldformYDataK,
                   1,
@@ -229,14 +251,15 @@ autoFIPC <-
                   technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000),
                   GenRandomPars = F
                 )
+              }
             )
-          }
         }
       }
 
       if (
+        exists("oldFormModel") &&
         !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
@@ -253,8 +276,9 @@ autoFIPC <-
       }
 
       if (
+        exists("oldFormModel") &&
         !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by normal MMLE/EM'
@@ -272,8 +296,9 @@ autoFIPC <-
       }
 
       if (
+        exists("oldFormModel") &&
         !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/QMCEM'
@@ -291,8 +316,9 @@ autoFIPC <-
       }
 
       if (
+        exists("oldFormModel") &&
         !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/MHRM'
@@ -310,8 +336,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel") || !oldFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
       }
@@ -396,8 +422,9 @@ autoFIPC <-
 
       if (tryFitwholeNewItems) {
         if (
+          exists("newFormModel") &&
           !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+            itemtype != 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
@@ -420,17 +447,20 @@ autoFIPC <-
         }
 
         if (
+          exists("newFormModel") &&
           !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+            itemtype != 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
 
-          try(rm(newFormModel))
-          while (!exists('newFormModel')) {
-            try(
-              newFormModel <-
+          max_retries <- 3L
+          newFormModel <-
+            .fit_mhrm_with_retries(
+              "newFormModel",
+              max_retries,
+              function() {
                 mirt::mirt(
                   data = newformXDataK,
                   1,
@@ -441,14 +471,15 @@ autoFIPC <-
                   technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000),
                   GenRandomPars = F
                 )
+              }
             )
-          }
         }
       }
 
       if (
+        exists("newFormModel") &&
         !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
@@ -465,8 +496,9 @@ autoFIPC <-
       }
 
       if (
+        exists("newFormModel") &&
         !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by normal MMLE/EM'
@@ -484,8 +516,9 @@ autoFIPC <-
       }
 
       if (
+        exists("newFormModel") &&
         !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/QMCEM'
@@ -503,8 +536,9 @@ autoFIPC <-
       }
 
       if (
+        exists("newFormModel") &&
         !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/MHRM'
@@ -522,8 +556,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel") || !newFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
       }

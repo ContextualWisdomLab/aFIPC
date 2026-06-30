@@ -9,3 +9,10 @@
 5. DoS 완화를 위해 `return(1L)` 같은 기본 승인값을 넣을 때는 추정 기준척도, anchor/common item, true parameter 재현 계약을 우회하지 않는지 먼저 검증합니다.
 6. Fail-secure 에러 메시지는 테스트의 일부로 취급합니다. 보안 테스트는 실제 구현 메시지와 맞아야 하며, 오래된 `"Interactive prompt is not available"` 같은 별도 문구를 새로 만들지 않습니다.
 7. Prompt DoS 회귀 테스트는 모델 추정 실패에 기대지 말고, common-item confirmation guard처럼 취약한 입력 경계에서 바로 발생하는 fail-secure 에러를 검증합니다.
+
+## 2024-06-30 - 추정 실패 시 무한 재시도로 인한 리소스 고갈(DoS) 취약점
+**Vulnerability:** 데이터 처리 과정 중 모델 추정이 실패했을 때(예: `mirt` 패키지의 MHRM 알고리즘을 이용한 oldFormModel, newFormModel 추정), 변수가 성공적으로 생성될 때까지 `while(!exists('oldFormModel'))`과 같은 탈출 조건(exit condition)이 없는 무한 루프가 코드 내에 존재했습니다.
+**Learning:** 실패 시 무한 루프는 자동화된 환경(CI/CD, 묶음 처리 서버 등)에서 작업이 절대 끝나지 않고 CPU와 메모리 등 시스템 리소스를 계속 점유하게 만들어 서비스 거부(DoS) 상태를 유발합니다. 외부 라이브러리(패키지) 호출 실패를 무한정 재시도하는 것은 매우 위험합니다.
+**Prevention:**
+1. 어떠한 형태의 재시도 루프든 간에 반드시 최대 재시도 횟수(`max_retries`) 제한을 두어 무한 루프에 빠지지 않도록 방어적인 코드를 작성해야 합니다.
+2. 최대 재시도 횟수에 도달했을 때에는 `stop()` 함수 등을 사용해 명시적인 예외를 발생시키고 안전하게 실패하도록(fail-secure) 처리해야 합니다.
