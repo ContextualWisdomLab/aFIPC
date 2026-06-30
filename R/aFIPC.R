@@ -720,12 +720,8 @@ autoFIPC <-
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-        (length(levels(as.factor(
-            newFormModel@Data$data[, newFormItemName]
-          ))) ==
-            length(levels(as.factor(
-              oldFormModel@Data$data[, oldFormItemName]
-            ))))
+        (length(na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
+            length(na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
         message(
           'applying ',
