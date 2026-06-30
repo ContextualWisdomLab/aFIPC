@@ -1,3 +1,11 @@
-## 2025-02-23 - Avoid `grep` in inner loops for exact string matching on column names in R
-**Learning:** In the core `autoFIPC` logic, there were multiple inner loops that utilized `length(grep(paste0('^', name, '$'), colnames)) == 1` to perform exact string matching of items over columns. This regex-based lookup inside tight loops leads to severe performance degradation as the number of common items or columns increases. Furthermore, computing `levels(as.factor(vector))` inside a loop is substantially slower than utilizing `unique(vector)` for checking column categories.
-**Action:** When evaluating exact matching against arrays of strings in R, extract the string lists outside the loop and use vectorized equality operators (`sum(extractedNames == targetName) == 1`) or `%in%`. Always replace `levels(as.factor())` with `unique()` for counting categorical values to prevent unnecessary conversion and sort overhead.
+## 2026-06-30 - Pre-calculate Theta Variables to Avoid Redundant MAP estimation
+**Learning:** `mirt::fscores(..., method = 'MAP')` is called redundantly multiple times in `R/aFIPC.R`. It's an expensive operation and avoiding duplicate calls by pre-calculating and reusing the variables significantly improves performance.
+**Action:** Always pre-calculate and reuse the resulting Theta variables rather than calling it redundantly.
+
+## 2024-05-18 - R 언어에서 루프 내 정규식 탐색 병목 최적화
+**Learning:** R에서 데이터 프레임의 크기가 커질수록 루프 내에서 컬럼명을 추출하고 정규식을 이용해(`grep`) 문자열을 탐색하는 작업이 상당한 성능 오버헤드를 발생시킨다. 특히 O(N) 탐색을 루프 안에서 반복할 경우 O(N^2)의 비효율성을 초래한다.
+**Action:** 루프 내부에서 자주 호출되는 컬럼명이나 데이터 프레임 구조 탐색을 루프 밖으로 빼서 한 번만 계산하여 벡터로 저장하도록 한다. 정규식보다는 완전 일치 탐색(`%in%`, `match`)이 가능하도록 벡터 연산을 활용해 O(1) 수준으로 성능을 끌어올려야 한다.
+
+## 2026-06-30 - Avoid factor allocation for response-category counts
+**Learning:** `levels(as.factor(x))` allocates a factor just to count response categories, which is unnecessary in repeated common-item loops.
+**Action:** Use `length(na.omit(unique(x)))` for category-count comparisons while preserving the existing exact item-name matching.
