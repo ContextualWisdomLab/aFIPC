@@ -21,3 +21,7 @@
 ## 2026-06-30 - Preserve NA handling when removing factor conversions
 **Learning:** `levels(as.factor(x))` excludes missing responses from the category count, so a faster replacement must not count `NA` as an extra response category.
 **Action:** Keep `na.omit(unique(x))` rather than plain `unique(x)` in response-category comparisons.
+
+## 2026-06-30 - Cache vector-search indexes in R loops
+**Learning:** Redundant `which()` array scans inside loops introduce unnecessary O(N) overhead during array subsetting, especially when accessing the exact same index multiple times within the loop body. In this codebase's common item loop, repeated `which(NewScaleParms$item == ...)` calls were a bottleneck.
+**Action:** Cache the resulting index into a variable (e.g. `idx <- which(...)`) at the start of the relevant block and reuse it for all subsequent operations to avoid repeated O(N) penalty.

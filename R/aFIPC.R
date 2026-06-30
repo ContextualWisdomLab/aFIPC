@@ -723,11 +723,15 @@ autoFIPC <-
         (length(na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
             length(na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
+        newItemName <- paste0(newformCommonItemNames[i])
+        oldItemName <- paste0(oldformCommonItemNames[i])
+        newIdx <- which(NewScaleParms$item == newItemName)
+        oldIdx <- which(OldScaleParms$item == oldItemName)
         message(
           'applying ',
-          paste0(newformCommonItemNames[i]),
+          newItemName,
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldItemName,
           ' as common item use'
         )
 
@@ -735,7 +739,7 @@ autoFIPC <-
           '   Newform Parms: ',
           paste0(
             NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
+              newIdx,
               "value"
             ],
             ' '
@@ -745,7 +749,7 @@ autoFIPC <-
           '   Oldform Parms: ',
           paste0(
             OldScaleParms[
-              which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
+              oldIdx,
               "value"
             ],
             ' '
@@ -753,18 +757,18 @@ autoFIPC <-
         )
 
         NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
+          newIdx,
           "value"
         ] <-
           OldScaleParms[
-            which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
+            oldIdx,
             "value"
           ]
         message(
           '   Linkedform Parms: ',
           paste0(
             NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
+              newIdx,
               "value"
             ],
             ' '
@@ -773,7 +777,7 @@ autoFIPC <-
         )
 
         NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
+          newIdx,
           "est"
         ] <-
           FALSE
