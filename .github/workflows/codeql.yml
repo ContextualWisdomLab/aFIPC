@@ -38,6 +38,6 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@9e907b5e64f6b83e7804b09294d44122997950d6
+        uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e
         with:
           category: "/language:${{ matrix.language }}"
