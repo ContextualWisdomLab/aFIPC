@@ -1,6 +1,7 @@
 #' automated fixed item parameter linking
 #'
 #' @import mirt
+
 #' @param newformXData new form data X
 #' @param oldformYData old form (base form) data Y
 #' @param newformCommonItemNames Common item variable names in new form data
@@ -16,21 +17,22 @@
 #' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is TRUE
 #' @param parameterOverwrite don't touch it
 #' @param empiricalhist do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
+#' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt.
 #' @param ... Additional arguments reserved for future extensions.
 #'
 #' @return the model list of the base form, new form, linked form
 #' @export
 #'
 #' @examples
-#' \donotrun{
+#' \dontrun{
 #' autoFIPC() ## FIXME
 #' }
 autoFIPC <-
   function(
-    newformXData = ...,
-    oldformYData = ...,
-    newformCommonItemNames = ...,
-    oldformCommonItemNames = ...,
+    newformXData,
+    oldformYData,
+    newformCommonItemNames,
+    oldformCommonItemNames,
     itemtype = '3PL',
     newformBILOGprior = NULL,
     oldformBILOGprior = NULL,
@@ -42,6 +44,7 @@ autoFIPC <-
     forceNormalZeroOne = F,
     parameterOverwrite = F,
     empiricalhist = F,
+    confirmCommonItems = NULL,
     ...
   ) {
     # print credits
@@ -74,12 +77,24 @@ autoFIPC <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
     checkCorrect <- function() {
-      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-      if (!grepl("^[0-9]+$", n)) {
-        return(checkCorrect())
+      if (isTRUE(confirmCommonItems)) {
+        return(1L)
       }
-
-      return(as.integer(n))
+      if (identical(confirmCommonItems, FALSE)) {
+        return(2L)
+      }
+      if (!interactive()) {
+        stop(
+          'Common item confirmation requires an interactive session; ',
+          'set confirmCommonItems = TRUE to accept the supplied pairs.'
+        )
+      }
+      repeat {
+        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
+        if (grepl("^[0-9]+$", n)) {
+          return(as.integer(n))
+        }
+      }
     }
     confirm <- checkCorrect()
     if (confirm != 1) {
@@ -99,15 +114,16 @@ autoFIPC <-
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checkoldformBILOGprior())
+          if (!interactive()) stop("Interactive session required for oldform BILOG prior")
+          repeat {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
+              )
+            if (grepl("^[0-9]+$", n)) {
+              return(as.integer(n))
+            }
           }
-
-          return(as.integer(n))
         }
         oldformBILOGprior <- checkoldformBILOGprior()
         if (oldformBILOGprior == 1) {
@@ -310,15 +326,16 @@ autoFIPC <-
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
-          n <-
-            readline(
-              prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
-            )
-          if (!grepl("^[0-9]+$", n)) {
-            return(checknewformBILOGprior())
+          if (!interactive()) stop("Interactive session required for newform BILOG prior")
+          repeat {
+            n <-
+              readline(
+                prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
+              )
+            if (grepl("^[0-9]+$", n)) {
+              return(as.integer(n))
+            }
           }
-
-          return(as.integer(n))
         }
         newformBILOGprior <- checknewformBILOGprior()
         if (newformBILOGprior == 1) {
@@ -555,8 +572,8 @@ autoFIPC <-
           (oldformCommonItemNames[i] %in% oldFormColNames)
         ) {
           IPDItemCount <- IPDItemCount + 1
-          IPDItemNamesOldForm[IPDItemCount] <- names(oldformYDataK)[match(oldformCommonItemNames[i], names(oldformYDataK))]
-          IPDItemNamesNewForm[IPDItemCount] <- names(newformXDataK)[match(newformCommonItemNames[i], names(newformXDataK))]
+          IPDItemNamesOldForm[IPDItemCount] <- oldformCommonItemNames[i]
+          IPDItemNamesNewForm[IPDItemCount] <- newformCommonItemNames[i]
         }
       }
 
@@ -697,10 +714,10 @@ autoFIPC <-
         (newformCommonItemNames[i] %in% newFormColNames) &&
         (oldformCommonItemNames[i] %in% oldFormColNames) &&
         (length(levels(as.factor(
-            newFormModel@Data$data[, names(newformXDataK)[match(newformCommonItemNames[i], names(newformXDataK))]]
+            newFormModel@Data$data[, newformCommonItemNames[i]]
           ))) ==
             length(levels(as.factor(
-              oldFormModel@Data$data[, names(oldformYDataK)[match(oldformCommonItemNames[i], names(oldformYDataK))]]
+              oldFormModel@Data$data[, oldformCommonItemNames[i]]
             ))))
       ) {
         message(
