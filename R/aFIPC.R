@@ -567,13 +567,15 @@ autoFIPC <-
       oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
       for (i in 1:length(oldformCommonItemNames)) {
+        newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
+        oldFormItemName <- oldFormColNames[match(oldformCommonItemNames[i], oldFormColNames)]
         if (
-          (newformCommonItemNames[i] %in% newFormColNames) &&
-          (oldformCommonItemNames[i] %in% oldFormColNames)
+          !is.na(newFormItemName) &&
+          !is.na(oldFormItemName)
         ) {
           IPDItemCount <- IPDItemCount + 1
-          IPDItemNamesOldForm[IPDItemCount] <- oldformCommonItemNames[i]
-          IPDItemNamesNewForm[IPDItemCount] <- newformCommonItemNames[i]
+          IPDItemNamesOldForm[IPDItemCount] <- oldFormItemName
+          IPDItemNamesNewForm[IPDItemCount] <- newFormItemName
         }
       }
 
@@ -710,14 +712,16 @@ autoFIPC <-
     oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
     for (i in 1:length(oldformCommonItemNames)) {
+      newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
+      oldFormItemName <- oldFormColNames[match(oldformCommonItemNames[i], oldFormColNames)]
       if (
-        (newformCommonItemNames[i] %in% newFormColNames) &&
-        (oldformCommonItemNames[i] %in% oldFormColNames) &&
+        !is.na(newFormItemName) &&
+        !is.na(oldFormItemName) &&
         (length(levels(as.factor(
-            newFormModel@Data$data[, newformCommonItemNames[i]]
+            newFormModel@Data$data[, newFormItemName]
           ))) ==
             length(levels(as.factor(
-              oldFormModel@Data$data[, oldformCommonItemNames[i]]
+              oldFormModel@Data$data[, oldFormItemName]
             ))))
       ) {
         message(
