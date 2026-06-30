@@ -8,3 +8,4 @@
 4. 대화형 재입력 루프도 무한 반복하지 않도록 제한된 횟수만 허용하고, 초과 시 명확한 에러로 종료합니다.
 5. DoS 완화를 위해 `return(1L)` 같은 기본 승인값을 넣을 때는 추정 기준척도, anchor/common item, true parameter 재현 계약을 우회하지 않는지 먼저 검증합니다.
 6. Fail-secure 에러 메시지는 테스트의 일부로 취급합니다. 보안 테스트는 실제 구현 메시지와 맞아야 하며, 오래된 `"Interactive prompt is not available"` 같은 별도 문구를 새로 만들지 않습니다.
+7. Prompt DoS 회귀 테스트는 모델 추정 실패에 기대지 말고, common-item confirmation guard처럼 취약한 입력 경계에서 바로 발생하는 fail-secure 에러를 검증합니다.
