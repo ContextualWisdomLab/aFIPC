@@ -16,6 +16,7 @@
 #' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is TRUE
 #' @param parameterOverwrite don't touch it
 #' @param empiricalhist do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
+#' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt.
 #' @param ... Additional arguments reserved for future extensions.
 #'
 #' @return the model list of the base form, new form, linked form
@@ -42,6 +43,7 @@ autoFIPC <-
     forceNormalZeroOne = F,
     parameterOverwrite = F,
     empiricalhist = F,
+    confirmCommonItems = NULL,
     ...
   ) {
     # print credits
@@ -74,13 +76,25 @@ autoFIPC <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
     checkCorrect <- function() {
-      if (!interactive()) return(1L)
-      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-      if (!grepl("^[0-9]+$", n)) {
-        return(checkCorrect())
+      if (isTRUE(confirmCommonItems)) {
+        return(1L)
+      }
+      if (identical(confirmCommonItems, FALSE)) {
+        return(2L)
+      }
+      if (!interactive()) {
+        stop(
+          'Common item confirmation requires an interactive session; ',
+          'set confirmCommonItems = TRUE to accept the supplied pairs.'
+        )
       }
 
-      return(as.integer(n))
+      n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
+      while (!grepl("^[0-9]+$", n)) {
+        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
+      }
+
+      as.integer(n)
     }
     confirm <- checkCorrect()
     if (confirm != 1) {
@@ -100,7 +114,6 @@ autoFIPC <-
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
-          if (!interactive()) return(1L)
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
@@ -312,7 +325,6 @@ autoFIPC <-
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
-          if (!interactive()) return(1L)
           n <-
             readline(
               prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
