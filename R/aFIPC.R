@@ -215,8 +215,8 @@ autoFIPC <-
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
 
-          try(rm(oldFormModel))
-          while (!exists('oldFormModel')) {
+          try(rm(oldFormModel), silent = TRUE)
+          for (attempt in seq_len(3)) {
             try(
               oldFormModel <-
                 mirt::mirt(
@@ -230,6 +230,7 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
+            if (exists('oldFormModel')) break
           }
         }
       }
@@ -427,8 +428,8 @@ autoFIPC <-
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
 
-          try(rm(newFormModel))
-          while (!exists('newFormModel')) {
+          try(rm(newFormModel), silent = TRUE)
+          for (attempt in seq_len(3)) {
             try(
               newFormModel <-
                 mirt::mirt(
@@ -442,6 +443,7 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
+            if (exists('newFormModel')) break
           }
         }
       }
