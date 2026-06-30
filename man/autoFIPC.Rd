@@ -4,25 +4,12 @@
 \alias{autoFIPC}
 \title{automated fixed item parameter linking}
 \usage{
-autoFIPC(
-  newformXData,
-  oldformYData,
-  newformCommonItemNames,
-  oldformCommonItemNames,
-  itemtype = "3PL",
-  newformBILOGprior = NULL,
-  oldformBILOGprior = NULL,
-  tryFitwholeNewItems = T,
-  tryFitwholeOldItems = T,
-  checkIPD = T,
-  tryEM = T,
-  freeMEAN = T,
-  forceNormalZeroOne = F,
-  parameterOverwrite = F,
-  empiricalhist = F,
-  confirmCommonItems = NULL,
-  ...
-)
+autoFIPC(newformXData = ..., oldformYData = ...,
+  newformCommonItemNames = ..., oldformCommonItemNames = ...,
+  itemtype = "3PL", newformBILOGprior = NULL, oldformBILOGprior = NULL,
+  tryFitwholeNewItems = T, tryFitwholeOldItems = T, checkIPD = T,
+  tryEM = T, freeMEAN = T, forceNormalZeroOne = F,
+  parameterOverwrite = F, empiricalhist = F, ...)
 }
 \arguments{
 \item{newformXData}{new form data X}
@@ -55,18 +42,8 @@ autoFIPC(
 
 \item{empiricalhist}{do you want to use empirical histogram method when tryEM = TRUE? default is FALSE}
 
-\item{confirmCommonItems}{set TRUE to accept the supplied common-item pairs without an interactive prompt.}
-
 \item{...}{Additional arguments reserved for future extensions.}
-}
-\value{
-the model list of the base form, new form, linked form
 }
 \description{
 automated fixed item parameter linking
-}
-\examples{
-\dontrun{
-autoFIPC() ## FIXME
-}
 }
