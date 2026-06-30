@@ -1,16 +1,25 @@
-test_that("autoFIPC passes securely without interactive prompt", {
-  library(mirt)
-
-  a <- matrix(c(1,1,2,2,3,3), ncol=2)
-  b <- matrix(c(1,1,2,2,3,3), ncol=2)
-
+test_that("autoFIPC raises error in non-interactive session for inputs", {
+  # interactive() should be FALSE by default in testthat environments
   expect_error(
     aFIPC::autoFIPC(
-      newformXData = a,
-      oldformYData = b,
-      newformCommonItemNames = c("Item1"),
-      oldformCommonItemNames = c("Item1")
+      newformXData = 1,
+      oldformYData = 2,
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A')
     ),
-    "Interactive prompt is not available"
+    "Common item confirmation requires an interactive session"
+  )
+})
+
+test_that("autoFIPC does not implicitly approve supplied common items", {
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = 1,
+      oldformYData = 2,
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      confirmCommonItems = FALSE
+    ),
+    "Please write down pairs correctly"
   )
 })
