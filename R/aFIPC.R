@@ -17,6 +17,7 @@
 #' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is TRUE
 #' @param parameterOverwrite don't touch it
 #' @param empiricalhist do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
+#' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt.
 #' @param ... Additional arguments reserved for future extensions.
 #'
 #' @return the model list of the base form, new form, linked form
@@ -43,6 +44,7 @@ autoFIPC <-
     forceNormalZeroOne = F,
     parameterOverwrite = F,
     empiricalhist = F,
+    confirmCommonItems = NULL,
     ...
   ) {
     # print credits
@@ -75,7 +77,18 @@ autoFIPC <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
     checkCorrect <- function() {
-      if (!interactive()) stop("Interactive session required for checking correct items")
+      if (isTRUE(confirmCommonItems)) {
+        return(1L)
+      }
+      if (identical(confirmCommonItems, FALSE)) {
+        return(2L)
+      }
+      if (!interactive()) {
+        stop(
+          'Common item confirmation requires an interactive session; ',
+          'set confirmCommonItems = TRUE to accept the supplied pairs.'
+        )
+      }
       repeat {
         n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
         if (grepl("^[0-9]+$", n)) {
