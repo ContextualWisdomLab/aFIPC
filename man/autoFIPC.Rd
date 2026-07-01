@@ -20,7 +20,6 @@ autoFIPC(
   forceNormalZeroOne = F,
   parameterOverwrite = F,
   empiricalhist = F,
-  confirmCommonItems = NULL,
   ...
 )
 }
@@ -54,8 +53,6 @@ autoFIPC(
 \item{parameterOverwrite}{don't touch it}
 
 \item{empiricalhist}{do you want to use empirical histogram method when tryEM = TRUE? default is FALSE}
-
-\item{confirmCommonItems}{set TRUE to accept the supplied common-item pairs without an interactive prompt.}
 
 \item{...}{Additional arguments reserved for future extensions.}
 }
