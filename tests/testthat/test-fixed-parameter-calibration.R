@@ -45,8 +45,8 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     technical = list(NCYCLES = 500)
   )
 
-  old_vcov <- as.matrix(stats::vcov(old_model))
-  new_vcov <- as.matrix(stats::vcov(new_model))
+  old_vcov <- as.matrix(old_model@vcov)
+  new_vcov <- as.matrix(new_model@vcov)
   expect_gt(nrow(old_vcov), 0)
   expect_gt(nrow(new_vcov), 0)
   expect_true(all(is.finite(diag(old_vcov))))
