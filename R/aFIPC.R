@@ -216,7 +216,9 @@ autoFIPC <-
           )
 
           try(rm(oldFormModel))
-          while (!exists('oldFormModel')) {
+          retries <- 0
+          max_retries <- 10
+          while (!exists('oldFormModel') && retries < max_retries) {
             try(
               oldFormModel <-
                 mirt::mirt(
@@ -230,6 +232,10 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
+            retries <- retries + 1
+          }
+          if (!exists('oldFormModel')) {
+            stop("Failed to estimate oldFormModel after maximum retries.")
           }
         }
       }
@@ -428,7 +434,9 @@ autoFIPC <-
           )
 
           try(rm(newFormModel))
-          while (!exists('newFormModel')) {
+          retries <- 0
+          max_retries <- 10
+          while (!exists('newFormModel') && retries < max_retries) {
             try(
               newFormModel <-
                 mirt::mirt(
@@ -442,6 +450,10 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
+            retries <- retries + 1
+          }
+          if (!exists('newFormModel')) {
+            stop("Failed to estimate newFormModel after maximum retries.")
           }
         }
       }
