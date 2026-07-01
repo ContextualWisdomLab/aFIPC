@@ -1,4 +1,4 @@
-name: Security Audit private-safe
+name: Security Audit (private-safe)
 
 on:
   push:
