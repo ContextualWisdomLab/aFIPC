@@ -195,13 +195,14 @@ test_that("IPD fixture quantitatively filters drifted anchors before linking", {
     new_item <- retained_new[i]
     old_fixed <- old_values[
       old_values$item == old_item & old_values$name %in% c("a1", "d"),
-      "value"
+      c("name", "value")
     ]
     linked_fixed <- linked_values[
       linked_values$item == new_item & linked_values$name %in% c("a1", "d"),
-      "value"
+      c("name", "value")
     ]
-    mean_abs_distance[i] <- mean(abs(old_fixed - linked_fixed))
+    aligned <- merge(old_fixed, linked_fixed, by = "name", sort = FALSE)
+    mean_abs_distance[i] <- mean(abs(aligned$value.x - aligned$value.y))
   }
 
   expect_lt(mean(mean_abs_distance), 1e-6)
