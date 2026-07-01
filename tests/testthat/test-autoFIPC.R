@@ -18,6 +18,8 @@ test_that("autoFIPC handles basic input correctly", {
   colnames(data_old) <- c("Item1", "Item2", "Item3", "Item4", "Item5", "CommonItem")
   colnames(data_new) <- c("Item6", "Item7", "Item8", "Item9", "Item10", "CommonItem")
 
+  # Keep this as a fast smoke test; Hessian/SE stability is covered by
+  # test-fixed-parameter-calibration.R.
   mod_old <- mirt(data_old, 1, itemtype = '2PL', SE = FALSE, verbose = FALSE)
   mod_new <- mirt(data_new, 1, itemtype = '2PL', SE = FALSE, verbose = FALSE)
 
@@ -60,6 +62,8 @@ test_that("autoFIPC handles forceNormalZeroOne and empiricalhist", {
   colnames(data_old) <- c("I1", "I2", "I3", "I4", "I5", "C1")
   colnames(data_new) <- c("I6", "I7", "I8", "I9", "I10", "C1")
 
+  # Keep this as a fast smoke test; Hessian/SE stability is covered by
+  # test-fixed-parameter-calibration.R.
   mod_old <- mirt(data_old, 1, itemtype = '2PL', SE = FALSE, verbose = FALSE)
   mod_new <- mirt(data_new, 1, itemtype = '2PL', SE = FALSE, verbose = FALSE)
 

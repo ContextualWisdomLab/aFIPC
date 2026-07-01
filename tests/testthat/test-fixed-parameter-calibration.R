@@ -31,7 +31,7 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     1,
     itemtype = "2PL",
     method = "EM",
-    SE = FALSE,
+    SE = TRUE,
     verbose = FALSE,
     technical = list(NCYCLES = 500)
   )
@@ -40,10 +40,19 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     1,
     itemtype = "2PL",
     method = "EM",
-    SE = FALSE,
+    SE = TRUE,
     verbose = FALSE,
     technical = list(NCYCLES = 500)
   )
+
+  old_vcov <- as.matrix(stats::vcov(old_model))
+  new_vcov <- as.matrix(stats::vcov(new_model))
+  expect_gt(nrow(old_vcov), 0)
+  expect_gt(nrow(new_vcov), 0)
+  expect_true(all(is.finite(diag(old_vcov))))
+  expect_true(all(is.finite(diag(new_vcov))))
+  expect_true(isTRUE(old_model@OptimInfo$secondordertest))
+  expect_true(isTRUE(new_model@OptimInfo$secondordertest))
 
   linked <- aFIPC::autoFIPC(
     newformXData = new_model,
