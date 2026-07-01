@@ -94,8 +94,8 @@ package metadata, and CI workflow definitions in Git.
 
 ## 9. Future Considerations / Roadmap
 
-- Add non-interactive regression fixtures for historically trusted
-  FIPC results.
+- Maintain non-interactive regression fixtures for historically trusted
+  FIPC results and extend them before behavior-changing calibration work.
 - Reduce interactive prompts in `autoFIPC()` for automation friendliness.
 - Evaluate migration path from historical `packrat/` to a modern
   lock workflow.
