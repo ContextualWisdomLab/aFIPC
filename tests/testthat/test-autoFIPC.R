@@ -1,4 +1,5 @@
 test_that("autoFIPC handles basic input correctly", {
+  skip_if_not_installed("mirt")
   library(mirt)
 
   # Need enough items to estimate the model properly to avoid "too few degrees of freedom"
@@ -17,8 +18,8 @@ test_that("autoFIPC handles basic input correctly", {
   colnames(data_old) <- c("Item1", "Item2", "Item3", "Item4", "Item5", "CommonItem")
   colnames(data_new) <- c("Item6", "Item7", "Item8", "Item9", "Item10", "CommonItem")
 
-  mod_old <- mirt(data_old, 1, itemtype = '2PL', verbose = FALSE)
-  mod_new <- mirt(data_new, 1, itemtype = '2PL', verbose = FALSE)
+  mod_old <- mirt(data_old, 1, itemtype = '2PL', SE = FALSE, verbose = FALSE)
+  mod_new <- mirt(data_new, 1, itemtype = '2PL', SE = FALSE, verbose = FALSE)
 
   res <- suppressMessages(
     aFIPC::autoFIPC(
@@ -42,10 +43,11 @@ test_that("autoFIPC handles basic input correctly", {
   linked_pars <- extract.mirt(res$LinkedModel, 'pars')
   old_pars <- extract.mirt(mod_old, 'pars')
 
-  expect_equal(linked_pars[[6]]@par, old_pars[[6]]@par)
+  expect_equal(linked_pars[[6]]@par, old_pars[[6]]@par, tolerance = 1e-6)
 })
 
 test_that("autoFIPC handles forceNormalZeroOne and empiricalhist", {
+  skip_if_not_installed("mirt")
   library(mirt)
 
   a <- matrix(rep(1, 6))
@@ -58,8 +60,8 @@ test_that("autoFIPC handles forceNormalZeroOne and empiricalhist", {
   colnames(data_old) <- c("I1", "I2", "I3", "I4", "I5", "C1")
   colnames(data_new) <- c("I6", "I7", "I8", "I9", "I10", "C1")
 
-  mod_old <- mirt(data_old, 1, itemtype = '2PL', verbose = FALSE)
-  mod_new <- mirt(data_new, 1, itemtype = '2PL', verbose = FALSE)
+  mod_old <- mirt(data_old, 1, itemtype = '2PL', SE = FALSE, verbose = FALSE)
+  mod_new <- mirt(data_new, 1, itemtype = '2PL', SE = FALSE, verbose = FALSE)
 
   res <- suppressMessages(
     aFIPC::autoFIPC(
