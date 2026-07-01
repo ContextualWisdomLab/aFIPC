@@ -21,3 +21,7 @@
 ## 2026-06-30 - Preserve NA handling when removing factor conversions
 **Learning:** `levels(as.factor(x))` excludes missing responses from the category count, so a faster replacement must not count `NA` as an extra response category.
 **Action:** Keep `na.omit(unique(x))` rather than plain `unique(x)` in response-category comparisons.
+
+## 2024-07-01 - Vectorized Data Frame String Extraction
+**Learning:** In R, when vectorizing data frame subsetting to avoid `for` loops, calling `as.character()` directly on a multi-column subset (e.g., `as.character(df[1, cols])`) stringifies the underlying list structure (e.g. `c("list(a = 1)", "list(b = 2)")`) rather than the elements themselves.
+**Action:** Always apply `unlist()` first (e.g., `as.character(unlist(df[1, cols]))`) to safely flatten the row into a vector while preserving element-specific string conversion for types like factors.
