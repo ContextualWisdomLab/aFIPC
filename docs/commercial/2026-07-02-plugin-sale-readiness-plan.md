@@ -19,6 +19,25 @@ Figma FigJam planning artifact:
 
 - <https://www.figma.com/board/jD7NBmiuHUC0SRPhkTAGJk?utm_source=codex&utm_content=edit_in_figjam&oai_id=&request_id=cca2c104-985a-4dac-b27a-57853c527805>
 
+Sale-room index:
+
+- `docs/commercial/2026-07-02-sale-room-index.md`
+
+## Phase 3 Execution Status
+
+Current executed items:
+
+- Figma authentication confirmed for the workspace user.
+- Existing FigJam planning board updated with the v2 sale-readiness gate.
+- Figma Slides buyer deck generated for technical diligence and investment
+  committee review.
+- GitHub/Data Analytics lookup returned no PR-triggered workflow runs for the
+  pre-refresh local baseline commit; this is documented as a process-state
+  non-blocker until the branch is pushed and a PR workflow exists.
+- Repository structure decision recorded: keep `aFIPC` as one R package and one
+  sale unit for the current transaction package; do not split a library or add a
+  submodule before buyer acceptance.
+
 ## Plugin Roles
 
 ### Figma
@@ -147,6 +166,15 @@ Output:
 - productized sale-room package;
 - buyer acceptance checklist.
 
+Structure decision:
+
+- Keep the current package/repository as the sale unit for this phase.
+- Do not introduce a submodule before buyer acceptance because it increases
+  checkout, ownership, and validation friction without improving the current
+  evidence gate.
+- Defer any library extraction until after buyer acceptance and only after
+  numerical-equivalence regression fixtures exist.
+
 ### Phase 3: Figma Assets
 
 1. Keep the FigJam execution flow as the operating map.
@@ -198,8 +226,7 @@ The program is sale-package-ready only when all are true:
 
 ## Immediate Next Actions
 
-1. Generate a Figma Slides buyer deck from this plan.
-2. Add a repository data-room index under `docs/commercial/`.
-3. Use GitHub/Data Analytics to attach current commit/workflow evidence.
-4. Re-run `scripts/validate-sale-readiness.R`.
-5. Commit the refreshed sale package.
+1. Re-run `scripts/validate-sale-readiness.R`.
+2. Commit the refreshed sale package.
+3. After push or PR creation, attach remote workflow evidence to the validation
+   appendix if the buyer requires GitHub-hosted CI proof.

@@ -70,6 +70,20 @@ Last locally observed baseline on 2026-07-02:
 Because dependency and R versions can drift, this snapshot must be refreshed
 before final buyer delivery.
 
+## GitHub/Data Analytics Snapshot
+
+2026-07-02 lookup for repository `ContextualWisdomLab/aFIPC` and pre-refresh
+local baseline commit `196c82bc889dcd00b237c7443f385ef0f52f0f29` returned no
+PR-triggered workflow runs.
+
+Interpretation:
+
+- This branch's local sale-readiness gate remains the current completion
+  evidence until the branch is pushed and a PR-triggered workflow exists.
+- A missing PR-triggered workflow run is not a blocker by itself.
+- After push or PR creation, record the latest workflow run ID, conclusion, and
+  commit SHA in a dated appendix.
+
 ## Evidence Interpretation
 
 Sale-readiness is a technical acceptance state, not a business valuation proof.

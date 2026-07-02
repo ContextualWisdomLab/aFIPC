@@ -45,6 +45,18 @@ below are true.
 | Operations | Maintainer workflow, risk policy, and release gate are documented. | `docs/operations/maintenance-runbook.md` |
 | Architecture | Runtime shape and high-risk areas are documented. | `ARCHITECTURE.md`, `AGENTS.md` |
 | Security intake | Vulnerability reporting path is present. | `.github/SECURITY.md` |
+| Sale-room index | Buyer-facing data-room sequence, structure decision, plugin artifacts, and handover checklist are documented. | `docs/commercial/2026-07-02-sale-room-index.md` |
+
+## Repository Structure Decision
+
+For the current KRW 2B target transaction package, keep `aFIPC` as one R package
+and one sale unit. Do not split a separate library and do not introduce a
+submodule before buyer acceptance.
+
+This preserves the existing validation surface and avoids creating a new
+integration boundary that would require additional numerical-equivalence
+evidence. A later split is acceptable only after buyer acceptance and only when
+new regression fixtures prove the extracted unit preserves current behavior.
 
 ## Buyer Handover Checklist
 
@@ -57,7 +69,9 @@ SHA in the evidence log:
 4. Confirm `NAMESPACE` exports only supported public functions.
 5. Confirm README links to the completion baseline and diligence evidence.
 6. Confirm no pending local-only dependency or data file is required to run tests.
-7. List unresolved risks explicitly rather than hiding them in sales language.
+7. Review `docs/commercial/2026-07-02-sale-room-index.md`.
+8. Confirm Figma board/deck access for the buyer without using Code Connect.
+9. List unresolved risks explicitly rather than hiding them in sales language.
 
 ## Known Limits
 
