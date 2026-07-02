@@ -716,6 +716,11 @@ autoFIPC <-
     newFormColNames <- colnames(newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE])
     oldFormColNames <- colnames(oldformYDataK[, colnames(oldFormModel@Data$data), drop = FALSE])
 
+    # Create an item-to-row index map for O(1) access to avoid repeated array scanning
+    # Since an item can have multiple parameters (a1, d, g, u), we group row indices by item name.
+    new_item_map <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)
+    old_item_map <- split(seq_len(nrow(OldScaleParms)), OldScaleParms$item)
+
     newFormItemIdxs <- match(newformCommonItemNames, newFormColNames)
     oldFormItemIdxs <- match(oldformCommonItemNames, oldFormColNames)
 
@@ -736,10 +741,8 @@ autoFIPC <-
           ' as common item use'
         )
 
-        new_item_idx <- match(newformCommonItemNames[i], NewScaleParms$item)
-        new_item_idx <- which(NewScaleParms$item == NewScaleParms$item[new_item_idx])
-        old_item_idx <- match(oldformCommonItemNames[i], OldScaleParms$item)
-        old_item_idx <- which(OldScaleParms$item == OldScaleParms$item[old_item_idx])
+        new_item_idx <- new_item_map[[newformCommonItemNames[i]]]
+        old_item_idx <- old_item_map[[oldformCommonItemNames[i]]]
 
         message(
           '   Newform Parms: ',
