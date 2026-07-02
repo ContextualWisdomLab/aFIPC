@@ -10,5 +10,9 @@ surveyFA(...)
 \item{...}{Arguments passed to the function}
 }
 \description{
-Stub for surveyFA
+Placeholder for the surveyFA fallback path.
+}
+\value{
+This function currently errors because the historical fallback
+algorithm is not implemented in this package.
 }

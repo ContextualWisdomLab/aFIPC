@@ -19,6 +19,7 @@
 #' automated fixed item parameter linking
 #'
 #' @import mirt
+#' @importFrom stats na.omit
 
 #' @param newformXData new form data X
 #' @param oldformYData old form (base form) data Y

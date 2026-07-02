@@ -1,11 +1,15 @@
 #' @title surveyFA
-#' @description Stub for surveyFA
+#' @description Placeholder for the surveyFA fallback path.
 #' @param ... Arguments passed to the function
-#' @return NULL
+#' @return This function currently errors because the historical fallback
+#'   algorithm is not implemented in this package.
 #' @importFrom stats factanal
 #' @export
 surveyFA <- function(...) {
-  # Stub function to satisfy R CMD check until real implementation is provided
-  message("surveyFA is currently a stub.")
-  NULL
+  stop(
+    "surveyFA fallback is not implemented in this package; ",
+    "use direct mirt model inputs or add a maintainer-approved fallback ",
+    "implementation with regression fixtures.",
+    call. = FALSE
+  )
 }

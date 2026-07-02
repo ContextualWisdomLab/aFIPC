@@ -17,7 +17,11 @@ preserve numerical behavior while modernizing repository operations
 ## Development status
 
 - Algorithmic core is legacy but trusted for historical outputs.
+- Program completion baseline:
+  `docs/plans/2026-07-02-program-completion-baseline.md`
 - Operational guardrails are now maintained via GitHub Actions and Dependabot.
+- `surveyFA()` fallback is explicit but not algorithmically implemented; use
+  direct `mirt` model inputs until a maintainer-approved fallback lands.
 - Legacy `packrat` bootstrap is opt-in via `AFIPC_ENABLE_PACKRAT=true`.
 - Broken host-specific `packrat/lib-R` symlinks were removed for portable builds.
 - Architectural and agent operation docs are available in:
