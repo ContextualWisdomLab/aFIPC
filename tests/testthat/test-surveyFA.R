@@ -50,12 +50,14 @@ test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
   names(raw) <- paste0("item", 1:2)
 
   expect_error(
-    aFIPC::surveyFA(
-      data = raw,
-      autofix = TRUE,
-      forceUIRT = TRUE,
-      itemtype = "not_a_model",
-      maxItemRemovals = 1
+    suppressWarnings(
+      aFIPC::surveyFA(
+        data = raw,
+        autofix = TRUE,
+        forceUIRT = TRUE,
+        itemtype = "not_a_model",
+        maxItemRemovals = 1
+      )
     ),
     "could not estimate a valid model after bounded recovery attempts"
   )

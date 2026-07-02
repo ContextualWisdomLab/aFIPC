@@ -26,14 +26,16 @@ test_that("autoFIPC executes without errors in non-interactive environment", {
   old_mod <- mirt::mirt(dat_old, 1, itemtype = "2PL", SE = FALSE, verbose = FALSE)
   new_mod <- mirt::mirt(dat_new, 1, itemtype = "2PL", SE = FALSE, verbose = FALSE)
 
-  res <- aFIPC::autoFIPC(
-    newformXData = new_mod,
-    oldformYData = old_mod,
-    newformCommonItemNames = paste0("Item", 1:5),
-    oldformCommonItemNames = paste0("Item", 1:5),
-    itemtype = "2PL",
-    checkIPD = FALSE,
-    confirmCommonItems = TRUE
+  res <- suppressWarnings(
+    aFIPC::autoFIPC(
+      newformXData = new_mod,
+      oldformYData = old_mod,
+      newformCommonItemNames = paste0("Item", 1:5),
+      oldformCommonItemNames = paste0("Item", 1:5),
+      itemtype = "2PL",
+      checkIPD = FALSE,
+      confirmCommonItems = TRUE
+    )
   )
 
   expect_type(res, "list")

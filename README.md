@@ -30,6 +30,10 @@ preserve numerical behavior while modernizing repository operations
   - `surveyFA()`의 bounded 재추정 시도(대체 추정기 + bounded item 제거)
   - 복구 불가 시 명시적 실패 메시지(`surveyFA fallback could not estimate ...`)
   - 회귀 고정 테스트(`tests/testthat/test-surveyFA.R`)의 신규/기존 항목 통과
+- KRW 2B technical sale-readiness diligence pack:
+  `docs/commercial/2026-07-02-krw-2b-sale-readiness.md`
+- Reproducible sale-readiness verification evidence:
+  `docs/validation/2026-07-02-sale-readiness-evidence.md`
 - Architectural and agent operation docs are available in:
   - `ARCHITECTURE.md`
   - `AGENTS.md`

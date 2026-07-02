@@ -21,6 +21,17 @@ plus:
 - fallback returns a fitted `mirt` model for recoverable input when possible;
 - fallback exhaustion reports an explicit reason and list of removed items.
 
+Treat `aFIPC` as ready for a KRW 2B technical diligence package only when the
+commercial sale-ready criteria are current and the following buyer-facing
+artifacts exist:
+
+- a sale-readiness diligence pack with included/excluded scope, handover
+  checklist, known limits, and release recommendation;
+- a verification evidence file that records exact local commands and current
+  result interpretation;
+- README links that let a buyer find the completion baseline and evidence
+  without relying on chat history.
+
 For commercial staging, external review-gate delays (예: OpenCode/리뷰 모델 가용성
 이슈)은 기능 완성도 판단의 1차 Blocker가 되지 않는다. 품질 요건은
 패키지 테스트/회귀·문서 증빙으로 판단한다.
@@ -34,7 +45,8 @@ This branch integrates the minimum safe completion baseline:
 - maintainer planning/runbook documentation;
 - explicit `stats::na.omit` namespace import;
 - bounded `surveyFA()` fallback with alternate estimation and bounded autofix
-  behavior.
+  behavior;
+- KRW 2B diligence pack and repeatable sale-readiness evidence documents.
 
 ## Release Blocker
 

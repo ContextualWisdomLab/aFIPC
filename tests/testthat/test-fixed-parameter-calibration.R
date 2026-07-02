@@ -45,17 +45,19 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     technical = list(NCYCLES = 500)
   )
 
-  linked <- aFIPC::autoFIPC(
-    newformXData = new_model,
-    oldformYData = old_model,
-    newformCommonItemNames = new_common_items,
-    oldformCommonItemNames = old_common_items,
-    itemtype = "2PL",
-    checkIPD = FALSE,
-    tryEM = TRUE,
-    freeMEAN = FALSE,
-    forceNormalZeroOne = TRUE,
-    confirmCommonItems = TRUE
+  linked <- suppressWarnings(
+    aFIPC::autoFIPC(
+      newformXData = new_model,
+      oldformYData = old_model,
+      newformCommonItemNames = new_common_items,
+      oldformCommonItemNames = old_common_items,
+      itemtype = "2PL",
+      checkIPD = FALSE,
+      tryEM = TRUE,
+      freeMEAN = FALSE,
+      forceNormalZeroOne = TRUE,
+      confirmCommonItems = TRUE
+    )
   )
 
   old_values <- mirt::mod2values(old_model)
