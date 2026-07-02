@@ -203,7 +203,7 @@ autoFIPC <-
 
       if (tryFitwholeOldItems == T) {
         if (
-          exists("oldFormModel") &&
+          exists("oldFormModel", inherits = FALSE) &&
           !oldFormModel@OptimInfo$secondordertest &&
             itemtype != 'ideal'
         ) {
@@ -228,7 +228,7 @@ autoFIPC <-
         }
 
         if (
-          exists("oldFormModel") &&
+          exists("oldFormModel", inherits = FALSE) &&
           !oldFormModel@OptimInfo$secondordertest &&
             itemtype != 'ideal'
         ) {
@@ -258,7 +258,7 @@ autoFIPC <-
       }
 
       if (
-        exists("oldFormModel") &&
+        exists("oldFormModel", inherits = FALSE) &&
         !oldFormModel@OptimInfo$secondordertest &&
           itemtype != 'ideal'
       ) {
@@ -277,7 +277,7 @@ autoFIPC <-
       }
 
       if (
-        exists("oldFormModel") &&
+        exists("oldFormModel", inherits = FALSE) &&
         !oldFormModel@OptimInfo$secondordertest &&
           itemtype != 'ideal'
       ) {
@@ -297,7 +297,7 @@ autoFIPC <-
       }
 
       if (
-        exists("oldFormModel") &&
+        exists("oldFormModel", inherits = FALSE) &&
         !oldFormModel@OptimInfo$secondordertest &&
           itemtype != 'ideal'
       ) {
@@ -317,7 +317,7 @@ autoFIPC <-
       }
 
       if (
-        exists("oldFormModel") &&
+        exists("oldFormModel", inherits = FALSE) &&
         !oldFormModel@OptimInfo$secondordertest &&
           itemtype != 'ideal'
       ) {
@@ -337,7 +337,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("oldFormModel") || !oldFormModel@OptimInfo$secondordertest) &&
+        (!exists("oldFormModel", inherits = FALSE) || !oldFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
@@ -423,7 +423,7 @@ autoFIPC <-
 
       if (tryFitwholeNewItems) {
         if (
-          exists("newFormModel") &&
+          exists("newFormModel", inherits = FALSE) &&
           !newFormModel@OptimInfo$secondordertest &&
             itemtype != 'ideal'
         ) {
@@ -448,7 +448,7 @@ autoFIPC <-
         }
 
         if (
-          exists("newFormModel") &&
+          exists("newFormModel", inherits = FALSE) &&
           !newFormModel@OptimInfo$secondordertest &&
             itemtype != 'ideal'
         ) {
@@ -478,7 +478,7 @@ autoFIPC <-
       }
 
       if (
-        exists("newFormModel") &&
+        exists("newFormModel", inherits = FALSE) &&
         !newFormModel@OptimInfo$secondordertest &&
           itemtype != 'ideal'
       ) {
@@ -497,7 +497,7 @@ autoFIPC <-
       }
 
       if (
-        exists("newFormModel") &&
+        exists("newFormModel", inherits = FALSE) &&
         !newFormModel@OptimInfo$secondordertest &&
           itemtype != 'ideal'
       ) {
@@ -517,7 +517,7 @@ autoFIPC <-
       }
 
       if (
-        exists("newFormModel") &&
+        exists("newFormModel", inherits = FALSE) &&
         !newFormModel@OptimInfo$secondordertest &&
           itemtype != 'ideal'
       ) {
@@ -537,7 +537,7 @@ autoFIPC <-
       }
 
       if (
-        exists("newFormModel") &&
+        exists("newFormModel", inherits = FALSE) &&
         !newFormModel@OptimInfo$secondordertest &&
           itemtype != 'ideal'
       ) {
@@ -557,7 +557,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("newFormModel") || !newFormModel@OptimInfo$secondordertest) &&
+        (!exists("newFormModel", inherits = FALSE) || !newFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
