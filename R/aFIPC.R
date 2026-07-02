@@ -716,14 +716,17 @@ autoFIPC <-
     newFormColNames <- colnames(newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE])
     oldFormColNames <- colnames(oldformYDataK[, colnames(oldFormModel@Data$data), drop = FALSE])
 
+    newFormItemIdxs <- match(newformCommonItemNames, newFormColNames)
+    oldFormItemIdxs <- match(oldformCommonItemNames, oldFormColNames)
+
     for (i in 1:length(oldformCommonItemNames)) {
-      newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
-      oldFormItemName <- oldFormColNames[match(oldformCommonItemNames[i], oldFormColNames)]
+      newFormItemName <- newFormColNames[newFormItemIdxs[i]]
+      oldFormItemName <- oldFormColNames[oldFormItemIdxs[i]]
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-        (length(na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
-            length(na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
+        (length(na.omit(unique(newFormModel@Data$data[, newFormItemIdxs[i]]))) ==
+            length(na.omit(unique(oldFormModel@Data$data[, oldFormItemIdxs[i]]))))
       ) {
         message(
           'applying ',
@@ -733,8 +736,10 @@ autoFIPC <-
           ' as common item use'
         )
 
-        new_item_idx <- which(NewScaleParms$item == newformCommonItemNames[i])
-        old_item_idx <- which(OldScaleParms$item == oldformCommonItemNames[i])
+        new_item_idx <- match(newformCommonItemNames[i], NewScaleParms$item)
+        new_item_idx <- which(NewScaleParms$item == NewScaleParms$item[new_item_idx])
+        old_item_idx <- match(oldformCommonItemNames[i], OldScaleParms$item)
+        old_item_idx <- which(OldScaleParms$item == OldScaleParms$item[old_item_idx])
 
         message(
           '   Newform Parms: ',
