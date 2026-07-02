@@ -32,9 +32,9 @@ Current executed items:
 - Figma Slides buyer deck generated for technical diligence and investment
   committee review.
 - GitHub/Data Analytics lookup for PR #92 confirms the current branch head,
-  unresolved review-thread count, and current-head check conclusions. If a
-  documentation-only evidence refresh starts new queued checks, that queue state
-  is documented separately from code/test/security blockers.
+  unresolved review-thread count, and current-head check state. Queued or
+  pending checks after a documentation-only evidence refresh are documented
+  separately from code/test/security blockers unless a check fails.
 - Repository structure decision recorded: keep `aFIPC` as one R package and one
   sale unit for the current transaction package; do not split a library or add a
   submodule before buyer acceptance.
