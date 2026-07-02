@@ -12,6 +12,8 @@
 ^CONTRIBUTING\.md$
 ^docs$
 ^docs/.*
+^scripts$
+^scripts/.*
 ^registered_agents\.json$
 ^task_agent_mapping\.json$
 ^\.gitleaks\.toml$

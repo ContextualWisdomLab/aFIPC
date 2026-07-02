@@ -41,7 +41,7 @@ below are true.
 | Fixed-parameter behavior | Common-item fixed-parameter linking is protected by regression fixtures. | `tests/testthat/test-fixed-parameter-calibration.R`, `test-regression-fixtures.R` |
 | Fallback behavior | `surveyFA()` can return a fitted `mirt` model for recoverable input. | `tests/testthat/test-surveyFA.R` |
 | Failure behavior | Unrecoverable fallback attempts stop with a bounded, explicit message. | `tests/testthat/test-surveyFA.R` |
-| Quality gate | Local package checks finish with 0 errors and 0 warnings. | `docs/validation/2026-07-02-sale-readiness-evidence.md` |
+| Quality gate | Single-command local validation finishes with test warnings/failures at zero and package check errors/warnings at zero. | `scripts/validate-sale-readiness.R`, `docs/validation/2026-07-02-sale-readiness-evidence.md` |
 | Operations | Maintainer workflow, risk policy, and release gate are documented. | `docs/operations/maintenance-runbook.md` |
 | Architecture | Runtime shape and high-risk areas are documented. | `ARCHITECTURE.md`, `AGENTS.md` |
 | Security intake | Vulnerability reporting path is present. | `.github/SECURITY.md` |
@@ -52,8 +52,8 @@ Before sharing a sale-room snapshot, complete these steps and record the commit
 SHA in the evidence log:
 
 1. Confirm the worktree is clean.
-2. Run `testthat::test_dir("tests/testthat")`.
-3. Run `rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning")`.
+2. Run `R_PROFILE_USER=/dev/null Rscript scripts/validate-sale-readiness.R`.
+3. Confirm the script prints `SALE_READINESS_OK`.
 4. Confirm `NAMESPACE` exports only supported public functions.
 5. Confirm README links to the completion baseline and diligence evidence.
 6. Confirm no pending local-only dependency or data file is required to run tests.

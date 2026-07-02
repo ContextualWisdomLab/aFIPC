@@ -183,15 +183,17 @@ test_that("IPD fixture filters anchors before fixed-parameter linking", {
     technical = list(NCYCLES = 600)
   )
 
-  linked <- suppressWarnings(aFIPC::autoFIPC(
-    newformXData = new_model,
-    oldformYData = old_model,
-    newformCommonItemNames = new_common_items,
-    oldformCommonItemNames = old_common_items,
-    itemtype = fx$itemtype,
-    checkIPD = TRUE,
-    tryEM = TRUE,
-    confirmCommonItems = TRUE
+  linked <- suppressMessages(suppressWarnings(
+    aFIPC::autoFIPC(
+      newformXData = new_model,
+      oldformYData = old_model,
+      newformCommonItemNames = new_common_items,
+      oldformCommonItemNames = old_common_items,
+      itemtype = fx$itemtype,
+      checkIPD = TRUE,
+      tryEM = TRUE,
+      confirmCommonItems = TRUE
+    )
   ))
 
   expect_true("IPDData" %in% names(linked))

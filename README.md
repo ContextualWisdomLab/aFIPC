@@ -55,8 +55,14 @@ preserve numerical behavior while modernizing repository operations
 ## Local package check
 
 ```bash
+R_PROFILE_USER=/dev/null Rscript scripts/validate-sale-readiness.R
+```
+
+Lower-level checks:
+
+```bash
 R_PROFILE_USER=/dev/null Rscript -e \
-'install.packages(c("rcmdcheck"), repos="https://cloud.r-project.org")'
+'install.packages(c("pkgload", "testthat", "rcmdcheck"), repos="https://cloud.r-project.org")'
 R_PROFILE_USER=/dev/null Rscript -e \
 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning")'
 ```

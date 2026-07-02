@@ -10,13 +10,26 @@ maintainer can reproduce the result from a fresh checkout.
 
 - R with package build/check tooling available.
 - Installed package dependencies declared in `DESCRIPTION`.
-- Optional: `rcmdcheck` for CRAN-style local checks.
+- Validation helper packages: `pkgload`, `testthat`, and `rcmdcheck`.
 - No private secrets or external data files are required for the validation
   commands below.
 
 ## Verification Commands
 
 Run from the repository root:
+
+```bash
+R_PROFILE_USER=/dev/null Rscript scripts/validate-sale-readiness.R
+```
+
+Required final line:
+
+- `SALE_READINESS_OK`
+
+The validation script runs the lower-level gates below and fails if either gate
+misses its required summary.
+
+Lower-level test gate:
 
 ```bash
 R_PROFILE_USER=/dev/null Rscript -e 'pkgload::load_all(); testthat::test_dir("tests/testthat")'
@@ -28,7 +41,7 @@ Required result:
 - `WARN 0`
 - `SKIP 0` for critical package tests
 
-Run the CRAN-style package gate:
+Lower-level CRAN-style package gate:
 
 ```bash
 R_PROFILE_USER=/dev/null Rscript -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning")'
@@ -45,6 +58,7 @@ Required result:
 
 Last locally observed baseline on 2026-07-02:
 
+- `scripts/validate-sale-readiness.R`: completed with `SALE_READINESS_OK`.
 - `testthat::test_dir("tests/testthat")`: 51 passing assertions, 0 failures,
   0 warnings, 0 skips.
 - `R CMD check --no-manual --as-cran`: 0 errors, 0 warnings, 1 CRAN incoming
