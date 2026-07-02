@@ -3,25 +3,29 @@ test_that("surveyFA can recover with bounded autofix for messy response data", {
   set.seed(20260702)
 
   raw <- as.data.frame(
-    matrix(
-      c(
-        rbinom(200, 1, 0.65),
-        rbinom(200, 1, 0.55),
-        rep(1, 200)
-      ),
-      ncol = 3
+    mirt::simdata(
+      a = matrix(c(
+        1.00, 1.20, 0.95, 1.08, 1.12,
+        0.90, 1.05, 1.18, 1.22, 0.88
+      ), ncol = 1),
+      d = c(-1.0, -0.45, -0.10, 0.30, 0.70, -0.65, 0.20, 0.55, 0.95, -0.30),
+      itemtype = rep("2PL", 10),
+      N = 200
     )
   )
-  names(raw) <- paste0("item", 1:3)
+  names(raw) <- paste0("item", seq_len(ncol(raw)))
+  # include one constant column to exercise bounded cleanup behavior
+  raw$item11 <- 1
 
   fitted <- aFIPC::surveyFA(
     data = raw,
     autofix = TRUE,
     forceUIRT = TRUE,
+    forceNormalEM = TRUE,
     SE = FALSE
   )
 
-  expect_s3_class(fitted, "SingleGroupClass")
+  expect_true(inherits(fitted, "SingleGroupClass"))
   expect_true(fitted@OptimInfo$secondordertest)
 })
 

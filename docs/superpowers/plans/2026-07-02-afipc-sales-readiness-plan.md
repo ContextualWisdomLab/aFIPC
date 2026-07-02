@@ -45,12 +45,21 @@ Keep the call-compatible arguments used by `R/aFIPC.R`:
 
 ```r
 set.seed(20260702)
-raw <- as.data.frame(mirt::simdata(a = matrix(c(1.1, 1.2, 0.8), ncol = 3), d = c(-0.3, 0.2, 0.9), N = 200, itemtype = "2PL")
-names(raw) <- paste0("item", 1:3)
-# inject one constant item for robustness path
-raw$item3 <- 1
-fit <- aFIPC::surveyFA(raw, autofix = TRUE, forceUIRT = TRUE, SE = FALSE)
-expect_s3_class(fit, "SingleGroupClass")
+raw <- as.data.frame(
+  mirt::simdata(
+    a = matrix(c(
+      1.00, 1.20, 0.95, 1.08, 1.12,
+      0.90, 1.05, 1.18, 1.22, 0.88
+    ), ncol = 1),
+    d = c(-1.0, -0.45, -0.10, 0.30, 0.70, -0.65, 0.20, 0.55, 0.95, -0.30),
+    itemtype = rep("2PL", 10),
+    N = 200
+  )
+)
+names(raw) <- paste0("item", seq_len(ncol(raw)))
+raw$item11 <- 1
+fit <- aFIPC::surveyFA(raw, autofix = TRUE, forceUIRT = TRUE, forceNormalEM = TRUE, SE = FALSE)
+expect_true(inherits(fit, "SingleGroupClass"))
 ```
 
 - [x] **Step 4: Add malformed-input test**
@@ -103,6 +112,6 @@ No changes to `R/aFIPC.R` core algorithm beyond call-compatibility behavior.
 **Files:**
 - None (handoff note)
 
-- [ ] **Step 11: Register and publish next goal state**
+- [x] **Step 11: Register and publish next goal state**
 
 Keep execution goal focused on commercial readiness and keep review-bot availability out of blocking criteria.

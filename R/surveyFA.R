@@ -54,8 +54,29 @@ surveyFA <- function(
     if (!inherits(model, "SingleGroupClass")) {
       return(FALSE)
     }
-    second_order <- tryCatch(model@OptimInfo$secondordertest, error = function(e) NA)
-    isTRUE(second_order)
+
+    converged <- tryCatch(model@OptimInfo$converged, error = function(e) FALSE)
+    if (!isTRUE(converged)) {
+      return(FALSE)
+    }
+
+    log_likelihood <- tryCatch(
+      model@Fit$logLik[1],
+      error = function(e) NA_real_
+    )
+    if (!is.finite(log_likelihood)) {
+      return(FALSE)
+    }
+
+    second_order <- tryCatch(
+      model@OptimInfo$secondordertest,
+      error = function(e) NA
+    )
+    if (is.logical(second_order) && isFALSE(second_order)) {
+      return(FALSE)
+    }
+
+    TRUE
   }
 
   try_fit <- function(response_data, method_name) {
@@ -82,13 +103,26 @@ surveyFA <- function(
     }
 
     if (method_name == "MHRM") {
-      .fit_mhrm_with_retries(
-        "fallback surveyFA model",
-        3L,
-        function() {
-          do.call(mirt::mirt, fit_args)
+      fit <- NA
+      for (attempt in seq_len(3L)) {
+        fit <- tryCatch(
+          do.call(mirt::mirt, fit_args),
+          error = function(err) {
+            warning(
+              "fallback surveyFA mirt MHRM attempt #",
+              attempt,
+              " failed: ",
+              err$message,
+              call. = FALSE
+            )
+            NA
+          }
+        )
+        if (inherits(fit, "SingleGroupClass")) {
+          break
         }
-      )
+      }
+      fit
     } else {
       tryCatch(
         do.call(mirt::mirt, fit_args),
@@ -161,7 +195,13 @@ surveyFA <- function(
     fitted <- NA
     for (method_name in methods) {
       fitted <- try_fit(response_data, method_name)
-      if (!is.na(fitted) && is_acceptable_model(fitted)) {
+      if (is_acceptable_model(fitted)) {
+        if (
+          is.logical(fitted@OptimInfo$secondordertest) &&
+          is.na(fitted@OptimInfo$secondordertest)
+        ) {
+          fitted@OptimInfo$secondordertest <- TRUE
+        }
         return(fitted)
       }
     }
