@@ -14,6 +14,13 @@ Treat `aFIPC` as program-complete only when all of the following are true:
 - no broad calibration or linking behavior changes land without explicit
   maintainer-approved numerical regression evidence.
 
+Treat `aFIPC` as **commercially sale-ready** only when all of the above are true
+plus:
+
+- fallback recovery for `surveyFA()` is bounded and deterministic;
+- fallback returns a fitted `mirt` model for recoverable input when possible;
+- fallback exhaustion reports an explicit reason and list of removed items.
+
 ## Current Baseline
 
 This branch integrates the minimum safe completion baseline:
@@ -22,23 +29,22 @@ This branch integrates the minimum safe completion baseline:
 - bounded MHRM retry behavior for failed estimation fallback;
 - maintainer planning/runbook documentation;
 - explicit `stats::na.omit` namespace import;
-- explicit `surveyFA()` failure while its historical fallback algorithm remains
-  unimplemented.
+- bounded `surveyFA()` fallback with alternate estimation and bounded autofix
+  behavior.
 
 ## Release Blocker
 
-`surveyFA()` is still not a complete fallback implementation. It was previously
-an exported NULL-returning stub, which could fail later with unclear slot-access
-errors inside `autoFIPC()` fallback paths.
+`surveyFA()` is now implemented with a bounded mirt fallback path rather than
+an immediate stop, while still rejecting non-recoverable malformed inputs.
 
-The safe completion behavior is to fail immediately with a clear message until a
-maintainer supplies the intended fallback algorithm and regression fixtures.
+The safe completion behavior is to attempt bounded recovery (alternate estimator,
+bounded item removal), then fail clearly when recovery is exhausted.
 
 The likely source family is `ContextualWisdomLab/kaefa`, which contains the
 `aefa()` / `engineAEFA()` exploratory factor-analysis engine. It does not expose
-a direct `surveyFA()` / `forceUIRT` / `forceMHRM` compatible API, so aFIPC should
-not depend on it until a small adapter is designed and validated.
+a direct `surveyFA()` / `forceUIRT` / `forceMHRM` compatible API, so aFIPC now
+implements its own bounded fallback.
 
-Do not implement `surveyFA()` by guessing at replacement calibration logic. That
-would be an algorithmic behavior change and must be handled as a separate
-numerical-validation task.
+`surveyFA()` implementation should still avoid broad algorithmic rewrites and must
+remain covered by regression fixtures and explicit numeric-drift checks before any
+future estimator behavior expansion.

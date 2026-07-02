@@ -20,8 +20,8 @@ preserve numerical behavior while modernizing repository operations
 - Program completion baseline:
   `docs/plans/2026-07-02-program-completion-baseline.md`
 - Operational guardrails are now maintained via GitHub Actions and Dependabot.
-- `surveyFA()` fallback is explicit but not algorithmically implemented; use
-  direct `mirt` model inputs until a maintainer-approved fallback lands.
+- `surveyFA()` fallback now uses a bounded `mirt`-native recovery path that
+  attempts alternate estimators and bounded item removal before failing.
 - Legacy `packrat` bootstrap is opt-in via `AFIPC_ENABLE_PACKRAT=true`.
 - Broken host-specific `packrat/lib-R` symlinks were removed for portable builds.
 - Architectural and agent operation docs are available in:

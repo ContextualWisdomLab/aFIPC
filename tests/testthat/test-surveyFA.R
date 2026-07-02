@@ -1,6 +1,35 @@
-test_that("surveyFA fallback fails explicitly until implemented", {
+test_that("surveyFA can recover with bounded autofix for messy response data", {
+  skip_if_not_installed("mirt")
+  set.seed(20260702)
+
+  raw <- as.data.frame(
+    matrix(
+      c(
+        rbinom(200, 1, 0.65),
+        rbinom(200, 1, 0.55),
+        rep(1, 200)
+      ),
+      ncol = 3
+    )
+  )
+  names(raw) <- paste0("item", 1:3)
+
+  fitted <- aFIPC::surveyFA(
+    data = raw,
+    autofix = TRUE,
+    forceUIRT = TRUE,
+    SE = FALSE
+  )
+
+  expect_s3_class(fitted, "SingleGroupClass")
+  expect_true(fitted@OptimInfo$secondordertest)
+})
+
+test_that("surveyFA errors clearly for unsupported input", {
+  skip_if_not_installed("mirt")
+
   expect_error(
-    aFIPC::surveyFA(data.frame(item1 = c(0, 1, 1, 0))),
-    "surveyFA fallback is not implemented"
+    aFIPC::surveyFA(1:10, forceUIRT = TRUE),
+    "surveyFA requires a response matrix or data frame"
   )
 })
