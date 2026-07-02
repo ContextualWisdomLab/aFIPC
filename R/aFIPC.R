@@ -215,7 +215,7 @@ autoFIPC <-
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
 
-          try(rm(oldFormModel), silent = TRUE)
+          try(rm(list = 'oldFormModel', envir = environment(), inherits = FALSE), silent = TRUE)
           for (attempt in seq_len(3)) {
             try(
               oldFormModel <-
@@ -230,7 +230,10 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('oldFormModel')) break
+            if (exists('oldFormModel', envir = environment(), inherits = FALSE)) break
+          }
+          if (!exists('oldFormModel', envir = environment(), inherits = FALSE)) {
+            stop("Estimation failed repeatedly for oldFormModel. Exiting.")
           }
         }
       }
@@ -428,7 +431,7 @@ autoFIPC <-
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
 
-          try(rm(newFormModel), silent = TRUE)
+          try(rm(list = 'newFormModel', envir = environment(), inherits = FALSE), silent = TRUE)
           for (attempt in seq_len(3)) {
             try(
               newFormModel <-
@@ -443,7 +446,10 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('newFormModel')) break
+            if (exists('newFormModel', envir = environment(), inherits = FALSE)) break
+          }
+          if (!exists('newFormModel', envir = environment(), inherits = FALSE)) {
+            stop("Estimation failed repeatedly for newFormModel. Exiting.")
           }
         }
       }
