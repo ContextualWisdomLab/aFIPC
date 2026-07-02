@@ -235,7 +235,7 @@ autoFIPC <-
             retry_count <- retry_count + 1
           }
           if (!exists('oldFormModel')) {
-            stop("최대 재시도 횟수 초과 후 모델 추정에 실패했습니다. 데이터 및 파라미터를 확인하십시오.")
+            stop("\ucd5c\ub300\u0020\uc7ac\uc2dc\ub3c4\u0020\ud69f\uc218\u0020\ucd08\uacfc\u0020\ud6c4\u0020\ubaa8\ub378\u0020\ucd94\uc815\uc5d0\u0020\uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4\u002e\u0020\ub370\uc774\ud130\u0020\ubc0f\u0020\ud30c\ub77c\ubbf8\ud130\ub97c\u0020\ud655\uc778\ud558\uc2ed\uc2dc\uc624\u002e")
           }
         }
       }
@@ -453,7 +453,7 @@ autoFIPC <-
             retry_count <- retry_count + 1
           }
           if (!exists('newFormModel')) {
-            stop("최대 재시도 횟수 초과 후 모델 추정에 실패했습니다. 데이터 및 파라미터를 확인하십시오.")
+            stop("\ucd5c\ub300\u0020\uc7ac\uc2dc\ub3c4\u0020\ud69f\uc218\u0020\ucd08\uacfc\u0020\ud6c4\u0020\ubaa8\ub378\u0020\ucd94\uc815\uc5d0\u0020\uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4\u002e\u0020\ub370\uc774\ud130\u0020\ubc0f\u0020\ud30c\ub77c\ubbf8\ud130\ub97c\u0020\ud655\uc778\ud558\uc2ed\uc2dc\uc624\u002e")
           }
         }
       }
