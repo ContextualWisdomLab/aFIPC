@@ -158,14 +158,15 @@ Approved future option:
   documented if present.
   Evidence source: validation evidence doc.
 - GitHub PR #92 current-head evidence:
-  current PR head, unresolved review threads 0, and current-head remote checks
-  queued after a documentation-only evidence refresh.
-  Evidence source: Data Analytics/GitHub lookup on 2026-07-02.
+  current PR head, unresolved review threads 0, and current-head remote check
+  conclusions.
+  Evidence source: Data Analytics/GitHub lookup on 2026-07-03.
 
 Interpretation:
 
-- Local validation is the authoritative technical completion evidence while
-  current-head GitHub checks are queued.
+- Local validation is the authoritative technical completion evidence. Remote
+  GitHub checks provide corroborating evidence when concluded; queued checks
+  after a documentation-only refresh are non-blocking unless they fail.
 - Review-decision latency, queued remote checks, and skipped manual evidence
   publication are process states, not product defects, unless they expose a
   concrete code, test, or security issue.

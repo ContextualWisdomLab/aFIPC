@@ -59,7 +59,7 @@ Required result:
 
 ## Current Evidence Snapshot
 
-Last locally observed baseline on 2026-07-02:
+Last locally observed baseline on 2026-07-03 KST:
 
 - `scripts/validate-sale-readiness.R`: completed with `SALE_READINESS_OK`.
 - `testthat::test_dir("tests/testthat")`: 51 passing assertions, 0 failures,
@@ -75,15 +75,16 @@ before final buyer delivery.
 
 ## GitHub/Data Analytics Snapshot
 
-2026-07-02 lookup for repository `ContextualWisdomLab/aFIPC` and PR #92
-confirmed the current PR head and unresolved review-thread state.
+2026-07-03 lookup for repository `ContextualWisdomLab/aFIPC` and PR #92
+confirmed the current PR head, unresolved review-thread state, and remote check
+conclusions.
 
 Interpretation:
 
 - Unresolved review threads: 0.
-- Current-head remote checks were queued after the documentation-only evidence
-  refresh; local `SALE_READINESS_OK` remains the current technical completion
-  gate while the remote queue drains.
+- Current-head remote checks were passing or explicitly skipped at lookup time;
+  local `SALE_READINESS_OK` remains the current technical completion gate if a
+  documentation-only refresh starts a new queued run.
 - Stale or delayed review-decision state is not a blocker unless it reveals a
   concrete code, test, or security defect.
 - When the handover commit SHA changes, record the latest workflow run IDs,
