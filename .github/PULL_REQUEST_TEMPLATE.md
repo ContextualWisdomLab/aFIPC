@@ -5,6 +5,15 @@
 - What changed?
 - Why is this needed?
 
+## Change Category
+
+- [ ] Regression evidence
+- [ ] Security / DoS guardrail
+- [ ] Performance optimization
+- [ ] CI / governance
+- [ ] Documentation only
+- [ ] Other:
+
 ## Validation
 
 - [ ] `R CMD check` (or equivalent CI) succeeded
