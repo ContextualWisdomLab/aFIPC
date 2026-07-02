@@ -26,47 +26,78 @@ The sale-room package is complete when all of the following are true:
 
 ## Repository Evidence
 
-| Evidence Area | Source | Buyer Action |
-| --- | --- | --- |
-| Package source | `R/`, `DESCRIPTION`, `NAMESPACE`, `man/` | Inspect exported API and package metadata. |
-| Validation gate | `scripts/validate-sale-readiness.R` | Run the command from the repository root. |
-| Technical sale pack | `docs/commercial/2026-07-02-krw-2b-sale-readiness.md` | Review scope, completion criteria, and limits. |
-| Plugin execution plan | `docs/commercial/2026-07-02-plugin-sale-readiness-plan.md` | Review plugin-deliverable mapping and final gate. |
-| Validation evidence | `docs/validation/2026-07-02-sale-readiness-evidence.md` | Compare local output with required summaries. |
-| Architecture | `ARCHITECTURE.md` | Confirm runtime shape and high-risk areas. |
-| Maintainer operations | `docs/operations/maintenance-runbook.md` | Confirm repeatable maintenance workflow. |
-| Security intake | `.github/SECURITY.md` | Confirm vulnerability reporting path. |
-| CI policy | `.github/workflows/`, `.github/dependabot.yml` | Confirm actions and dependency hygiene. |
+- Package source:
+  `R/`, `DESCRIPTION`, `NAMESPACE`, and `man/`.
+  Buyer action: inspect exported API and package metadata.
+- Validation gate:
+  `scripts/validate-sale-readiness.R`.
+  Buyer action: run the command from the repository root.
+- Technical sale pack:
+  `docs/commercial/2026-07-02-krw-2b-sale-readiness.md`.
+  Buyer action: review scope, completion criteria, and limits.
+- Plugin execution plan:
+  `docs/commercial/2026-07-02-plugin-sale-readiness-plan.md`.
+  Buyer action: review plugin-deliverable mapping and final gate.
+- Validation evidence:
+  `docs/validation/2026-07-02-sale-readiness-evidence.md`.
+  Buyer action: compare local output with required summaries.
+- Architecture:
+  `ARCHITECTURE.md`.
+  Buyer action: confirm runtime shape and high-risk areas.
+- Maintainer operations:
+  `docs/operations/maintenance-runbook.md`.
+  Buyer action: confirm repeatable maintenance workflow.
+- Security intake:
+  `.github/SECURITY.md`.
+  Buyer action: confirm vulnerability reporting path.
+- CI policy:
+  `.github/workflows/` and `.github/dependabot.yml`.
+  Buyer action: confirm actions and dependency hygiene.
 
 ## Figma Artifacts
 
 Code Connect is explicitly excluded.
 
-| Artifact | Status | Location |
-| --- | --- | --- |
-| FigJam execution board | Created and updated with the v2 sale-readiness gate. | <https://www.figma.com/board/jD7NBmiuHUC0SRPhkTAGJk> |
-| Figma Slides buyer deck | Generated for buyer/investment-committee review. | Copy the canonical Figma Slides URL from the generated preview before external sharing. |
-| One-page executive brief | Planned derivative of the deck and this index. | Create from this index if the buyer requires a single-page PDF. |
+- FigJam execution board:
+  created and updated with the v2 sale-readiness gate.
+  Location: <https://www.figma.com/board/jD7NBmiuHUC0SRPhkTAGJk>.
+- Figma Slides buyer deck:
+  generated for buyer and investment-committee review.
+  Before external sharing, copy the canonical Figma Slides URL from the
+  generated preview.
+- One-page executive brief:
+  planned derivative of the deck and this index.
+  Create it from this index if the buyer requires a single-page PDF.
 
 ## Product Design Frame
 
 ### Buyer Personas
 
-| Persona | Primary Need | Acceptance Signal |
-| --- | --- | --- |
-| Assessment publisher | Preserve fixed-item linking behavior across forms. | Regression fixtures demonstrate stable linking paths. |
-| Psychometrics team | Inspect calibration behavior without interactive prompts. | `autoFIPC()` and `surveyFA()` are documented and covered by tests. |
-| Edtech platform | Evaluate whether legacy IRT calibration logic can be acquired and maintained. | Package check, runbook, architecture notes, and security intake are present. |
-| Research lab | Reproduce and extend historical calibration workflows. | Source package, docs, and local validation command are available. |
+- Assessment publisher:
+  needs fixed-item linking behavior preserved across forms.
+  Acceptance signal: regression fixtures demonstrate stable linking paths.
+- Psychometrics team:
+  needs calibration behavior that can be inspected without prompts.
+  Acceptance signal: `autoFIPC()` and `surveyFA()` are documented and tested.
+- Edtech platform:
+  needs to evaluate legacy IRT logic as an acquirable asset.
+  Acceptance signal: package check, runbook, architecture notes, and security
+  intake are present.
+- Research lab:
+  needs to reproduce and extend historical calibration workflows.
+  Acceptance signal: source, docs, and local validation command are available.
 
 ### Jobs To Be Done
 
-| Job | Package Response |
-| --- | --- |
-| Run fixed-parameter calibration and linking from source. | Preserve `autoFIPC()` and existing numerical behavior. |
-| Recover from selected `surveyFA()` estimation failures. | Use bounded `mirt`-native fallback attempts before explicit failure. |
-| Prove technical diligence without private data. | Use synthetic fixtures and `scripts/validate-sale-readiness.R`. |
-| Handover the asset to a buyer's technical team. | Provide README, architecture, runbook, security policy, and this index. |
+- Run fixed-parameter calibration and linking from source.
+  Package response: preserve `autoFIPC()` and existing numerical behavior.
+- Recover from selected `surveyFA()` estimation failures.
+  Package response: use bounded `mirt`-native fallback attempts before failure.
+- Prove technical diligence without private data.
+  Package response: use synthetic fixtures and the sale-readiness script.
+- Handover the asset to a buyer's technical team.
+  Package response: provide README, architecture, runbook, security policy, and
+  this index.
 
 ### Product Promise
 
@@ -108,15 +139,27 @@ Approved future option:
 
 ## Data Analytics Evidence
 
-| Metric | Current Required State | Evidence Source |
-| --- | --- | --- |
-| Test failures | 0 | `scripts/validate-sale-readiness.R` |
-| Test warnings | 0 | `scripts/validate-sale-readiness.R` |
-| Test skips | 0 for critical package tests | `scripts/validate-sale-readiness.R` |
-| R CMD check errors | 0 | `scripts/validate-sale-readiness.R` |
-| R CMD check warnings | 0 | `scripts/validate-sale-readiness.R` |
-| R CMD check notes | Documented if present | Validation evidence doc |
-| GitHub workflow runs for local baseline commit | None returned for PR-triggered workflow lookup | Data Analytics/GitHub lookup on 2026-07-02 |
+- Test failures:
+  required state 0.
+  Evidence source: `scripts/validate-sale-readiness.R`.
+- Test warnings:
+  required state 0.
+  Evidence source: `scripts/validate-sale-readiness.R`.
+- Test skips:
+  required state 0 for critical package tests.
+  Evidence source: `scripts/validate-sale-readiness.R`.
+- `R CMD check` errors:
+  required state 0.
+  Evidence source: `scripts/validate-sale-readiness.R`.
+- `R CMD check` warnings:
+  required state 0.
+  Evidence source: `scripts/validate-sale-readiness.R`.
+- `R CMD check` notes:
+  documented if present.
+  Evidence source: validation evidence doc.
+- GitHub workflow runs for local baseline commit:
+  none returned for PR-triggered workflow lookup before push.
+  Evidence source: Data Analytics/GitHub lookup on 2026-07-02.
 
 Interpretation:
 
@@ -128,13 +171,21 @@ Interpretation:
 
 ## Superpowers Execution Loop
 
-| Step | Done When | Blocker? |
-| --- | --- | --- |
-| Inspect | Current branch, worktree, docs, validation gate, and GitHub evidence are checked. | Yes, if repository state cannot be read. |
-| Implement | Sale-room docs and Figma assets are updated without changing numerical logic. | Yes, if required files cannot be edited. |
-| Validate | `scripts/validate-sale-readiness.R` prints `SALE_READINESS_OK`. | Yes, if package errors/warnings appear. |
-| Document | Known limits, structure decision, plugin roles, and buyer actions are recorded. | Yes, if unresolved product risks are hidden. |
-| Commit | Changes are grouped as a sale-package refresh. | No, if local verification is complete but remote review is delayed. |
+- Inspect:
+  current branch, worktree, docs, validation gate, and GitHub evidence are
+  checked. Blocker only if repository state cannot be read.
+- Implement:
+  sale-room docs and Figma assets are updated without changing numerical logic.
+  Blocker only if required files cannot be edited.
+- Validate:
+  `scripts/validate-sale-readiness.R` prints `SALE_READINESS_OK`.
+  Blocker if package errors or warnings appear.
+- Document:
+  known limits, structure decision, plugin roles, and buyer actions are
+  recorded. Blocker if unresolved product risks are hidden.
+- Commit:
+  changes are grouped as a sale-package refresh.
+  Not a blocker if local verification is complete but remote review is delayed.
 
 ## Blocker Policy
 

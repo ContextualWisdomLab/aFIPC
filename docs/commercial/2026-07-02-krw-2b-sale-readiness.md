@@ -33,19 +33,44 @@ Excluded from this sale-ready claim:
 The package may be presented as technically sale-ready only when all criteria
 below are true.
 
-| Area | Required Evidence | Current Artifact |
-| --- | --- | --- |
-| Install/load | Package installs and loads from source without runtime prompt requirements. | `R CMD check --no-manual --as-cran` |
-| Core API | `autoFIPC()` and `surveyFA()` are exported and documented. | `NAMESPACE`, `man/*.Rd`, README |
-| Non-interactive use | `autoFIPC()` has test coverage for non-interactive execution. | `tests/testthat/test-package-api.R` |
-| Fixed-parameter behavior | Common-item fixed-parameter linking is protected by regression fixtures. | `tests/testthat/test-fixed-parameter-calibration.R`, `test-regression-fixtures.R` |
-| Fallback behavior | `surveyFA()` can return a fitted `mirt` model for recoverable input. | `tests/testthat/test-surveyFA.R` |
-| Failure behavior | Unrecoverable fallback attempts stop with a bounded, explicit message. | `tests/testthat/test-surveyFA.R` |
-| Quality gate | Single-command local validation finishes with test warnings/failures at zero and package check errors/warnings at zero. | `scripts/validate-sale-readiness.R`, `docs/validation/2026-07-02-sale-readiness-evidence.md` |
-| Operations | Maintainer workflow, risk policy, and release gate are documented. | `docs/operations/maintenance-runbook.md` |
-| Architecture | Runtime shape and high-risk areas are documented. | `ARCHITECTURE.md`, `AGENTS.md` |
-| Security intake | Vulnerability reporting path is present. | `.github/SECURITY.md` |
-| Sale-room index | Buyer-facing data-room sequence, structure decision, plugin artifacts, and handover checklist are documented. | `docs/commercial/2026-07-02-sale-room-index.md` |
+- Install/load:
+  package installs and loads from source without runtime prompt requirements.
+  Current artifact: `R CMD check --no-manual --as-cran`.
+- Core API:
+  `autoFIPC()` and `surveyFA()` are exported and documented.
+  Current artifacts: `NAMESPACE`, `man/*.Rd`, and README.
+- Non-interactive use:
+  `autoFIPC()` has coverage for non-interactive execution.
+  Current artifact: `tests/testthat/test-package-api.R`.
+- Fixed-parameter behavior:
+  common-item fixed-parameter linking is protected by regression fixtures.
+  Current artifacts:
+  `tests/testthat/test-fixed-parameter-calibration.R` and
+  `test-regression-fixtures.R`.
+- Fallback behavior:
+  `surveyFA()` can return a fitted `mirt` model for recoverable input.
+  Current artifact: `tests/testthat/test-surveyFA.R`.
+- Failure behavior:
+  unrecoverable fallback attempts stop with a bounded, explicit message.
+  Current artifact: `tests/testthat/test-surveyFA.R`.
+- Quality gate:
+  local validation finishes with test failures/warnings at zero and package
+  check errors/warnings at zero.
+  Current artifacts: `scripts/validate-sale-readiness.R` and
+  `docs/validation/2026-07-02-sale-readiness-evidence.md`.
+- Operations:
+  maintainer workflow, risk policy, and release gate are documented.
+  Current artifact: `docs/operations/maintenance-runbook.md`.
+- Architecture:
+  runtime shape and high-risk areas are documented.
+  Current artifacts: `ARCHITECTURE.md` and `AGENTS.md`.
+- Security intake:
+  vulnerability reporting path is present.
+  Current artifact: `.github/SECURITY.md`.
+- Sale-room index:
+  buyer sequence, structure decision, plugin artifacts, and checklist are
+  documented.
+  Current artifact: `docs/commercial/2026-07-02-sale-room-index.md`.
 
 ## Repository Structure Decision
 

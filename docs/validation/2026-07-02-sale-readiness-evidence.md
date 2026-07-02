@@ -44,7 +44,10 @@ Required result:
 Lower-level CRAN-style package gate:
 
 ```bash
-R_PROFILE_USER=/dev/null Rscript -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning")'
+R_PROFILE_USER=/dev/null Rscript -e 'rcmdcheck::rcmdcheck(
+  args = c("--no-manual", "--as-cran"),
+  error_on = "warning"
+)'
 ```
 
 Required result:
