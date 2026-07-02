@@ -109,10 +109,10 @@ autoFIPC <-
     ) {
       # if Data is mirt model
       oldFormModel <- oldformYData
-      oldformYDataK <- data.frame(oldFormModel@Data$data)
+      oldformYDataK <- as.data.frame(oldFormModel@Data$data)
     } else {
       # if Data is data.frame
-      oldformYDataK <- oldformYData
+      oldformYDataK <- as.data.frame(oldformYData)
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
         checkoldformBILOGprior <- function() {
           if (!interactive()) stop("Interactive session required for oldform BILOG prior")
@@ -323,9 +323,9 @@ autoFIPC <-
     ) {
       # if Data is mirt model
       newFormModel <- newformXData
-      newformXDataK <- data.frame(newFormModel@Data$data)
+      newformXDataK <- as.data.frame(newFormModel@Data$data)
     } else {
-      newformXDataK <- newformXData
+      newformXDataK <- as.data.frame(newformXData)
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
         checknewformBILOGprior <- function() {
           if (!interactive()) stop("Interactive session required for newform BILOG prior")
@@ -538,19 +538,21 @@ autoFIPC <-
       OldScaleParms[, "est"] <- TRUE
     }
 
-    NewScaleParms[which(NewScaleParms$item == paste0('GROUP')), "est"] <-
-      FALSE
-    OldScaleParms[which(OldScaleParms$item == paste0('GROUP')), "est"] <-
-      FALSE
+    new_group_idx <- which(NewScaleParms$item == 'GROUP')
+    old_group_idx <- which(OldScaleParms$item == 'GROUP')
+    if (length(new_group_idx) > 0) NewScaleParms[new_group_idx, "est"] <- FALSE
+    if (length(old_group_idx) > 0) OldScaleParms[old_group_idx, "est"] <- FALSE
 
-    NewScaleParms[which(NewScaleParms$name == "COV_11"), "est"] <-
-      TRUE
-    OldScaleParms[which(OldScaleParms$name == "COV_11"), "est"] <-
-      TRUE
+    new_cov11_idx <- which(NewScaleParms$name == "COV_11")
+    old_cov11_idx <- which(OldScaleParms$name == "COV_11")
+    if (length(new_cov11_idx) > 0) NewScaleParms[new_cov11_idx, "est"] <- TRUE
+    if (length(old_cov11_idx) > 0) OldScaleParms[old_cov11_idx, "est"] <- TRUE
 
     if (itemtype == 'Rasch') {
-      NewScaleParms[which(NewScaleParms$name == "a1"), "est"] <- FALSE
-      OldScaleParms[which(OldScaleParms$name == "a1"), "est"] <- FALSE
+      new_a1_idx <- which(NewScaleParms$name == "a1")
+      old_a1_idx <- which(OldScaleParms$name == "a1")
+      if (length(new_a1_idx) > 0) NewScaleParms[new_a1_idx, "est"] <- FALSE
+      if (length(old_a1_idx) > 0) OldScaleParms[old_a1_idx, "est"] <- FALSE
     }
 
     #IPD
@@ -566,8 +568,8 @@ autoFIPC <-
       IPDItemNamesNewForm <- vector()
 
       # IPD target item checking
-      newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
-      oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+      newFormColNames <- colnames(newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE])
+      oldFormColNames <- colnames(oldformYDataK[, colnames(oldFormModel@Data$data), drop = FALSE])
 
       for (i in 1:length(oldformCommonItemNames)) {
         newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
@@ -711,8 +713,8 @@ autoFIPC <-
       }
     }
 
-    newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
-    oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+    newFormColNames <- colnames(newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE])
+    oldFormColNames <- colnames(oldformYDataK[, colnames(oldFormModel@Data$data), drop = FALSE])
 
     for (i in 1:length(oldformCommonItemNames)) {
       newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
@@ -725,64 +727,48 @@ autoFIPC <-
       ) {
         message(
           'applying ',
-          paste0(newformCommonItemNames[i]),
+          newformCommonItemNames[i],
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldformCommonItemNames[i],
           ' as common item use'
         )
+
+        new_item_idx <- which(NewScaleParms$item == newformCommonItemNames[i])
+        old_item_idx <- which(OldScaleParms$item == oldformCommonItemNames[i])
 
         message(
           '   Newform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[new_item_idx, "value"],
             ' '
           )
         )
         message(
           '   Oldform Parms: ',
           paste0(
-            OldScaleParms[
-              which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-              "value"
-            ],
+            OldScaleParms[old_item_idx, "value"],
             ' '
           )
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "value"
-        ] <-
-          OldScaleParms[
-            which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-            "value"
-          ]
+        NewScaleParms[new_item_idx, "value"] <- OldScaleParms[old_item_idx, "value"]
+
         message(
           '   Linkedform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[new_item_idx, "value"],
             ' '
           ),
           '\n'
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "est"
-        ] <-
-          FALSE
+        NewScaleParms[new_item_idx, "est"] <- FALSE
       } else {
         message(
           'skipping ',
-          paste0(newformCommonItemNames[i]),
+          newformCommonItemNames[i],
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldformCommonItemNames[i],
           ' as common item use'
         )
       }
@@ -792,21 +778,24 @@ autoFIPC <-
       length(attr(newFormModel@ParObjects$lrPars, 'parnum')) != 0 &&
         length(attr(oldFormModel@ParObjects$lrPars, 'parnum')) != 0
     ) {
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"] <-
-        OldScaleParms[which(OldScaleParms$item == paste0('BETA')), "value"]
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "est"] <-
-        FALSE
+      new_beta_idx <- which(NewScaleParms$item == 'BETA')
+      old_beta_idx <- which(OldScaleParms$item == 'BETA')
 
-      message('applying BETA parameter as linking')
+      if (length(new_beta_idx) > 0 && length(old_beta_idx) > 0) {
+        NewScaleParms[new_beta_idx, "value"] <- OldScaleParms[old_beta_idx, "value"]
+        NewScaleParms[new_beta_idx, "est"] <- FALSE
 
-      message(
-        '   Linkedform Parms: ',
-        paste0(
-          NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"],
-          ' '
-        ),
-        '\n'
-      )
+        message('applying BETA parameter as linking')
+
+        message(
+          '   Linkedform Parms: ',
+          paste0(
+            NewScaleParms[new_beta_idx, "value"],
+            ' '
+          ),
+          '\n'
+        )
+      }
       betaFormula <-
         attr(newFormModel@ParObjects$lrPars, 'formula')[[1]]
       betaCOVdata <- attr(newFormModel@ParObjects$lrPars, 'df')
@@ -845,7 +834,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
+          ncol(newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE]),
           '\n',
           'MEAN = F1'
         ))
@@ -858,7 +847,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
+          ncol(newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE]),
           '\n'
         ))
     }
@@ -878,7 +867,7 @@ autoFIPC <-
 
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE],
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'EM',
@@ -898,7 +887,7 @@ autoFIPC <-
       } else {
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE],
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'EM',
@@ -925,7 +914,7 @@ autoFIPC <-
         # LinkedModel <- oldFormModel
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE],
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'MHRM',
@@ -945,7 +934,7 @@ autoFIPC <-
       } else {
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE],
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'MHRM',

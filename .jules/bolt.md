@@ -21,3 +21,6 @@
 ## 2026-06-30 - Preserve NA handling when removing factor conversions
 **Learning:** `levels(as.factor(x))` excludes missing responses from the category count, so a faster replacement must not count `NA` as an extra response category.
 **Action:** Keep `na.omit(unique(x))` rather than plain `unique(x)` in response-category comparisons.
+## 2024-05-18 - R 언어에서 루프 내 정규식 탐색 병목 최적화 및 문자열 연산
+**Learning:** `R/aFIPC.R` 내의 공통 문항 처리 루프에서 `which(NewScaleParms$item == paste0(newformCommonItemNames[i]))` 와 같이 `paste0()`를 불필요하게 호출하고 배열 전체를 반복 스캔하는 방식은 O(N) 탐색을 루프 안에서 반복할 경우 비효율성을 초래한다.
+**Action:** `paste0()` 래핑을 제거하고, 루프 내에서 결과 인덱스를 변수에 캐싱(`new_item_idx <- which(...)`)하여 후속 연산에서 재사용하도록 수정하였다. 이를 통해 불필요한 배열 스캔과 캐스팅 연산을 제거하여 성능을 개선할 수 있다.
