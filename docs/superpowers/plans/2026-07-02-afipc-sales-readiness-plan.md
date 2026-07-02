@@ -17,7 +17,7 @@
 **Files:**
 - Modify: `R/surveyFA.R`
 
-- [ ] **Step 1: Replace placeholder with fallback implementation**
+- [x] **Step 1: Replace placeholder with fallback implementation**
 
 Implement:
 
@@ -31,7 +31,7 @@ Implement:
 # - Stop with explicit message when recovery exhausted
 ```
 
-- [ ] **Step 2: Preserve API compatibility**
+- [x] **Step 2: Preserve API compatibility**
 
 Keep the call-compatible arguments used by `R/aFIPC.R`:
 `surveyFA(oldformYData, autofix = F, SE = T, forceUIRT = T, forceNormalEM = T, unstable = T, forceMHRM = T)`.
@@ -41,7 +41,7 @@ Keep the call-compatible arguments used by `R/aFIPC.R`:
 **Files:**
 - Replace: `tests/testthat/test-surveyFA.R`
 
-- [ ] **Step 3: Add successful fallback test**
+- [x] **Step 3: Add successful fallback test**
 
 ```r
 set.seed(20260702)
@@ -53,13 +53,15 @@ fit <- aFIPC::surveyFA(raw, autofix = TRUE, forceUIRT = TRUE, SE = FALSE)
 expect_s3_class(fit, "SingleGroupClass")
 ```
 
-- [ ] **Step 4: Add malformed-input test**
+- [x] **Step 4: Add malformed-input test**
+
+- [x] **Step 4b: Add explicit unrecoverable fallback test**
 
 ```r
 expect_error(aFIPC::surveyFA(1:10, forceUIRT = TRUE), "surveyFA requires a response matrix")
 ```
 
-- [ ] **Step 5: Keep fallback guard tests in `testthat` index**
+- [x] **Step 5: Keep fallback guard tests in `testthat` index**
 
 This file remains in the package test set and runs automatically with
 `testthat::test_dir("tests/testthat")`.
@@ -71,28 +73,28 @@ This file remains in the package test set and runs automatically with
 - Modify: `README.md`
 - Modify: `man/surveyFA.Rd`
 
-- [ ] **Step 6: Raise completion standard to commercial-ready**
+- [x] **Step 6: Raise completion standard to commercial-ready**
 
 Add `sales-ready` criteria for bounded fallback and explicit failed-recovery behavior.
 
-- [ ] **Step 7: Update `surveyFA` contract in README**
+- [x] **Step 7: Update `surveyFA` contract in README**
 
 Document that `surveyFA` now implements bounded fallback instead of immediate stop.
 
-- [ ] **Step 8: Align `.Rd` signature to source**
+- [x] **Step 8: Align `.Rd` signature to source**
 
 Manual sync of usage/arguments/value so `roxygen2` consumers are consistent.
 
 ### Task 4: Dry-run validation gates before handoff
 
-- [ ] **Step 9: Verify diff scope and syntax**
+- [x] **Step 9: Verify diff scope and syntax**
 
 ```bash
 cd /Users/seonghobae/Documents/Codex/2026-07-02/https-github-com-contextualwisdomlab-afipc-figma
 git diff --stat
 ```
 
-- [ ] **Step 10: Review for explicit blockers not in scope**
+- [x] **Step 10: Review for explicit blockers not in scope**
 
 No changes to `R/aFIPC.R` core algorithm beyond call-compatibility behavior.
 
@@ -104,4 +106,3 @@ No changes to `R/aFIPC.R` core algorithm beyond call-compatibility behavior.
 - [ ] **Step 11: Register and publish next goal state**
 
 Keep execution goal focused on commercial readiness and keep review-bot availability out of blocking criteria.
-

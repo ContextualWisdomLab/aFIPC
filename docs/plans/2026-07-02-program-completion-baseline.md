@@ -21,6 +21,10 @@ plus:
 - fallback returns a fitted `mirt` model for recoverable input when possible;
 - fallback exhaustion reports an explicit reason and list of removed items.
 
+For commercial staging, external review-gate delays (예: OpenCode/리뷰 모델 가용성
+이슈)은 기능 완성도 판단의 1차 Blocker가 되지 않는다. 품질 요건은
+패키지 테스트/회귀·문서 증빙으로 판단한다.
+
 ## Current Baseline
 
 This branch integrates the minimum safe completion baseline:

@@ -24,6 +24,12 @@ preserve numerical behavior while modernizing repository operations
   attempts alternate estimators and bounded item removal before failing.
 - Legacy `packrat` bootstrap is opt-in via `AFIPC_ENABLE_PACKRAT=true`.
 - Broken host-specific `packrat/lib-R` symlinks were removed for portable builds.
+- `ContextualWisdomLab` 운영팀 판매판단 체크리스트:
+  - 정합한 `R` 실행환경 + `R CMD check --as-cran` 통과
+  - `autoFIPC()`의 비인터랙티브 실행에서 명확한 종료 동작
+  - `surveyFA()`의 bounded 재추정 시도(대체 추정기 + bounded item 제거)
+  - 복구 불가 시 명시적 실패 메시지(`surveyFA fallback could not estimate ...`)
+  - 회귀 고정 테스트(`tests/testthat/test-surveyFA.R`)의 신규/기존 항목 통과
 - Architectural and agent operation docs are available in:
   - `ARCHITECTURE.md`
   - `AGENTS.md`

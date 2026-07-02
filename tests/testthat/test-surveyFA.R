@@ -33,3 +33,26 @@ test_that("surveyFA errors clearly for unsupported input", {
     "surveyFA requires a response matrix or data frame"
   )
 })
+
+test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
+  skip_if_not_installed("mirt")
+
+  raw <- as.data.frame(
+    matrix(
+      c(rbinom(80, 1, 0.5), rbinom(80, 1, 0.4)),
+      ncol = 2
+    )
+  )
+  names(raw) <- paste0("item", 1:2)
+
+  expect_error(
+    aFIPC::surveyFA(
+      data = raw,
+      autofix = TRUE,
+      forceUIRT = TRUE,
+      itemtype = "not_a_model",
+      maxItemRemovals = 1
+    ),
+    "could not estimate a valid model after bounded recovery attempts"
+  )
+})
