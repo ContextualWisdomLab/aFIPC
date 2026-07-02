@@ -216,7 +216,9 @@ autoFIPC <-
           )
 
           try(rm(oldFormModel))
-          while (!exists('oldFormModel')) {
+          max_retries <- 5
+          retry_count <- 0
+          while (!exists('oldFormModel') && retry_count < max_retries) {
             try(
               oldFormModel <-
                 mirt::mirt(
@@ -230,6 +232,10 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
+            retry_count <- retry_count + 1
+          }
+          if (!exists('oldFormModel')) {
+            stop("최대 재시도 횟수 초과 후 모델 추정에 실패했습니다. 데이터 및 파라미터를 확인하십시오.")
           }
         }
       }
@@ -428,7 +434,9 @@ autoFIPC <-
           )
 
           try(rm(newFormModel))
-          while (!exists('newFormModel')) {
+          max_retries <- 5
+          retry_count <- 0
+          while (!exists('newFormModel') && retry_count < max_retries) {
             try(
               newFormModel <-
                 mirt::mirt(
@@ -442,6 +450,10 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
+            retry_count <- retry_count + 1
+          }
+          if (!exists('newFormModel')) {
+            stop("최대 재시도 횟수 초과 후 모델 추정에 실패했습니다. 데이터 및 파라미터를 확인하십시오.")
           }
         }
       }
