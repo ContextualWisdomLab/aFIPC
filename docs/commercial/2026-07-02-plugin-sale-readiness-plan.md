@@ -31,9 +31,9 @@ Current executed items:
 - Existing FigJam planning board updated with the v2 sale-readiness gate.
 - Figma Slides buyer deck generated for technical diligence and investment
   committee review.
-- GitHub/Data Analytics lookup returned no PR-triggered workflow runs for the
-  pre-refresh local baseline commit; this is documented as a process-state
-  non-blocker until the branch is pushed and a PR workflow exists.
+- GitHub/Data Analytics lookup for PR #92 confirms the current branch head,
+  unresolved review-thread count, and current-head checks. Review-process
+  latency is documented separately from code/test/security blockers.
 - Repository structure decision recorded: keep `aFIPC` as one R package and one
   sale unit for the current transaction package; do not split a library or add a
   submodule before buyer acceptance.
@@ -228,5 +228,5 @@ The program is sale-package-ready only when all are true:
 
 1. Re-run `scripts/validate-sale-readiness.R`.
 2. Commit the refreshed sale package.
-3. After push or PR creation, attach remote workflow evidence to the validation
-   appendix if the buyer requires GitHub-hosted CI proof.
+3. Refresh PR #92 remote workflow evidence in the validation appendix when the
+   handover commit SHA changes or the buyer requires GitHub-hosted CI proof.

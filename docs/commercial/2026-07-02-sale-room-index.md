@@ -157,17 +157,21 @@ Approved future option:
 - `R CMD check` notes:
   documented if present.
   Evidence source: validation evidence doc.
-- GitHub workflow runs for local baseline commit:
-  none returned for PR-triggered workflow lookup before push.
+- GitHub PR #92 current-head evidence:
+  branch head `bb40dca00b98b18eb17755ed4aa1c09635b5fd4f`, unresolved review
+  threads 0, current-head checks passing, and manual evidence publication
+  status skipped.
   Evidence source: Data Analytics/GitHub lookup on 2026-07-02.
 
 Interpretation:
 
-- Local validation is the authoritative completion gate for this branch until it
-  is pushed and a PR-triggered workflow exists.
-- A missing PR-triggered workflow run is a process state, not a product defect.
-- After push or PR creation, attach the latest workflow run ID and conclusion to
-  this index or to a dated validation evidence appendix.
+- Local validation and current-head GitHub checks are the authoritative
+  technical completion evidence for this branch.
+- Review-decision latency and skipped manual evidence publication are process
+  states, not product defects, unless they expose a concrete code, test, or
+  security issue.
+- When the handover commit changes, attach the latest workflow run IDs and
+  conclusions to this index or to a dated validation evidence appendix.
 
 ## Superpowers Execution Loop
 
@@ -200,7 +204,9 @@ Blocking:
 Non-blocking when documented:
 
 - Review-bot delay.
-- Missing PR-triggered workflow run before the branch is pushed.
+- Review-decision latency after current-head checks pass.
+- Skipped manual evidence publication when repository validation evidence is
+  already present.
 - CRAN incoming "New submission" NOTE.
 - Historical `packrat/` modernization work.
 - Buyer legal, tax, price, or IP-assignment process.

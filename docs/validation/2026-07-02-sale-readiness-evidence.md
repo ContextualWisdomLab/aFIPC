@@ -75,17 +75,18 @@ before final buyer delivery.
 
 ## GitHub/Data Analytics Snapshot
 
-2026-07-02 lookup for repository `ContextualWisdomLab/aFIPC` and pre-refresh
-local baseline commit `196c82bc889dcd00b237c7443f385ef0f52f0f29` returned no
-PR-triggered workflow runs.
+2026-07-02 lookup for repository `ContextualWisdomLab/aFIPC` and PR #92
+confirmed current head `bb40dca00b98b18eb17755ed4aa1c09635b5fd4f`.
 
 Interpretation:
 
-- This branch's local sale-readiness gate remains the current completion
-  evidence until the branch is pushed and a PR-triggered workflow exists.
-- A missing PR-triggered workflow run is not a blocker by itself.
-- After push or PR creation, record the latest workflow run ID, conclusion, and
-  commit SHA in a dated appendix.
+- Unresolved review threads: 0.
+- Current-head checks pass; skipped manual evidence publication is a documented
+  process state.
+- Stale or delayed review-decision state is not a blocker unless it reveals a
+  concrete code, test, or security defect.
+- When the handover commit SHA changes, record the latest workflow run IDs,
+  conclusions, and commit SHA in a dated appendix.
 
 ## Evidence Interpretation
 
