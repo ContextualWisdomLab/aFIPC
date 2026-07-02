@@ -64,6 +64,9 @@ Last locally observed baseline on 2026-07-03 KST:
 - `scripts/validate-sale-readiness.R`: completed with `SALE_READINESS_OK`.
 - `testthat::test_dir("tests/testthat")`: 51 passing assertions, 0 failures,
   0 warnings, 0 skips.
+- Canonical summary terms for buyer automation: `PASS 51`, `WARN 0`,
+  `single R package/one sale unit`, `no split/no submodule`, and
+  `queued/pending checks non-blocker`.
 - `R CMD check --no-manual --as-cran`: 0 errors, 0 warnings, 1 CRAN incoming
   note for new submission status.
 - `surveyFA()` recovery test returns a fitted `mirt` `SingleGroupClass`.
