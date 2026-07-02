@@ -103,7 +103,7 @@ package metadata, and CI workflow definitions in Git.
 ## 10. Project Identification
 
 - Project Name: aFIPC
-- Repository URL: `https://github.com/seonghobae/aFIPC`
+- Repository URL: `https://github.com/ContextualWisdomLab/aFIPC`
 - Primary Contact: Seongho Bae
 - Date of Last Update: 2026-02-15
 

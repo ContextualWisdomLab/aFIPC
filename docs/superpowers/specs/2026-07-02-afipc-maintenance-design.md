@@ -177,8 +177,8 @@ into reviewable tasks with commands and verification gates.
 
 ### Gaps
 
-- The maintenance runbook still uses `seonghobae/aFIPC` in several commands,
-  while the active target is `ContextualWisdomLab/aFIPC`.
+- At planning time, the maintenance runbook used `seonghobae/aFIPC` in several
+  commands while the active target was `ContextualWisdomLab/aFIPC`.
 - The runbook lists weekly commands but does not explain duplicate bot PR
   grouping, superseding, or close criteria.
 - There is no durable place to link Figma/FigJam maintenance boards.
