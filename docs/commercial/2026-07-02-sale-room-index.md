@@ -158,18 +158,17 @@ Approved future option:
   documented if present.
   Evidence source: validation evidence doc.
 - GitHub PR #92 current-head evidence:
-  branch head `bb40dca00b98b18eb17755ed4aa1c09635b5fd4f`, unresolved review
-  threads 0, current-head checks passing, and manual evidence publication
-  status skipped.
+  current PR head, unresolved review threads 0, and current-head remote checks
+  queued after a documentation-only evidence refresh.
   Evidence source: Data Analytics/GitHub lookup on 2026-07-02.
 
 Interpretation:
 
-- Local validation and current-head GitHub checks are the authoritative
-  technical completion evidence for this branch.
-- Review-decision latency and skipped manual evidence publication are process
-  states, not product defects, unless they expose a concrete code, test, or
-  security issue.
+- Local validation is the authoritative technical completion evidence while
+  current-head GitHub checks are queued.
+- Review-decision latency, queued remote checks, and skipped manual evidence
+  publication are process states, not product defects, unless they expose a
+  concrete code, test, or security issue.
 - When the handover commit changes, attach the latest workflow run IDs and
   conclusions to this index or to a dated validation evidence appendix.
 
@@ -204,9 +203,10 @@ Blocking:
 Non-blocking when documented:
 
 - Review-bot delay.
-- Review-decision latency after current-head checks pass.
+- Review-decision latency after the local sale-readiness gate passes.
 - Skipped manual evidence publication when repository validation evidence is
   already present.
+- Queued remote GitHub checks after a documentation-only evidence refresh.
 - CRAN incoming "New submission" NOTE.
 - Historical `packrat/` modernization work.
 - Buyer legal, tax, price, or IP-assignment process.

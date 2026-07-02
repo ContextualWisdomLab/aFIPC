@@ -31,9 +31,10 @@ Current executed items:
 - Existing FigJam planning board updated with the v2 sale-readiness gate.
 - Figma Slides buyer deck generated for technical diligence and investment
   committee review.
-- GitHub/Data Analytics lookup for PR #92 confirms the current branch head,
-  unresolved review-thread count, and current-head checks. Review-process
-  latency is documented separately from code/test/security blockers.
+- GitHub/Data Analytics lookup for PR #92 confirms the current branch head and
+  unresolved review-thread count. Current remote checks may be queued after a
+  documentation-only evidence refresh; runner latency is documented separately
+  from code/test/security blockers.
 - Repository structure decision recorded: keep `aFIPC` as one R package and one
   sale unit for the current transaction package; do not split a library or add a
   submodule before buyer acceptance.

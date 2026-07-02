@@ -76,13 +76,14 @@ before final buyer delivery.
 ## GitHub/Data Analytics Snapshot
 
 2026-07-02 lookup for repository `ContextualWisdomLab/aFIPC` and PR #92
-confirmed current head `bb40dca00b98b18eb17755ed4aa1c09635b5fd4f`.
+confirmed the current PR head and unresolved review-thread state.
 
 Interpretation:
 
 - Unresolved review threads: 0.
-- Current-head checks pass; skipped manual evidence publication is a documented
-  process state.
+- Current-head remote checks were queued after the documentation-only evidence
+  refresh; local `SALE_READINESS_OK` remains the current technical completion
+  gate while the remote queue drains.
 - Stale or delayed review-decision state is not a blocker unless it reveals a
   concrete code, test, or security defect.
 - When the handover commit SHA changes, record the latest workflow run IDs,
