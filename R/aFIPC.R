@@ -688,10 +688,13 @@ autoFIPC <-
         print(modIPD_DIF)
         print(CommonItemList_NOIPD)
 
+        # Performance optimization: Replace the element-by-element loop with vapply
+        # to efficiently extract and convert data frame values to characters,
+        # preserving factor labels and skipping unnecessary O(n) overhead.
         ActualoldFormCommonItem <-
-          as.character(unlist(IPDItemList[1, CommonItemList_NOIPD]))
+          vapply(IPDItemList[1, CommonItemList_NOIPD], as.character, character(1), USE.NAMES = FALSE)
         ActualnewFormCommonItem <-
-          as.character(unlist(IPDItemList[2, CommonItemList_NOIPD]))
+          vapply(IPDItemList[2, CommonItemList_NOIPD], as.character, character(1), USE.NAMES = FALSE)
 
         message('ActualoldFormCommonItem: ', ActualoldFormCommonItem)
         message('ActualnewFormCommonItem: ', ActualnewFormCommonItem)

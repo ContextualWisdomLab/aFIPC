@@ -23,5 +23,5 @@
 **Action:** Keep `na.omit(unique(x))` rather than plain `unique(x)` in response-category comparisons.
 
 ## 2026-06-30 - Safe Vectorization of Data Frame Row Extraction
-**Learning:** In R, replacing a slow `for` loop with vectorized data frame row extraction requires care. Using `as.character(df[1, cols])` directly on a data frame subset yields its internal structure list elements (e.g. integer representations for factors). To safely coerce row values to strings, the subset must first be flattened, using `as.character(unlist(df[1, cols]))`.
-**Action:** Always wrap data frame slices with `unlist()` before calling type coercion functions like `as.character()` when refactoring O(n) loops to O(1) vectorized operations.
+**Learning:** In R, replacing a slow `for` loop with vectorized data frame row extraction requires care. Using `unlist()` on a data frame silently coerces factor columns to their underlying integer codes, leading to incorrect string representations. The safest and most robust way to extract elements as characters while preserving factor labels (and avoiding introduced names) is using `vapply()`, such as `vapply(df[cols], as.character, character(1), USE.NAMES = FALSE)`.
+**Action:** Always use `vapply(..., as.character, character(1))` instead of `unlist()` when vectorizing type coercion functions over data frame subsets containing potential factor columns.
