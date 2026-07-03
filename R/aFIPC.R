@@ -716,13 +716,17 @@ autoFIPC <-
     newFormColNames <- colnames(newformXDataK[, colnames(newFormModel@Data$data), drop = FALSE])
     oldFormColNames <- colnames(oldformYDataK[, colnames(oldFormModel@Data$data), drop = FALSE])
 
+    newFormItemIdxs <- match(newformCommonItemNames, newFormColNames)
+    oldFormItemIdxs <- match(oldformCommonItemNames, oldFormColNames)
+
     # Create an item-to-row index map for O(1) access to avoid repeated array scanning
     # Since an item can have multiple parameters (a1, d, g, u), we group row indices by item name.
     new_item_map <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)
     old_item_map <- split(seq_len(nrow(OldScaleParms)), OldScaleParms$item)
 
-    newFormItemIdxs <- match(newformCommonItemNames, newFormColNames)
-    oldFormItemIdxs <- match(oldformCommonItemNames, oldFormColNames)
+    # Clean up empty strings or null keys from the map which could cause out-of-bounds subsetting
+    new_item_map <- new_item_map[nzchar(names(new_item_map))]
+    old_item_map <- old_item_map[nzchar(names(old_item_map))]
 
     for (i in 1:length(oldformCommonItemNames)) {
       newFormItemName <- newFormColNames[newFormItemIdxs[i]]
