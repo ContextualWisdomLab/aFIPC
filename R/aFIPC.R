@@ -18,6 +18,7 @@
 #' @param parameterOverwrite don't touch it
 #' @param empiricalhist do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
 #' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt.
+#' @param max_retries maximum retries limit for MHRM fallback.
 #' @param ... Additional arguments reserved for future extensions.
 #'
 #' @return the model list of the base form, new form, linked form
@@ -45,6 +46,7 @@ autoFIPC <-
     parameterOverwrite = F,
     empiricalhist = F,
     confirmCommonItems = NULL,
+    max_retries = 5,
     ...
   ) {
     # print credits
@@ -216,9 +218,8 @@ autoFIPC <-
           )
 
           try(rm(oldFormModel))
-          max_retries <- 5
           retry_count <- 0
-          while (!exists('oldFormModel') && retry_count < max_retries) {
+          while (!exists('oldFormModel', inherits = FALSE) && retry_count < max_retries) {
             try(
               oldFormModel <-
                 mirt::mirt(
@@ -234,7 +235,7 @@ autoFIPC <-
             )
             retry_count <- retry_count + 1
           }
-          if (!exists('oldFormModel')) {
+          if (!exists('oldFormModel', inherits = FALSE)) {
             stop("\ucd5c\ub300\u0020\uc7ac\uc2dc\ub3c4\u0020\ud69f\uc218\u0020\ucd08\uacfc\u0020\ud6c4\u0020\ubaa8\ub378\u0020\ucd94\uc815\uc5d0\u0020\uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4\u002e\u0020\ub370\uc774\ud130\u0020\ubc0f\u0020\ud30c\ub77c\ubbf8\ud130\ub97c\u0020\ud655\uc778\ud558\uc2ed\uc2dc\uc624\u002e")
           }
         }
@@ -434,9 +435,8 @@ autoFIPC <-
           )
 
           try(rm(newFormModel))
-          max_retries <- 5
           retry_count <- 0
-          while (!exists('newFormModel') && retry_count < max_retries) {
+          while (!exists('newFormModel', inherits = FALSE) && retry_count < max_retries) {
             try(
               newFormModel <-
                 mirt::mirt(
@@ -452,7 +452,7 @@ autoFIPC <-
             )
             retry_count <- retry_count + 1
           }
-          if (!exists('newFormModel')) {
+          if (!exists('newFormModel', inherits = FALSE)) {
             stop("\ucd5c\ub300\u0020\uc7ac\uc2dc\ub3c4\u0020\ud69f\uc218\u0020\ucd08\uacfc\u0020\ud6c4\u0020\ubaa8\ub378\u0020\ucd94\uc815\uc5d0\u0020\uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4\u002e\u0020\ub370\uc774\ud130\u0020\ubc0f\u0020\ud30c\ub77c\ubbf8\ud130\ub97c\u0020\ud655\uc778\ud558\uc2ed\uc2dc\uc624\u002e")
           }
         }

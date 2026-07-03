@@ -21,6 +21,7 @@ autoFIPC(
   parameterOverwrite = F,
   empiricalhist = F,
   confirmCommonItems = NULL,
+  max_retries = 5,
   ...
 )
 }
@@ -56,6 +57,8 @@ autoFIPC(
 \item{empiricalhist}{do you want to use empirical histogram method when tryEM = TRUE? default is FALSE}
 
 \item{confirmCommonItems}{set TRUE to accept the supplied common-item pairs without an interactive prompt.}
+
+\item{max_retries}{maximum retries limit for MHRM fallback.}
 
 \item{...}{Additional arguments reserved for future extensions.}
 }
