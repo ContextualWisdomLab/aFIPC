@@ -1,4 +1,8 @@
 test_that("while loops for model estimation limit retries to prevent DoS", {
+  # To test the fix safely, we don't need a full run of autoFIPC which is heavy.
+  # We just evaluate the logic from aFIPC.R directly via mock environment or simple mock function.
+
+  # A simple local function that simulates the logic inside autoFIPC to verify retry_count works
   test_retry_loop <- function() {
     max_retries <- 5
     retry_count <- 0
