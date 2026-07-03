@@ -9,3 +9,7 @@
 5. DoS 완화를 위해 `return(1L)` 같은 기본 승인값을 넣을 때는 추정 기준척도, anchor/common item, true parameter 재현 계약을 우회하지 않는지 먼저 검증합니다.
 6. Fail-secure 에러 메시지는 테스트의 일부로 취급합니다. 보안 테스트는 실제 구현 메시지와 맞아야 하며, 오래된 `"Interactive prompt is not available"` 같은 별도 문구를 새로 만들지 않습니다.
 7. Prompt DoS 회귀 테스트는 모델 추정 실패에 기대지 말고, common-item confirmation guard처럼 취약한 입력 경계에서 바로 발생하는 fail-secure 에러를 검증합니다.
+## 2024-07-03 - [Preventing Denial of Service (DoS) with Infinite Retries]
+**Vulnerability:** Found unbounded `while (!exists('var'))` loops used alongside `try()` inside `R/aFIPC.R`. If the operation inside `try()` consistently fails, this creates an infinite loop resulting in a Denial of Service.
+**Learning:** `try()` constructs combined with existence checks on the assigned variable are a common but risky pattern for retrying flaky procedures like parameter estimation in R. Without bounds, these loops will block the process forever on unrecoverable failures.
+**Prevention:** Always include a `max_retries` counter in retry loops. If `max_retries` is exhausted, explicitly stop execution with `stop("Max retries reached")`.
