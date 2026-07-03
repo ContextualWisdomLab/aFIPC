@@ -239,6 +239,7 @@ autoFIPC <-
       }
 
       if (
+        exists('oldFormModel', envir = environment(), inherits = FALSE) &&
         !oldFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
@@ -455,6 +456,7 @@ autoFIPC <-
       }
 
       if (
+        exists('newFormModel', envir = environment(), inherits = FALSE) &&
         !newFormModel@OptimInfo$secondordertest &&
           !itemtype == 'ideal'
       ) {
