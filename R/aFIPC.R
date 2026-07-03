@@ -184,14 +184,15 @@ autoFIPC <-
 
       if (tryFitwholeOldItems == T) {
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
+          (!exists('oldFormModel', envir = environment(), inherits = FALSE) ||
+           !oldFormModel@OptimInfo$secondordertest) &&
             !itemtype == 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
           )
 
-          try(rm(oldFormModel))
+          try(rm(list = 'oldFormModel', envir = environment(), inherits = FALSE), silent = TRUE)
           try(
             oldFormModel <-
               mirt::mirt(
@@ -208,7 +209,8 @@ autoFIPC <-
         }
 
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
+          (!exists('oldFormModel', envir = environment(), inherits = FALSE) ||
+           !oldFormModel@OptimInfo$secondordertest) &&
             !itemtype == 'ideal'
         ) {
           message(
@@ -401,14 +403,15 @@ autoFIPC <-
 
       if (tryFitwholeNewItems) {
         if (
-          !newFormModel@OptimInfo$secondordertest &&
+          (!exists('newFormModel', envir = environment(), inherits = FALSE) ||
+           !newFormModel@OptimInfo$secondordertest) &&
             !itemtype == 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
           )
 
-          try(rm(newFormModel))
+          try(rm(list = 'newFormModel', envir = environment(), inherits = FALSE), silent = TRUE)
           try(
             newFormModel <-
               mirt::mirt(
@@ -425,7 +428,8 @@ autoFIPC <-
         }
 
         if (
-          !newFormModel@OptimInfo$secondordertest &&
+          (!exists('newFormModel', envir = environment(), inherits = FALSE) ||
+           !newFormModel@OptimInfo$secondordertest) &&
             !itemtype == 'ideal'
         ) {
           message(
