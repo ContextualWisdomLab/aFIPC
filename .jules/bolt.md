@@ -21,3 +21,6 @@
 ## 2026-06-30 - Preserve NA handling when removing factor conversions
 **Learning:** `levels(as.factor(x))` excludes missing responses from the category count, so a faster replacement must not count `NA` as an extra response category.
 **Action:** Keep `na.omit(unique(x))` rather than plain `unique(x)` in response-category comparisons.
+## 2025-01-20 - Optimize redundant which() array scans
+**Learning:** Calling `which(NewScaleParms$item == paste0(newformCommonItemNames[i]))` inside a loop repeatedly executes O(N) array scans unnecessarily. The strings are also redundantly wrapped in `paste0()`.
+**Action:** Calculate the target indexes (`which(...)`) once per loop iteration, cache them into variables (`new_idx`, `old_idx`), and reuse those variables for all subsequent modifications or extractions. Remove redundant `paste0()` wrapping for simple scalars to further optimize.

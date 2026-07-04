@@ -538,9 +538,9 @@ autoFIPC <-
       OldScaleParms[, "est"] <- TRUE
     }
 
-    NewScaleParms[which(NewScaleParms$item == paste0('GROUP')), "est"] <-
+    NewScaleParms[which(NewScaleParms$item == 'GROUP'), "est"] <-
       FALSE
-    OldScaleParms[which(OldScaleParms$item == paste0('GROUP')), "est"] <-
+    OldScaleParms[which(OldScaleParms$item == 'GROUP'), "est"] <-
       FALSE
 
     NewScaleParms[which(NewScaleParms$name == "COV_11"), "est"] <-
@@ -725,64 +725,49 @@ autoFIPC <-
       ) {
         message(
           'applying ',
-          paste0(newformCommonItemNames[i]),
+          newformCommonItemNames[i],
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldformCommonItemNames[i],
           ' as common item use'
         )
+
+        new_idx <- which(NewScaleParms$item == newformCommonItemNames[i])
+        old_idx <- which(OldScaleParms$item == oldformCommonItemNames[i])
 
         message(
           '   Newform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[new_idx, "value"],
             ' '
           )
         )
         message(
           '   Oldform Parms: ',
           paste0(
-            OldScaleParms[
-              which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-              "value"
-            ],
+            OldScaleParms[old_idx, "value"],
             ' '
           )
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "value"
-        ] <-
-          OldScaleParms[
-            which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-            "value"
-          ]
+        NewScaleParms[new_idx, "value"] <-
+          OldScaleParms[old_idx, "value"]
+
         message(
           '   Linkedform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[new_idx, "value"],
             ' '
           ),
           '\n'
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "est"
-        ] <-
-          FALSE
+        NewScaleParms[new_idx, "est"] <- FALSE
       } else {
         message(
           'skipping ',
-          paste0(newformCommonItemNames[i]),
+          newformCommonItemNames[i],
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldformCommonItemNames[i],
           ' as common item use'
         )
       }
@@ -792,9 +777,12 @@ autoFIPC <-
       length(attr(newFormModel@ParObjects$lrPars, 'parnum')) != 0 &&
         length(attr(oldFormModel@ParObjects$lrPars, 'parnum')) != 0
     ) {
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"] <-
-        OldScaleParms[which(OldScaleParms$item == paste0('BETA')), "value"]
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "est"] <-
+      beta_new_idx <- which(NewScaleParms$item == 'BETA')
+      beta_old_idx <- which(OldScaleParms$item == 'BETA')
+
+      NewScaleParms[beta_new_idx, "value"] <-
+        OldScaleParms[beta_old_idx, "value"]
+      NewScaleParms[beta_new_idx, "est"] <-
         FALSE
 
       message('applying BETA parameter as linking')
@@ -802,7 +790,7 @@ autoFIPC <-
       message(
         '   Linkedform Parms: ',
         paste0(
-          NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"],
+          NewScaleParms[beta_new_idx, "value"],
           ' '
         ),
         '\n'
