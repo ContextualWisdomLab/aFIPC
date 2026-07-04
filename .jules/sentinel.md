@@ -9,3 +9,11 @@
 5. DoS 완화를 위해 `return(1L)` 같은 기본 승인값을 넣을 때는 추정 기준척도, anchor/common item, true parameter 재현 계약을 우회하지 않는지 먼저 검증합니다.
 6. Fail-secure 에러 메시지는 테스트의 일부로 취급합니다. 보안 테스트는 실제 구현 메시지와 맞아야 하며, 오래된 `"Interactive prompt is not available"` 같은 별도 문구를 새로 만들지 않습니다.
 7. Prompt DoS 회귀 테스트는 모델 추정 실패에 기대지 말고, common-item confirmation guard처럼 취약한 입력 경계에서 바로 발생하는 fail-secure 에러를 검증합니다.
+
+## 2024-06-25 - Unbounded Loop in Model Retry (Infinite Loop DoS)
+**Vulnerability:** When the initial `mirt::mirt()` model estimation failed, the code utilized an unconstrained `while (!exists('model'))` loop to continually attempt re-estimation. Since R's deterministic errors inside `try()` would repetitively fail without side-effects altering the outcome, this created an infinite loop Denial of Service (DoS) in automated environments.
+**Learning:** Deterministic failure handling must never rely on unbounded loops. Relying on `try()` combined with `while (!exists(...))` assumes transient errors, which is often not true for statistical model convergence issues.
+**Prevention:**
+1. Always replace `while (!exists(...))` retries with a bounded `for` loop (e.g., `for (attempt in seq_len(3))`).
+2. Include an explicit check for the success condition inside the loop (`if (exists('model')) break`).
+3. After the loop, verify success and fail securely with an explicit error (`if (!exists('model')) stop(...)`) to prevent unhandled exceptions downstream.
