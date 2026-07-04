@@ -692,16 +692,12 @@ autoFIPC <-
         print(modIPD_DIF)
         print(CommonItemList_NOIPD)
 
+        # ⚡ Bolt: 루프 내에서 데이터 프레임을 서브셋팅(subsetting)하는 O(N) 연산을
+        # unlist()를 활용한 벡터화된(vectorized) O(1) 연산으로 대체하여 성능 향상
         ActualoldFormCommonItem <-
-          vector(length = length(CommonItemList_NOIPD))
+          as.character(unlist(IPDItemList[1, CommonItemList_NOIPD]))
         ActualnewFormCommonItem <-
-          vector(length = length(CommonItemList_NOIPD))
-        for (i in 1:length(CommonItemList_NOIPD)) {
-          ActualoldFormCommonItem[i] <-
-            as.character(IPDItemList[CommonItemList_NOIPD][1, i])
-          ActualnewFormCommonItem[i] <-
-            as.character(IPDItemList[CommonItemList_NOIPD][2, i])
-        }
+          as.character(unlist(IPDItemList[2, CommonItemList_NOIPD]))
 
         message('ActualoldFormCommonItem: ', ActualoldFormCommonItem)
         message('ActualnewFormCommonItem: ', ActualnewFormCommonItem)
