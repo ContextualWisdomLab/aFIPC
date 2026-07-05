@@ -604,14 +604,7 @@ autoFIPC <-
       IPDParmNames <- OldScaleParms$name
       IPDParmNames <- IPDParmNames[!duplicated(IPDParmNames)]
       IPDParmNames <-
-        IPDParmNames[
-          -c(
-            grep("^MEAN", IPDParmNames),
-            grep("^COV", IPDParmNames),
-            grep("^ak", IPDParmNames),
-            grep("^d0$", IPDParmNames)
-          )
-        ]
+        IPDParmNames[!grepl("^(MEAN|COV|ak)", IPDParmNames) & IPDParmNames != "d0"]
       IPDParmNames <- as.character(IPDParmNames)
 
       mirt::mirtCluster()
