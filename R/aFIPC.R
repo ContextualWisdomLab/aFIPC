@@ -53,6 +53,25 @@ autoFIPC <-
     try(invisible(gc()), silent = T)
     # garbage cleaning
 
+    # Input validation - Security Enhancement
+    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !inherits(newformXData, "SingleGroupClass")) {
+      stop("Security Error: newformXData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
+    }
+    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !inherits(oldformYData, "SingleGroupClass")) {
+      stop("Security Error: oldformYData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
+    }
+
+    if (!is.character(newformCommonItemNames) && !is.factor(newformCommonItemNames)) {
+      stop("Security Error: newformCommonItemNames must be a character vector")
+    }
+    if (!is.character(oldformCommonItemNames) && !is.factor(oldformCommonItemNames)) {
+      stop("Security Error: oldformCommonItemNames must be a character vector")
+    }
+
+    if (!is.character(itemtype) || length(itemtype) != 1) {
+      stop("Security Error: itemtype must be a single character string")
+    }
+
     # checking configure
     if (length(newformCommonItemNames) != length(oldformCommonItemNames)) {
       stop('Common Items are not equal')
@@ -180,6 +199,10 @@ autoFIPC <-
               GenRandomPars = F
             )
         )
+      }
+
+      if (!exists("oldFormModel")) {
+        stop("Security Error: Initial estimation of oldFormModel completely failed")
       }
 
       if (tryFitwholeOldItems == T) {
@@ -394,6 +417,10 @@ autoFIPC <-
               GenRandomPars = F
             )
         )
+      }
+
+      if (!exists("newFormModel")) {
+        stop("Security Error: Initial estimation of newFormModel completely failed")
       }
 
       if (tryFitwholeNewItems) {
