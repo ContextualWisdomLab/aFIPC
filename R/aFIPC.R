@@ -725,64 +725,40 @@ autoFIPC <-
       ) {
         message(
           'applying ',
-          paste0(newformCommonItemNames[i]),
+          newformCommonItemNames[i],
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldformCommonItemNames[i],
           ' as common item use'
         )
 
+        # ⚡ Bolt: Cache array indices to avoid repeated O(N) array scans
+        new_idx <- which(NewScaleParms$item == newformCommonItemNames[i])
+        old_idx <- which(OldScaleParms$item == oldformCommonItemNames[i])
+
         message(
           '   Newform Parms: ',
-          paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
-            ' '
-          )
+          paste0(NewScaleParms[new_idx, "value"], ' ')
         )
         message(
           '   Oldform Parms: ',
-          paste0(
-            OldScaleParms[
-              which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-              "value"
-            ],
-            ' '
-          )
+          paste0(OldScaleParms[old_idx, "value"], ' ')
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "value"
-        ] <-
-          OldScaleParms[
-            which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-            "value"
-          ]
+        NewScaleParms[new_idx, "value"] <- OldScaleParms[old_idx, "value"]
+
         message(
           '   Linkedform Parms: ',
-          paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
-            ' '
-          ),
+          paste0(NewScaleParms[new_idx, "value"], ' '),
           '\n'
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "est"
-        ] <-
-          FALSE
+        NewScaleParms[new_idx, "est"] <- FALSE
       } else {
         message(
           'skipping ',
-          paste0(newformCommonItemNames[i]),
+          newformCommonItemNames[i],
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldformCommonItemNames[i],
           ' as common item use'
         )
       }
