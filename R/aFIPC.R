@@ -725,17 +725,21 @@ autoFIPC <-
       ) {
         message(
           'applying ',
-          paste0(newformCommonItemNames[i]),
+          newformCommonItemNames[i],
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldformCommonItemNames[i],
           ' as common item use'
         )
+
+        # ⚡ Bolt: Cache index lookups to avoid repeated O(N) scans
+        new_idx <- which(NewScaleParms$item == newformCommonItemNames[i])
+        old_idx <- which(OldScaleParms$item == oldformCommonItemNames[i])
 
         message(
           '   Newform Parms: ',
           paste0(
             NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
+              new_idx,
               "value"
             ],
             ' '
@@ -745,7 +749,7 @@ autoFIPC <-
           '   Oldform Parms: ',
           paste0(
             OldScaleParms[
-              which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
+              old_idx,
               "value"
             ],
             ' '
@@ -753,18 +757,18 @@ autoFIPC <-
         )
 
         NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
+          new_idx,
           "value"
         ] <-
           OldScaleParms[
-            which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
+            old_idx,
             "value"
           ]
         message(
           '   Linkedform Parms: ',
           paste0(
             NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
+              new_idx,
               "value"
             ],
             ' '
@@ -773,16 +777,16 @@ autoFIPC <-
         )
 
         NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
+          new_idx,
           "est"
         ] <-
           FALSE
       } else {
         message(
           'skipping ',
-          paste0(newformCommonItemNames[i]),
+          newformCommonItemNames[i],
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldformCommonItemNames[i],
           ' as common item use'
         )
       }
