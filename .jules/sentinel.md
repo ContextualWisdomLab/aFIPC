@@ -17,3 +17,10 @@
 1. Always replace `while (!exists(...))` retries with a bounded `for` loop (e.g., `for (attempt in seq_len(3))`).
 2. Include an explicit check for the success condition inside the loop (`if (exists('model')) break`).
 3. After the loop, verify success and fail securely with an explicit error (`if (!exists('model')) stop(...)`) to prevent unhandled exceptions downstream.
+
+## 2024-06-26 - Vector Wipeout due to Multiple Negative grep() Outputs
+**Vulnerability:** In `R/aFIPC.R`, multiple negative `grep()` outputs were combined using `-c(grep(...), ...)` to filter a vector of parameter names. If none of the `grep()` patterns match any elements in the vector, `grep()` returns an empty integer vector `integer(0)`. Combining multiple `integer(0)` results in `integer(0)`. Subsetting a vector with `-integer(0)` (e.g., `vector[-integer(0)]`) returns an empty vector (`character(0)` or similar, depending on type), silently wiping out the entire vector contents and causing downstream logic failures.
+**Learning:** Using `grep()` with negative indices (`-c(...)`) is inherently unsafe in base R when the possibility exists that no matches will be found. This pattern leads to silent and unpredictable state corruption because it effectively removes all elements instead of preserving them.
+**Prevention:**
+1. Never use `-c(grep(...), ...)` to exclude elements from a vector.
+2. Always use the negation of `grepl()` (e.g., `!grepl("^(pattern1|pattern2)", vector)`) which safely returns a logical vector. If there are no matches, it returns a vector of `TRUE`s, safely preserving the original vector when subsetted.
