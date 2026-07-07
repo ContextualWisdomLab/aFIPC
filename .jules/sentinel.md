@@ -17,3 +17,10 @@
 1. Always replace `while (!exists(...))` retries with a bounded `for` loop (e.g., `for (attempt in seq_len(3))`).
 2. Include an explicit check for the success condition inside the loop (`if (exists('model')) break`).
 3. After the loop, verify success and fail securely with an explicit error (`if (!exists('model')) stop(...)`) to prevent unhandled exceptions downstream.
+
+## 2024-07-07 - Unhandled Exception Leakage Downstream
+**Vulnerability:** `try()` block 이후에 반환된 객체가 실제로 존재하는지(성공했는지) 검증하지 않고 해당 객체의 프로퍼티(`@OptimInfo$secondordertest`)에 바로 접근하는 패턴이 여러 곳에 존재했습니다. 추정이 실패하여 에러가 발생한 경우 변수가 생성되지 않거나 기존 변수가 유지되어 의도치 않은 예외나 내부 상태 노출을 발생시킵니다.
+**Learning:** `try()`를 통한 예외 처리는 에러를 억제할 뿐, 결과 객체의 존재를 보장하지 않습니다. 실패한 동작의 결과를 가정하고 후속 코드를 실행하면 치명적인 예외가 발생할 수 있습니다.
+**Prevention:**
+1. `try()` 블록 외부에서 결과 객체를 사용할 때는 항상 해당 객체가 생성되었는지 확인해야 합니다 (`exists('model')`).
+2. 객체의 프로퍼티에 안전하게 접근하려면, 객체가 존재하고 예상되는 타입인지 검증하는 로직을 결합해야 합니다 (예: `(!exists('model') || !isTRUE(model@OptimInfo$secondordertest))`).

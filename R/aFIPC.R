@@ -184,8 +184,8 @@ autoFIPC <-
 
       if (tryFitwholeOldItems == T) {
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+            itemtype != 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
@@ -208,8 +208,8 @@ autoFIPC <-
         }
 
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+            itemtype != 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
@@ -237,8 +237,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
@@ -255,8 +255,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by normal MMLE/EM'
@@ -274,8 +274,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/QMCEM'
@@ -293,8 +293,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/MHRM'
@@ -312,8 +312,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
       }
@@ -398,8 +398,8 @@ autoFIPC <-
 
       if (tryFitwholeNewItems) {
         if (
-          !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+            itemtype != 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
@@ -422,8 +422,8 @@ autoFIPC <-
         }
 
         if (
-          !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+            itemtype != 'ideal'
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
@@ -451,8 +451,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
@@ -469,8 +469,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by normal MMLE/EM'
@@ -488,8 +488,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/QMCEM'
@@ -507,8 +507,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/MHRM'
@@ -526,8 +526,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+          itemtype != 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
       }
@@ -618,7 +618,7 @@ autoFIPC <-
       message('Discovering IPD')
       if (itemtype == 'nominal' | tryEM == T) {
         if (empiricalhist == T) {
-          modIPD_MG <- multipleGroup(
+          modIPD_MG <- mirt::multipleGroup(
             IPDData,
             model = 1,
             group = IPDgroup,
@@ -630,7 +630,7 @@ autoFIPC <-
           )
           try(
             modIPD_DIF <-
-              DIF(
+              mirt::DIF(
                 modIPD_MG,
                 IPDParmNames,
                 scheme = 'drop_sequential',
@@ -640,7 +640,7 @@ autoFIPC <-
               )
           )
         } else {
-          modIPD_MG <- multipleGroup(
+          modIPD_MG <- mirt::multipleGroup(
             IPDData,
             model = 1,
             group = IPDgroup,
@@ -652,7 +652,7 @@ autoFIPC <-
           )
           try(
             modIPD_DIF <-
-              DIF(
+              mirt::DIF(
                 modIPD_MG,
                 IPDParmNames,
                 scheme = 'drop_sequential',
@@ -663,7 +663,7 @@ autoFIPC <-
           )
         }
       } else {
-        modIPD_MG <- multipleGroup(
+        modIPD_MG <- mirt::multipleGroup(
           IPDData,
           model = 1,
           group = IPDgroup,
@@ -674,7 +674,7 @@ autoFIPC <-
         )
         try(
           modIPD_DIF <-
-            DIF(
+            mirt::DIF(
               modIPD_MG,
               IPDParmNames,
               scheme = 'drop_sequential',
@@ -988,9 +988,9 @@ autoFIPC <-
     # }
 
     # calculate theta
-    ThetaOldform <- fscores(oldFormModel, method = 'MAP')
-    ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
-    ThetaNewform <- fscores(newFormModel, method = 'MAP')
+    ThetaOldform <- mirt::fscores(oldFormModel, method = 'MAP')
+    ThetaLinkedform <- mirt::fscores(LinkedModel, method = 'MAP')
+    ThetaNewform <- mirt::fscores(newFormModel, method = 'MAP')
 
     # calculate expected score
     ExpectedScoreOldform <-
