@@ -1,0 +1,19 @@
+## 2024-06-23 - 재귀적 입력 검증으로 인한 대화형 프롬프트 DoS 취약점
+**Vulnerability:** 대화형 프롬프트 함수(`checkCorrect`, `checkoldformBILOGprior`, `checknewformBILOGprior`)에서 사용자가 올바르지 않은 값(예: 숫자가 아닌 문자열)을 입력했을 때, 꼬리 재귀(tail-recursive) 방식으로 자기 자신을 호출하도록 구현되어 있었습니다. 이는 R의 C 스택 사이즈 제한으로 인해 스택 고갈(Stack Exhaustion)로 이어지는 DoS(서비스 거부) 취약점을 야기할 수 있으며, `readline()`이 계속 빈 문자열을 반환하는 비대화형(non-interactive) CI/CD 환경에서는 무한 루프를 발생시켰습니다.
+**Learning:** 입력 검증 루프는 재귀 호출을 사용하여 구현해서는 안 되며, 특히 자동화된 환경에서 입력이 제공될 때 더욱 주의해야 합니다. 비대화형 세션에서의 탈출구(escape hatch)가 없는 재귀적 입력 루프는 리소스를 즉시 고갈시켜 자동화된 테스트 및 CI 환경을 손상시킵니다.
+**Prevention:**
+1. 입력 검증 시 재귀 호출 대신 `repeat` 루프를 사용합니다.
+2. 수동 입력을 요구하기 전에 항상 `!interactive()`를 사용하여 현재 세션이 대화형인지 확인하고, 비대화형 세션일 경우에는 즉시 에러를 발생시켜 안전하게 실패(fail securely)하도록 처리합니다.
+3. common item 확인처럼 추정 결과의 기준척도와 true parameter 재현에 직접 영향을 주는 입력은 비대화형 환경에서 기본값으로 자동 승인하지 않습니다. 자동화에서는 `confirmCommonItems = TRUE`처럼 명시적 opt-in을 요구합니다.
+4. 대화형 재입력 루프도 무한 반복하지 않도록 제한된 횟수만 허용하고, 초과 시 명확한 에러로 종료합니다.
+5. DoS 완화를 위해 `return(1L)` 같은 기본 승인값을 넣을 때는 추정 기준척도, anchor/common item, true parameter 재현 계약을 우회하지 않는지 먼저 검증합니다.
+6. Fail-secure 에러 메시지는 테스트의 일부로 취급합니다. 보안 테스트는 실제 구현 메시지와 맞아야 하며, 오래된 `"Interactive prompt is not available"` 같은 별도 문구를 새로 만들지 않습니다.
+7. Prompt DoS 회귀 테스트는 모델 추정 실패에 기대지 말고, common-item confirmation guard처럼 취약한 입력 경계에서 바로 발생하는 fail-secure 에러를 검증합니다.
+
+## 2024-06-25 - Unbounded Loop in Model Retry (Infinite Loop DoS)
+**Vulnerability:** When the initial `mirt::mirt()` model estimation failed, the code utilized an unconstrained `while (!exists('model'))` loop to continually attempt re-estimation. Since R's deterministic errors inside `try()` would repetitively fail without side-effects altering the outcome, this created an infinite loop Denial of Service (DoS) in automated environments.
+**Learning:** Deterministic failure handling must never rely on unbounded loops. Relying on `try()` combined with `while (!exists(...))` assumes transient errors, which is often not true for statistical model convergence issues.
+**Prevention:**
+1. Always replace `while (!exists(...))` retries with a bounded `for` loop (e.g., `for (attempt in seq_len(3))`).
+2. Include an explicit check for the success condition inside the loop (`if (exists('model')) break`).
+3. After the loop, verify success and fail securely with an explicit error (`if (!exists('model')) stop(...)`) to prevent unhandled exceptions downstream.
