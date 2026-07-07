@@ -603,14 +603,11 @@ autoFIPC <-
       # IPD estimation
       IPDParmNames <- OldScaleParms$name
       IPDParmNames <- IPDParmNames[!duplicated(IPDParmNames)]
+      # ⚡ Bolt: 여러 개의 부정 grep() 호출을 단일 !grepl() 호출로 교체하여 O(N) 최적화
+      # base R의 integer(0) subsetting 버그(벡터 전체 삭제)를 방지하여 안정성 확보
       IPDParmNames <-
         IPDParmNames[
-          -c(
-            grep("^MEAN", IPDParmNames),
-            grep("^COV", IPDParmNames),
-            grep("^ak", IPDParmNames),
-            grep("^d0$", IPDParmNames)
-          )
+          !grepl("^(MEAN|COV|ak|d0$)", IPDParmNames)
         ]
       IPDParmNames <- as.character(IPDParmNames)
 
