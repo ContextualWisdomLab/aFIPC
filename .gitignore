@@ -1,18 +1,3 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-
-# local secrets and credentials
-.env
-.env.*
-*.pem
-*.key
-credentials.*
-
-# local OpenCode task artifacts
-registered_agents.json
-task_agent_mapping.json
-
-# local package build artifacts
-aFIPC_*.tar.gz
+*.Rcheck
+*.tar.gz
+r_install*.log

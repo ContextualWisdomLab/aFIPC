@@ -165,58 +165,70 @@ test_that("autoFIPC covers QMCEM estimation failure mode", {
 })
 
 
-test_that("autoFIPC nominal models", {
+test_that("autoFIPC covers errors", {
   skip_if_not_installed("mirt")
   library(mirt)
 
-  dat_old <- matrix(sample(c(1, 2, 3), 100, replace = TRUE), ncol = 5)
-  dat_new <- matrix(sample(c(1, 2, 3), 100, replace = TRUE), ncol = 5)
+  set.seed(123)
+  dat_old <- expand.table(LSAT7)
+  dat_new <- expand.table(LSAT7)
 
-  dat_old <- data.frame(dat_old)
-  dat_new <- data.frame(dat_new)
-
-  colnames(dat_old) <- paste0("V", 1:5)
-  colnames(dat_new) <- paste0("V", 1:5)
+  # make dat_old terrible so that it fails to estimate
+  dat_old[] <- 0
 
   c_items <- colnames(dat_old)[1:2]
 
-  model_old <- mirt(dat_old, 1, itemtype = 'nominal', SE = FALSE)
-  model_new <- mirt(dat_new, 1, itemtype = 'nominal', SE = FALSE)
-
   expect_error(aFIPC::autoFIPC(
-    newformXData = model_new,
-    oldformYData = model_old,
+    newformXData = dat_new,
+    oldformYData = dat_old,
     newformCommonItemNames = c_items,
     oldformCommonItemNames = c_items,
-    itemtype = 'nominal',
-    tryFitwholeNewItems = FALSE,
-    tryFitwholeOldItems = FALSE,
-    checkIPD = TRUE,
+    itemtype = 'Rasch',
+    tryFitwholeNewItems = TRUE,
+    tryFitwholeOldItems = TRUE,
+    checkIPD = FALSE,
     tryEM = TRUE,
     freeMEAN = TRUE,
     forceNormalZeroOne = FALSE,
     parameterOverwrite = FALSE,
-    empiricalhist = TRUE
-  ), NA)
+    empiricalhist = FALSE
+  ))
 })
 
-test_that("autoFIPC beta params", {
+test_that("autoFIPC handles different itemtype and tryEM settings", {
   skip_if_not_installed("mirt")
   library(mirt)
 
+  set.seed(123)
   dat_old <- expand.table(LSAT7)
   dat_new <- expand.table(LSAT7)
   dat_new[1:50, 1] <- sample(0:1, 50, replace = TRUE)
 
   c_items <- colnames(dat_old)[1:2]
 
-  # create models with lrPars to trigger beta logic
-  covdata <- data.frame(GROUP = rep(c('G1', 'G2'), each = 500))
-  model_old <- mirt(dat_old, 1, covdata = covdata, formula = ~ GROUP, SE = FALSE)
-  model_new <- mirt(dat_new, 1, covdata = covdata, formula = ~ GROUP, SE = FALSE)
-
+  # For itemtype = '3PL', checkoldformBILOGprior triggers if oldformBILOGprior is NULL
   expect_error(aFIPC::autoFIPC(
-    newformXData = model_new,
+    newformXData = dat_new,
+    oldformYData = dat_old,
+    newformCommonItemNames = c_items,
+    oldformCommonItemNames = c_items,
+    itemtype = '3PL',
+    tryFitwholeNewItems = FALSE,
+    tryFitwholeOldItems = FALSE,
+    checkIPD = FALSE,
+    tryEM = TRUE,
+    freeMEAN = TRUE,
+    forceNormalZeroOne = FALSE,
+    parameterOverwrite = FALSE,
+    empiricalhist = FALSE,
+    oldformBILOGprior = NULL,
+    newformBILOGprior = NULL
+  ), NA)
+
+  # Check with oldformYData as model instead of dataframe
+  model_old <- mirt(dat_old, 1, itemtype = 'Rasch', SE = FALSE)
+  expect_error(aFIPC::autoFIPC(
+    newformXData = dat_new,
     oldformYData = model_old,
     newformCommonItemNames = c_items,
     oldformCommonItemNames = c_items,
