@@ -78,6 +78,16 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     expect_false(any(linked_fixed$est))
   }
 
+  # Kim (2006) invariant, second half: parameters of the NON-common new-form
+  # items must stay free (estimated) so they move onto the fixed base scale,
+  # rather than being frozen along with the anchors.
+  new_unique_items <- setdiff(new_item_names, new_common_items)
+  free_new <- linked_values[
+    linked_values$item %in% new_unique_items & linked_values$name %in% c("a1", "d"),
+    "est"
+  ]
+  expect_true(all(free_new))
+
   old_estimates <- old_values[
     old_values$item %in% old_common_items & old_values$name %in% c("a1", "d"),
     "value"
