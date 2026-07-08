@@ -1,0 +1,8 @@
+# Trivy configuration (auto-loaded from the repo root by `trivy fs .`).
+#
+# Its only job is to activate the path-scoped secret suppression in
+# .trivyignore.yaml. Trivy 0.71.x auto-detects only a plain `.trivyignore`
+# (which cannot scope a rule to a path); pointing `ignorefile` at the YAML file
+# lets us suppress the vendored-doc false positive WITHOUT globally disabling
+# private-key detection. See .trivyignore.yaml for the full justification.
+ignorefile: .trivyignore.yaml
