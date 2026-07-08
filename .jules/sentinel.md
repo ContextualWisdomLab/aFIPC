@@ -17,3 +17,9 @@
 1. Always replace `while (!exists(...))` retries with a bounded `for` loop (e.g., `for (attempt in seq_len(3))`).
 2. Include an explicit check for the success condition inside the loop (`if (exists('model')) break`).
 3. After the loop, verify success and fail securely with an explicit error (`if (!exists('model')) stop(...)`) to prevent unhandled exceptions downstream.
+
+## 2024-07-08 - Data Integrity Loss via Negative Grep Combination
+**Vulnerability:** Filtering vectors in base R using a combination of negative `grep()` results, such as `x[-c(grep("A", x), grep("B", x))]`, wiped out the entire vector when no matches were found. This evaluates to `x[-integer(0)]` which incorrectly returns `character(0)` instead of the original vector, causing unexpected data loss and potentially breaking downstream logic that relies on preserved vectors.
+**Learning:** Avoid using `grep()` combinations with negative indexing for filtering vectors unless strictly checked. Empty match results do not map to "ignore" in vector exclusions.
+**Prevention:**
+Always replace `x[-c(grep(pattern1, x), grep(pattern2, x))]` logic with `x[!grepl("(pattern1|pattern2)", x)]`. The `grepl()` function returns a robust logical vector where `FALSE` can be reliably negated, keeping the vector intact when no elements match.
