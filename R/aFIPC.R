@@ -564,10 +564,8 @@ autoFIPC <-
     NewScaleParms <- mirt::mod2values(newFormModel)
     OldScaleParms <- mirt::mod2values(oldFormModel)
 
-    if (!parameterOverwrite) {
-      NewScaleParms[, "est"] <- TRUE
-      OldScaleParms[, "est"] <- TRUE
-    }
+    # Preserve mirt's structural estimability flags. Forcing every row TRUE
+    # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
 
     NewScaleParms[which(NewScaleParms$item == paste0('GROUP')), "est"] <-
       FALSE
