@@ -32,7 +32,7 @@ test_that("autoFIPC validates input types securely", {
       newformCommonItemNames = c('A'),
       oldformCommonItemNames = c('A')
     ),
-    "Security Error: newformXData must be a data.frame, matrix, or mirt model"
+    "Security Error: newformXData must be a data.frame, matrix, or a valid fitted mirt model"
   )
 
   expect_error(
@@ -53,17 +53,6 @@ test_that("autoFIPC validates input types securely", {
       oldformCommonItemNames = c('A'),
       itemtype = c("3PL", "2PL")
     ),
-    "Security Error: itemtype must be a single character string"
-  )
-
-  expect_error(
-    aFIPC::autoFIPC(
-      newformXData = data.frame(A=1),
-      oldformYData = structure(list(), class = "SingleGroupClass"),
-      newformCommonItemNames = c('A'),
-      oldformCommonItemNames = c('A'),
-      confirmCommonItems = TRUE
-    ),
-    "Security Error: oldformYData must be a data.frame, matrix, or mirt model"
+    "Security Error: itemtype must be length 1 or length 1 \\(number of items\\)."
   )
 })

@@ -55,7 +55,7 @@ autoFIPC(
 
 \item{empiricalhist}{do you want to use empirical histogram method when tryEM = TRUE? default is FALSE}
 
-\item{confirmCommonItems}{set TRUE to accept the supplied common-item pairs without an interactive prompt.}
+\item{confirmCommonItems}{set TRUE to accept the supplied common-item pairs without an interactive prompt. Default NULL: in interactive sessions the user will be prompted; set FALSE to explicitly reject (function will stop).}
 
 \item{...}{Additional arguments reserved for future extensions.}
 }
