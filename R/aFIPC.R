@@ -54,10 +54,11 @@ autoFIPC <-
     # garbage cleaning
 
     # Input validation - Security Enhancement
-    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !inherits(newformXData, "SingleGroupClass")) {
+    isMirtModel <- function(x) isS4(x) && methods::is(x, "SingleGroupClass")
+    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !isMirtModel(newformXData)) {
       stop("Security Error: newformXData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
     }
-    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !inherits(oldformYData, "SingleGroupClass")) {
+    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !isMirtModel(oldformYData)) {
       stop("Security Error: oldformYData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
     }
 
