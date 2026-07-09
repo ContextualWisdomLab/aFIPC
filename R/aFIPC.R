@@ -215,8 +215,8 @@ autoFIPC <-
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
 
-          try(rm(oldFormModel))
-          while (!exists('oldFormModel')) {
+          try(rm(oldFormModel), silent = TRUE)
+          for (attempt in seq_len(3)) {
             try(
               oldFormModel <-
                 mirt::mirt(
@@ -230,7 +230,9 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
+            if (exists('oldFormModel')) break
           }
+          if (!exists('oldFormModel')) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
         }
       }
 
@@ -427,8 +429,8 @@ autoFIPC <-
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
 
-          try(rm(newFormModel))
-          while (!exists('newFormModel')) {
+          try(rm(newFormModel), silent = TRUE)
+          for (attempt in seq_len(3)) {
             try(
               newFormModel <-
                 mirt::mirt(
@@ -442,7 +444,9 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
+            if (exists('newFormModel')) break
           }
+          if (!exists('newFormModel')) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
         }
       }
 
@@ -688,16 +692,12 @@ autoFIPC <-
         print(modIPD_DIF)
         print(CommonItemList_NOIPD)
 
+        # ⚡ Bolt: 루프 내에서 데이터 프레임을 서브셋팅(subsetting)하는 O(N) 연산을
+        # unlist()를 활용한 벡터화된(vectorized) O(1) 연산으로 대체하여 성능 향상
         ActualoldFormCommonItem <-
-          vector(length = length(CommonItemList_NOIPD))
+          as.character(unlist(IPDItemList[1, CommonItemList_NOIPD]))
         ActualnewFormCommonItem <-
-          vector(length = length(CommonItemList_NOIPD))
-        for (i in 1:length(CommonItemList_NOIPD)) {
-          ActualoldFormCommonItem[i] <-
-            as.character(IPDItemList[CommonItemList_NOIPD][1, i])
-          ActualnewFormCommonItem[i] <-
-            as.character(IPDItemList[CommonItemList_NOIPD][2, i])
-        }
+          as.character(unlist(IPDItemList[2, CommonItemList_NOIPD]))
 
         message('ActualoldFormCommonItem: ', ActualoldFormCommonItem)
         message('ActualnewFormCommonItem: ', ActualnewFormCommonItem)
@@ -975,10 +975,12 @@ autoFIPC <-
     # if(!LinkedModel@OptimInfo$secondordertest){
     #   message('Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.')
     #
-    #   rm(LinkedModel)
-    #   while (!exists('LinkedModel')) {
+    #   try(rm(LinkedModel), silent = TRUE)
+    #   for (attempt in seq_len(3)) {
     #     try(LinkedModel <- mirt::mirt(data = newformXDataK[colnames(newFormModel@Data$data)], LinkedModelSyntax, itemtype = newFormModel@Model$itemtype, SE = T, method = 'MHRM', accelerate = 'squarem', technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000), pars = NewScaleParms, GenRandomPars = T))
+    #     if (exists('LinkedModel')) break
     #   }
+    #   if (!exists('LinkedModel')) stop('Failed to estimate LinkedModel with MHRM after 3 attempts')
     # }
 
     # if(!LinkedModel@OptimInfo$secondordertest){
