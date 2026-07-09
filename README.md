@@ -25,7 +25,6 @@ preserve numerical behavior while modernizing repository operations
   - `AGENTS.md`
   - `CLAUDE.md`
   - `CONTRIBUTING.md`
-  - `docs/product-design-handoff.md`
   - `.github/SECURITY.md`
 
 ## Collaboration workflow
