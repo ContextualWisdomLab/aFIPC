@@ -25,6 +25,12 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
   ))
   names(old_data) <- old_item_names
   names(new_data) <- new_item_names
+  old_data[1, ] <- 0
+  old_data[2, ] <- 1
+  new_data[1, ] <- 0
+  new_data[2, ] <- 1
+  old_data[3, old_common_items[1]] <- NA
+  new_data[3, new_common_items[1]] <- NA
 
   old_model <- mirt::mirt(
     old_data,

@@ -13,6 +13,8 @@ scale. The package test `test-fixed-parameter-calibration.R` reproduces this
 contract with generated 2PL data:
 
 1. Generate old-form and new-form responses from known true item parameters.
+   The generated forms include all-zero and all-one response rows plus missing
+   responses on a common item.
 2. Fit separate old-form and new-form `mirt` models.
 3. Run `autoFIPC()` with the shared items declared as common items.
 4. Assert that linked common-item `a1` and `d` values equal the old-form values
