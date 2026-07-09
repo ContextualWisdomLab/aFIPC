@@ -184,7 +184,7 @@ autoFIPC <-
 
       if (tryFitwholeOldItems == T) {
         if (
-          (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+          (!exists('oldFormModel', inherits = FALSE) || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
             itemtype != 'ideal'
         ) {
           message(
@@ -208,7 +208,7 @@ autoFIPC <-
         }
 
         if (
-          (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+          (!exists('oldFormModel', inherits = FALSE) || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
             itemtype != 'ideal'
         ) {
           message(
@@ -230,14 +230,14 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('oldFormModel')) break
+            if (exists('oldFormModel', inherits = FALSE)) break
           }
-          if (!exists('oldFormModel')) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
+          if (!exists('oldFormModel', inherits = FALSE)) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
         }
       }
 
       if (
-        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+        (!exists('oldFormModel', inherits = FALSE) || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         message(
@@ -255,7 +255,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+        (!exists('oldFormModel', inherits = FALSE) || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         message(
@@ -274,7 +274,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+        (!exists('oldFormModel', inherits = FALSE) || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         message(
@@ -293,7 +293,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+        (!exists('oldFormModel', inherits = FALSE) || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         message(
@@ -312,7 +312,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
+        (!exists('oldFormModel', inherits = FALSE) || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
@@ -398,7 +398,7 @@ autoFIPC <-
 
       if (tryFitwholeNewItems) {
         if (
-          (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+          (!exists('newFormModel', inherits = FALSE) || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
             itemtype != 'ideal'
         ) {
           message(
@@ -422,7 +422,7 @@ autoFIPC <-
         }
 
         if (
-          (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+          (!exists('newFormModel', inherits = FALSE) || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
             itemtype != 'ideal'
         ) {
           message(
@@ -444,14 +444,14 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('newFormModel')) break
+            if (exists('newFormModel', inherits = FALSE)) break
           }
-          if (!exists('newFormModel')) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
+          if (!exists('newFormModel', inherits = FALSE)) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
         }
       }
 
       if (
-        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+        (!exists('newFormModel', inherits = FALSE) || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         message(
@@ -469,7 +469,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+        (!exists('newFormModel', inherits = FALSE) || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         message(
@@ -488,7 +488,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+        (!exists('newFormModel', inherits = FALSE) || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         message(
@@ -507,7 +507,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+        (!exists('newFormModel', inherits = FALSE) || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         message(
@@ -526,7 +526,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
+        (!exists('newFormModel', inherits = FALSE) || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           itemtype != 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
@@ -685,7 +685,7 @@ autoFIPC <-
       }
       mirt::mirtCluster(remove = T)
 
-      if (exists('modIPD_DIF')) {
+      if (exists('modIPD_DIF', inherits = FALSE)) {
         modIPD_IPDItem <- names(modIPD_DIF)
         CommonItemList_NOIPD <-
           colnames(IPDData)[!colnames(IPDData) %in% modIPD_IPDItem]
@@ -1022,7 +1022,7 @@ autoFIPC <-
     modelReturn$ThetaLinkedform <- ThetaLinkedform
     if (checkIPD) {
       modelReturn$IPDData <- data.frame(IPDData, IPDgroup)
-      if (exists('CommonItemList_NOIPD')) {
+      if (exists('CommonItemList_NOIPD', inherits = FALSE)) {
         modelReturn$IPDCommonItemList <- IPDItemList[CommonItemList_NOIPD]
       }
     }
