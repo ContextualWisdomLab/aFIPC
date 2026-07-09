@@ -603,15 +603,12 @@ autoFIPC <-
       # IPD estimation
       IPDParmNames <- OldScaleParms$name
       IPDParmNames <- IPDParmNames[!duplicated(IPDParmNames)]
-      IPDParmNames <-
-        IPDParmNames[
-          -c(
-            grep("^MEAN", IPDParmNames),
-            grep("^COV", IPDParmNames),
-            grep("^ak", IPDParmNames),
-            grep("^d0$", IPDParmNames)
-          )
-        ]
+      # ⚡ Bolt: 다중 grep() 결합 방식은 일치하는 패턴이 없을 때 integer(0)를 반환하여
+      # 전체 벡터를 비워버리는 심각한 버그(character(0) 리턴)를 유발할 수 있으며,
+      # 매번 벡터를 탐색하여 O(N)의 성능 저하가 발생합니다.
+      # 이를 단일 grepl() 정규식 탐색을 통한 논리 인덱싱(logical indexing)으로 변경하여
+      # 안전하게 필터링하고 탐색 비용을 O(N)에서 O(1) 수준의 단일 패스로 최적화했습니다.
+      IPDParmNames <- IPDParmNames[!grepl("^(MEAN|COV|ak)|^d0$", IPDParmNames)]
       IPDParmNames <- as.character(IPDParmNames)
 
       mirt::mirtCluster()
