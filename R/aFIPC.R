@@ -54,11 +54,10 @@ autoFIPC <-
     # garbage cleaning
 
     # Input validation - Security Enhancement
-    isMirtModel <- function(x) isS4(x) && methods::is(x, "SingleGroupClass")
-    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !isMirtModel(newformXData)) {
+    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !inherits(newformXData, "SingleGroupClass")) {
       stop("Security Error: newformXData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
     }
-    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !isMirtModel(oldformYData)) {
+    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !inherits(oldformYData, "SingleGroupClass")) {
       stop("Security Error: oldformYData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
     }
 
@@ -202,7 +201,7 @@ autoFIPC <-
         )
       }
 
-      if (!exists("oldFormModel", inherits = FALSE)) {
+      if (!exists("oldFormModel")) {
         stop("Security Error: Initial estimation of oldFormModel completely failed")
       }
 
@@ -254,9 +253,9 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('oldFormModel', inherits = FALSE)) break
+            if (exists('oldFormModel')) break
           }
-          if (!exists('oldFormModel', inherits = FALSE)) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
+          if (!exists('oldFormModel')) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
         }
       }
 
@@ -420,7 +419,7 @@ autoFIPC <-
         )
       }
 
-      if (!exists("newFormModel", inherits = FALSE)) {
+      if (!exists("newFormModel")) {
         stop("Security Error: Initial estimation of newFormModel completely failed")
       }
 
@@ -472,9 +471,9 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('newFormModel', inherits = FALSE)) break
+            if (exists('newFormModel')) break
           }
-          if (!exists('newFormModel', inherits = FALSE)) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
+          if (!exists('newFormModel')) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
         }
       }
 
@@ -565,8 +564,10 @@ autoFIPC <-
     NewScaleParms <- mirt::mod2values(newFormModel)
     OldScaleParms <- mirt::mod2values(oldFormModel)
 
-    # Preserve mirt's structural estimability flags. Forcing every row TRUE
-    # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
+    if (!parameterOverwrite) {
+      NewScaleParms[, "est"] <- TRUE
+      OldScaleParms[, "est"] <- TRUE
+    }
 
     NewScaleParms[which(NewScaleParms$item == paste0('GROUP')), "est"] <-
       FALSE
@@ -711,7 +712,7 @@ autoFIPC <-
       }
       mirt::mirtCluster(remove = T)
 
-      if (exists('modIPD_DIF', inherits = FALSE)) {
+      if (exists('modIPD_DIF')) {
         modIPD_IPDItem <- names(modIPD_DIF)
         CommonItemList_NOIPD <-
           colnames(IPDData)[!colnames(IPDData) %in% modIPD_IPDItem]
@@ -1048,7 +1049,7 @@ autoFIPC <-
     modelReturn$ThetaLinkedform <- ThetaLinkedform
     if (checkIPD) {
       modelReturn$IPDData <- data.frame(IPDData, IPDgroup)
-      if (exists('CommonItemList_NOIPD', inherits = FALSE)) {
+      if (exists('CommonItemList_NOIPD')) {
         modelReturn$IPDCommonItemList <- IPDItemList[CommonItemList_NOIPD]
       }
     }
