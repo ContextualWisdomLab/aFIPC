@@ -184,7 +184,7 @@ autoFIPC <-
 
       if (tryFitwholeOldItems == T) {
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
+          (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
             !itemtype == 'ideal'
         ) {
           message(
@@ -208,7 +208,7 @@ autoFIPC <-
         }
 
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
+          (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
             !itemtype == 'ideal'
         ) {
           message(
@@ -237,7 +237,7 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         message(
@@ -255,7 +255,7 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         message(
@@ -274,7 +274,7 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         message(
@@ -293,7 +293,7 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         message(
@@ -312,7 +312,7 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
+        (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
@@ -398,7 +398,7 @@ autoFIPC <-
 
       if (tryFitwholeNewItems) {
         if (
-          !newFormModel@OptimInfo$secondordertest &&
+          (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
             !itemtype == 'ideal'
         ) {
           message(
@@ -422,7 +422,7 @@ autoFIPC <-
         }
 
         if (
-          !newFormModel@OptimInfo$secondordertest &&
+          (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
             !itemtype == 'ideal'
         ) {
           message(
@@ -451,7 +451,7 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         message(
@@ -469,7 +469,7 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         message(
@@ -488,7 +488,7 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         message(
@@ -507,7 +507,7 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         message(
@@ -526,7 +526,7 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
+        (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
           !itemtype == 'ideal'
       ) {
         stop('Estimation failed. Please check test quality.')
@@ -965,14 +965,14 @@ autoFIPC <-
       }
     }
 
-    # if(!LinkedModel@OptimInfo$secondordertest){
+    # if((!exists('LinkedModel') || !isTRUE(LinkedModel@OptimInfo$secondordertest))){
     #   message('Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.')
     #
     #   rm(LinkedModel)
     #   try(LinkedModel <- mirt::mirt(data = newformXDataK[colnames(newFormModel@Data$data)], LinkedModelSyntax, itemtype = newFormModel@Model$itemtype, SE = T, method = 'QMCEM', accelerate = 'squarem', technical = list(NCYCLES = 1e+5), pars = NewScaleParms, GenRandomPars = F))
     # }
     #
-    # if(!LinkedModel@OptimInfo$secondordertest){
+    # if((!exists('LinkedModel') || !isTRUE(LinkedModel@OptimInfo$secondordertest))){
     #   message('Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.')
     #
     #   try(rm(LinkedModel), silent = TRUE)
@@ -983,7 +983,7 @@ autoFIPC <-
     #   if (!exists('LinkedModel')) stop('Failed to estimate LinkedModel with MHRM after 3 attempts')
     # }
 
-    # if(!LinkedModel@OptimInfo$secondordertest){
+    # if((!exists('LinkedModel') || !isTRUE(LinkedModel@OptimInfo$secondordertest))){
     #   stop('Estimation failed. Please check test quality.')
     # }
 

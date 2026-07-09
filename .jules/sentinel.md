@@ -17,3 +17,10 @@
 1. Always replace `while (!exists(...))` retries with a bounded `for` loop (e.g., `for (attempt in seq_len(3))`).
 2. Include an explicit check for the success condition inside the loop (`if (exists('model')) break`).
 3. After the loop, verify success and fail securely with an explicit error (`if (!exists('model')) stop(...)`) to prevent unhandled exceptions downstream.
+
+## 2024-06-25 - Unhandled State Error During Deterministic Model Failures
+**Vulnerability:** When checking convergence or attributes on model objects (e.g. `!oldFormModel@OptimInfo$secondordertest`), if the object estimation inside a `try()` block failed, the object was never instantiated. This led to "object not found" runtime exceptions and potential internal state leakage in upstream evaluation pipelines if unhandled completely.
+**Learning:** Checking properties of an object instantiated within a deterministic error block (like `try()`) requires ensuring the object itself actually exists before referencing its attributes. Failing to do so causes subsequent execution steps to fail ungracefully.
+**Prevention:**
+1. Always use `exists('object')` coupled with `isTRUE(object@property)` checks rather than directly referencing properties that might evaluate to a boolean check on a non-existent object.
+2. In R scripts, explicitly prepend existence validations like `(!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest))` before conditionally handling retries or throwing fallback errors.
