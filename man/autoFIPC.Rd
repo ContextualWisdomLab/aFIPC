@@ -49,7 +49,7 @@ autoFIPC(
 
 \item{freeMEAN}{allow freely mean estimation, default is TRUE}
 
-\item{forceNormalZeroOne}{set the prior distribution follows N(0,1) distribution. default is TRUE}
+\item{forceNormalZeroOne}{set the prior distribution follows N(0,1) distribution. default is FALSE}
 
 \item{parameterOverwrite}{don't touch it}
 

@@ -14,7 +14,7 @@
 #' @param checkIPD do you want to check item parameter drift? default is TRUE
 #' @param tryEM do you want to try EM algorithm when you calibrate model? defalut is TRUE
 #' @param freeMEAN allow freely mean estimation, default is TRUE
-#' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is TRUE
+#' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is FALSE
 #' @param parameterOverwrite don't touch it
 #' @param empiricalhist do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
 #' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt.
@@ -206,11 +206,13 @@ autoFIPC <-
         stop("Security Error: Initial estimation of oldFormModel completely failed")
       }
 
+      oldFormModelNeedsFallback <- function() {
+        !exists("oldFormModel", inherits = FALSE) ||
+          (!oldFormModel@OptimInfo$secondordertest && itemtype != 'ideal')
+      }
+
       if (tryFitwholeOldItems == T) {
-        if (
-          !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
-        ) {
+        if (oldFormModelNeedsFallback()) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
           )
@@ -231,10 +233,7 @@ autoFIPC <-
           )
         }
 
-        if (
-          !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
-        ) {
+        if (oldFormModelNeedsFallback()) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
@@ -260,10 +259,7 @@ autoFIPC <-
         }
       }
 
-      if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (oldFormModelNeedsFallback()) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
         )
@@ -278,10 +274,7 @@ autoFIPC <-
           )
       }
 
-      if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (oldFormModelNeedsFallback()) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by normal MMLE/EM'
         )
@@ -297,10 +290,7 @@ autoFIPC <-
           )
       }
 
-      if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (oldFormModelNeedsFallback()) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/QMCEM'
         )
@@ -316,10 +306,7 @@ autoFIPC <-
           )
       }
 
-      if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (oldFormModelNeedsFallback()) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/MHRM'
         )
@@ -335,10 +322,7 @@ autoFIPC <-
           )
       }
 
-      if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (oldFormModelNeedsFallback()) {
         stop('Estimation failed. Please check test quality.')
       }
     }
@@ -424,11 +408,13 @@ autoFIPC <-
         stop("Security Error: Initial estimation of newFormModel completely failed")
       }
 
+      newFormModelNeedsFallback <- function() {
+        !exists("newFormModel", inherits = FALSE) ||
+          (!newFormModel@OptimInfo$secondordertest && itemtype != 'ideal')
+      }
+
       if (tryFitwholeNewItems) {
-        if (
-          !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
-        ) {
+        if (newFormModelNeedsFallback()) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
           )
@@ -449,10 +435,7 @@ autoFIPC <-
           )
         }
 
-        if (
-          !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
-        ) {
+        if (newFormModelNeedsFallback()) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
           )
@@ -478,10 +461,7 @@ autoFIPC <-
         }
       }
 
-      if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (newFormModelNeedsFallback()) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
         )
@@ -496,10 +476,7 @@ autoFIPC <-
           )
       }
 
-      if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (newFormModelNeedsFallback()) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by normal MMLE/EM'
         )
@@ -515,10 +492,7 @@ autoFIPC <-
           )
       }
 
-      if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (newFormModelNeedsFallback()) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/QMCEM'
         )
@@ -534,10 +508,7 @@ autoFIPC <-
           )
       }
 
-      if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (newFormModelNeedsFallback()) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/MHRM'
         )
@@ -553,10 +524,7 @@ autoFIPC <-
           )
       }
 
-      if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
-      ) {
+      if (newFormModelNeedsFallback()) {
         stop('Estimation failed. Please check test quality.')
       }
     }
