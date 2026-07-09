@@ -202,7 +202,7 @@ autoFIPC <-
         )
       }
 
-      if (!exists("oldFormModel")) {
+      if (!exists("oldFormModel", inherits = FALSE)) {
         stop("Security Error: Initial estimation of oldFormModel completely failed")
       }
 
@@ -254,9 +254,9 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('oldFormModel')) break
+            if (exists('oldFormModel', inherits = FALSE)) break
           }
-          if (!exists('oldFormModel')) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
+          if (!exists('oldFormModel', inherits = FALSE)) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
         }
       }
 
@@ -420,7 +420,7 @@ autoFIPC <-
         )
       }
 
-      if (!exists("newFormModel")) {
+      if (!exists("newFormModel", inherits = FALSE)) {
         stop("Security Error: Initial estimation of newFormModel completely failed")
       }
 
@@ -472,9 +472,9 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('newFormModel')) break
+            if (exists('newFormModel', inherits = FALSE)) break
           }
-          if (!exists('newFormModel')) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
+          if (!exists('newFormModel', inherits = FALSE)) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
         }
       }
 
@@ -703,7 +703,7 @@ autoFIPC <-
       }
       mirt::mirtCluster(remove = T)
 
-      if (exists('modIPD_DIF')) {
+      if (exists('modIPD_DIF', inherits = FALSE)) {
         modIPD_IPDItem <- names(modIPD_DIF)
         CommonItemList_NOIPD <-
           colnames(IPDData)[!colnames(IPDData) %in% modIPD_IPDItem]
@@ -1040,7 +1040,7 @@ autoFIPC <-
     modelReturn$ThetaLinkedform <- ThetaLinkedform
     if (checkIPD) {
       modelReturn$IPDData <- data.frame(IPDData, IPDgroup)
-      if (exists('CommonItemList_NOIPD')) {
+      if (exists('CommonItemList_NOIPD', inherits = FALSE)) {
         modelReturn$IPDCommonItemList <- IPDItemList[CommonItemList_NOIPD]
       }
     }
