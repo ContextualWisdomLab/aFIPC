@@ -19,6 +19,8 @@ contract with generated 2PL data:
    and are not estimated in the linked model.
 5. Assert that the old-form estimates recover the generating common-item
    parameters closely enough for a small deterministic regression test.
+6. Fit with `SE = TRUE` and assert finite Hessian-derived covariance matrices
+   plus passing `secondordertest` results for the old, new, and linked models.
 
 ## References
 
