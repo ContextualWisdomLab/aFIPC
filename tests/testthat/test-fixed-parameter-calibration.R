@@ -31,7 +31,7 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     1,
     itemtype = "2PL",
     method = "EM",
-    SE = FALSE,
+    SE = TRUE,
     verbose = FALSE,
     technical = list(NCYCLES = 500)
   )
@@ -40,10 +40,19 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     1,
     itemtype = "2PL",
     method = "EM",
-    SE = FALSE,
+    SE = TRUE,
     verbose = FALSE,
     technical = list(NCYCLES = 500)
   )
+
+  old_vcov <- as.matrix(old_model@vcov)
+  new_vcov <- as.matrix(new_model@vcov)
+  expect_gt(nrow(old_vcov), 0)
+  expect_gt(nrow(new_vcov), 0)
+  expect_true(all(is.finite(diag(old_vcov))))
+  expect_true(all(is.finite(diag(new_vcov))))
+  expect_true(isTRUE(old_model@OptimInfo$secondordertest))
+  expect_true(isTRUE(new_model@OptimInfo$secondordertest))
 
   linked <- aFIPC::autoFIPC(
     newformXData = new_model,
@@ -58,8 +67,19 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     confirmCommonItems = TRUE
   )
 
+  linked_vcov <- as.matrix(linked$LinkedModel@vcov)
+  expect_gt(nrow(linked_vcov), 0)
+  expect_true(all(is.finite(diag(linked_vcov))))
+  expect_true(isTRUE(linked$LinkedModel@OptimInfo$secondordertest))
+
   old_values <- mirt::mod2values(old_model)
   linked_values <- mirt::mod2values(linked$LinkedModel)
+  linked_structural <- linked_values[
+    linked_values$item %in% new_item_names[5:6] &
+      linked_values$name %in% c("g", "u"),
+    "est"
+  ]
+  expect_false(any(linked_structural))
 
   for (i in seq_along(old_common_items)) {
     old_item <- old_common_items[i]

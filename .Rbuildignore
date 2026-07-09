@@ -16,5 +16,5 @@
 ^task_agent_mapping\.json$
 ^\.gitleaks\.toml$
 ^\.jules(/.*)?$
-^\.trivyignore$
+^\.trivyignore\.yaml$
 ^trivy\.yaml$
