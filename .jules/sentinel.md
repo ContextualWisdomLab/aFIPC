@@ -24,3 +24,11 @@
 **Prevention:**
 1. Never use `-c(grep(...), ...)` to exclude elements from a vector.
 2. Always use the negation of `grepl()` (e.g., `!grepl("^(pattern1|pattern2)", vector)`) which safely returns a logical vector. If there are no matches, it returns a vector of `TRUE`s, safely preserving the original vector when subsetted.
+
+## 2024-07-05 - Missing Input Validation
+**Vulnerability:** The `autoFIPC` function lacked explicit input validation for core arguments like `newformXData`, `oldformYData`, `newformCommonItemNames`, and `itemtype`. When unexpected types (e.g. integer `1` instead of a data structure, or an array for `itemtype`) were provided, the errors propagated dynamically causing unhandled downstream exceptions or potential state leaks depending on internal implementations (like `mirt` and `try` blocks capturing objects unexpectedly). Furthermore, if the base model estimation `try(mirt(...))` entirely failed to produce a model object, the code would later crash when trying to access `@OptimInfo`, leading to untracked exceptions.
+**Learning:** In dynamically typed environments like R, trusting user inputs without explicit runtime validation boundaries allows malformed types to flow deeply into internal logic. This can result in obscure failure modes, leakage of unhandled stack exceptions, or unpredictable behavior across statistical dependencies.
+**Prevention:**
+1. Always enforce explicit boundary checks on public-facing functions (e.g., verifying `is.data.frame`, `is.matrix`, or custom class types).
+2. Fail fast and securely with explicit "Security Error" messages when the data contract is violated, before passing data to third-party statistical engines.
+3. When using `try()` to swallow errors on initial setup, immediately verify the expected object (`exists("model")`) was actually created before accessing its slots or attributes.

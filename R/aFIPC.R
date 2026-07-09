@@ -53,6 +53,26 @@ autoFIPC <-
     try(invisible(gc()), silent = T)
     # garbage cleaning
 
+    # Input validation - Security Enhancement
+    isMirtModel <- function(x) isS4(x) && methods::is(x, "SingleGroupClass")
+    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !isMirtModel(newformXData)) {
+      stop("Security Error: newformXData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
+    }
+    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !isMirtModel(oldformYData)) {
+      stop("Security Error: oldformYData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
+    }
+
+    if (!is.character(newformCommonItemNames) && !is.factor(newformCommonItemNames)) {
+      stop("Security Error: newformCommonItemNames must be a character vector")
+    }
+    if (!is.character(oldformCommonItemNames) && !is.factor(oldformCommonItemNames)) {
+      stop("Security Error: oldformCommonItemNames must be a character vector")
+    }
+
+    if (!is.character(itemtype) || length(itemtype) != 1) {
+      stop("Security Error: itemtype must be a single character string")
+    }
+
     # checking configure
     if (length(newformCommonItemNames) != length(oldformCommonItemNames)) {
       stop('Common Items are not equal')
@@ -180,6 +200,10 @@ autoFIPC <-
               GenRandomPars = F
             )
         )
+      }
+
+      if (!exists("oldFormModel")) {
+        stop("Security Error: Initial estimation of oldFormModel completely failed")
       }
 
       if (tryFitwholeOldItems == T) {
@@ -396,6 +420,10 @@ autoFIPC <-
         )
       }
 
+      if (!exists("newFormModel")) {
+        stop("Security Error: Initial estimation of newFormModel completely failed")
+      }
+
       if (tryFitwholeNewItems) {
         if (
           !newFormModel@OptimInfo$secondordertest &&
@@ -537,10 +565,8 @@ autoFIPC <-
     NewScaleParms <- mirt::mod2values(newFormModel)
     OldScaleParms <- mirt::mod2values(oldFormModel)
 
-    if (!parameterOverwrite) {
-      NewScaleParms[, "est"] <- TRUE
-      OldScaleParms[, "est"] <- TRUE
-    }
+    # Preserve mirt's structural estimability flags. Forcing every row TRUE
+    # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
 
     NewScaleParms[which(NewScaleParms$item == paste0('GROUP')), "est"] <-
       FALSE
