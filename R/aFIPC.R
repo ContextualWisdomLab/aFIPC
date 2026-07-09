@@ -53,6 +53,26 @@ autoFIPC <-
     try(invisible(gc()), silent = T)
     # garbage cleaning
 
+    # Input validation - Security Enhancement
+    isMirtModel <- function(x) isS4(x) && methods::is(x, "SingleGroupClass")
+    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !isMirtModel(newformXData)) {
+      stop("Security Error: newformXData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
+    }
+    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !isMirtModel(oldformYData)) {
+      stop("Security Error: oldformYData must be a data.frame, matrix, or mirt model (SingleGroupClass)")
+    }
+
+    if (!is.character(newformCommonItemNames) && !is.factor(newformCommonItemNames)) {
+      stop("Security Error: newformCommonItemNames must be a character vector")
+    }
+    if (!is.character(oldformCommonItemNames) && !is.factor(oldformCommonItemNames)) {
+      stop("Security Error: oldformCommonItemNames must be a character vector")
+    }
+
+    if (!is.character(itemtype) || length(itemtype) != 1) {
+      stop("Security Error: itemtype must be a single character string")
+    }
+
     # checking configure
     if (length(newformCommonItemNames) != length(oldformCommonItemNames)) {
       stop('Common Items are not equal')
@@ -182,6 +202,10 @@ autoFIPC <-
         )
       }
 
+      if (!exists("oldFormModel", inherits = FALSE)) {
+        stop("Security Error: Initial estimation of oldFormModel completely failed")
+      }
+
       if (tryFitwholeOldItems == T) {
         if (
           (!exists('oldFormModel') || !isTRUE(oldFormModel@OptimInfo$secondordertest)) &&
@@ -230,9 +254,9 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('oldFormModel')) break
+            if (exists('oldFormModel', inherits = FALSE)) break
           }
-          if (!exists('oldFormModel')) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
+          if (!exists('oldFormModel', inherits = FALSE)) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
         }
       }
 
@@ -396,6 +420,10 @@ autoFIPC <-
         )
       }
 
+      if (!exists("newFormModel", inherits = FALSE)) {
+        stop("Security Error: Initial estimation of newFormModel completely failed")
+      }
+
       if (tryFitwholeNewItems) {
         if (
           (!exists('newFormModel') || !isTRUE(newFormModel@OptimInfo$secondordertest)) &&
@@ -444,9 +472,9 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('newFormModel')) break
+            if (exists('newFormModel', inherits = FALSE)) break
           }
-          if (!exists('newFormModel')) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
+          if (!exists('newFormModel', inherits = FALSE)) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
         }
       }
 
@@ -537,10 +565,8 @@ autoFIPC <-
     NewScaleParms <- mirt::mod2values(newFormModel)
     OldScaleParms <- mirt::mod2values(oldFormModel)
 
-    if (!parameterOverwrite) {
-      NewScaleParms[, "est"] <- TRUE
-      OldScaleParms[, "est"] <- TRUE
-    }
+    # Preserve mirt's structural estimability flags. Forcing every row TRUE
+    # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
 
     NewScaleParms[which(NewScaleParms$item == paste0('GROUP')), "est"] <-
       FALSE
@@ -603,15 +629,7 @@ autoFIPC <-
       # IPD estimation
       IPDParmNames <- OldScaleParms$name
       IPDParmNames <- IPDParmNames[!duplicated(IPDParmNames)]
-      IPDParmNames <-
-        IPDParmNames[
-          -c(
-            grep("^MEAN", IPDParmNames),
-            grep("^COV", IPDParmNames),
-            grep("^ak", IPDParmNames),
-            grep("^d0$", IPDParmNames)
-          )
-        ]
+      IPDParmNames <- IPDParmNames[!grepl("^(MEAN|COV|ak|d0$)", IPDParmNames)]
       IPDParmNames <- as.character(IPDParmNames)
 
       mirt::mirtCluster()
@@ -685,7 +703,7 @@ autoFIPC <-
       }
       mirt::mirtCluster(remove = T)
 
-      if (exists('modIPD_DIF')) {
+      if (exists('modIPD_DIF', inherits = FALSE)) {
         modIPD_IPDItem <- names(modIPD_DIF)
         CommonItemList_NOIPD <-
           colnames(IPDData)[!colnames(IPDData) %in% modIPD_IPDItem]
@@ -714,9 +732,13 @@ autoFIPC <-
     newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
     oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
-    for (i in 1:length(oldformCommonItemNames)) {
-      newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
-      oldFormItemName <- oldFormColNames[match(oldformCommonItemNames[i], oldFormColNames)]
+    for (i in seq_along(oldformCommonItemNames)) {
+      newFormItemStr <- newformCommonItemNames[i]
+      oldFormItemStr <- oldformCommonItemNames[i]
+
+      newFormItemName <- newFormColNames[match(newFormItemStr, newFormColNames)]
+      oldFormItemName <- oldFormColNames[match(oldFormItemStr, oldFormColNames)]
+
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
@@ -725,64 +747,49 @@ autoFIPC <-
       ) {
         message(
           'applying ',
-          paste0(newformCommonItemNames[i]),
+          newFormItemStr,
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldFormItemStr,
           ' as common item use'
         )
+
+        newIdx <- which(NewScaleParms$item == newFormItemStr)
+        oldIdx <- which(OldScaleParms$item == oldFormItemStr)
 
         message(
           '   Newform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[newIdx, "value"],
             ' '
           )
         )
         message(
           '   Oldform Parms: ',
           paste0(
-            OldScaleParms[
-              which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-              "value"
-            ],
+            OldScaleParms[oldIdx, "value"],
             ' '
           )
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "value"
-        ] <-
-          OldScaleParms[
-            which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-            "value"
-          ]
+        NewScaleParms[newIdx, "value"] <-
+          OldScaleParms[oldIdx, "value"]
         message(
           '   Linkedform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[newIdx, "value"],
             ' '
           ),
           '\n'
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "est"
-        ] <-
+        NewScaleParms[newIdx, "est"] <-
           FALSE
       } else {
         message(
           'skipping ',
-          paste0(newformCommonItemNames[i]),
+          newFormItemStr,
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldFormItemStr,
           ' as common item use'
         )
       }
@@ -792,9 +799,12 @@ autoFIPC <-
       length(attr(newFormModel@ParObjects$lrPars, 'parnum')) != 0 &&
         length(attr(oldFormModel@ParObjects$lrPars, 'parnum')) != 0
     ) {
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"] <-
-        OldScaleParms[which(OldScaleParms$item == paste0('BETA')), "value"]
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "est"] <-
+      newBetaIdx <- which(NewScaleParms$item == 'BETA')
+      oldBetaIdx <- which(OldScaleParms$item == 'BETA')
+
+      NewScaleParms[newBetaIdx, "value"] <-
+        OldScaleParms[oldBetaIdx, "value"]
+      NewScaleParms[newBetaIdx, "est"] <-
         FALSE
 
       message('applying BETA parameter as linking')
@@ -802,7 +812,7 @@ autoFIPC <-
       message(
         '   Linkedform Parms: ',
         paste0(
-          NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"],
+          NewScaleParms[newBetaIdx, "value"],
           ' '
         ),
         '\n'
@@ -1022,7 +1032,7 @@ autoFIPC <-
     modelReturn$ThetaLinkedform <- ThetaLinkedform
     if (checkIPD) {
       modelReturn$IPDData <- data.frame(IPDData, IPDgroup)
-      if (exists('CommonItemList_NOIPD')) {
+      if (exists('CommonItemList_NOIPD', inherits = FALSE)) {
         modelReturn$IPDCommonItemList <- IPDItemList[CommonItemList_NOIPD]
       }
     }
