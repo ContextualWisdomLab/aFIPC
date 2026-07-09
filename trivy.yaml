@@ -1,3 +1,0 @@
-scan:
-  skip-files:
-    - "packrat/lib/**/openssl/doc/keys.html"
