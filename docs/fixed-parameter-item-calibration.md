@@ -28,7 +28,7 @@ new-form item parameter vector to the old-form estimate and holds it fixed
 during the linked calibration:
 
 ```text
-theta_hat(x_j) := theta_hat(y_j)      and      est(x_j) := FALSE
+item_parms(x_j) := item_parms(y_j)    and      est(x_j) := FALSE
 ```
 
 while every non-anchor new-form parameter stays free and is estimated on the
