@@ -39,10 +39,3 @@
 **Prevention:**
 1. `try()` 블록 외부에서 결과 객체를 사용할 때는 항상 해당 객체가 생성되었는지 확인해야 합니다 (`exists('model')`).
 2. 객체의 프로퍼티에 안전하게 접근하려면, 객체가 존재하고 예상되는 타입인지 검증하는 로직을 결합해야 합니다 (예: `(!exists('model') || !isTRUE(model@OptimInfo$secondordertest))`).
-
-## 2024-07-09 - CI Failure: Trivy False Positives in Vendored Dependencies
-**Vulnerability:** Trivy Secret scanner incorrectly flagged `HIGH` severity `AsymmetricPrivateKey` vulnerabilities inside `packrat/lib/.../openssl/doc/keys.html`. These are example keys inside HTML documentation of a vendored library, not live credentials.
-**Learning:** Security scanners like Trivy can produce false positives when scanning vendored dependencies, test fixtures, or documentation containing example secrets. This can break CI pipelines.
-**Prevention:**
-1. Suppress only the known false-positive file path with `trivy.yaml` `scan.skip-files`, especially in vendored directories like `packrat/`.
-2. Keep suppressions path-scoped and never globally disable the secret rule for all vendored code.
