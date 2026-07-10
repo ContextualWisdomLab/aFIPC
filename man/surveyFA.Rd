@@ -23,5 +23,6 @@ surveyFA(data, autofix = TRUE, forceUIRT = TRUE, forceNormalEM = FALSE,
 Fallback calibration helper used when direct \code{autoFIPC()} estimation fails.
 }
 \value{
-A fitted \code{mirt} model object.
+A fitted \code{mirt} model object with finite log-likelihood and, when
+\code{SE = TRUE}, a passing second-order test plus finite covariance estimates.
 }

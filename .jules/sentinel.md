@@ -46,3 +46,4 @@
 **Prevention:**
 1. Always implement explicit, short-circuited runtime type validation for scalar boolean inputs.
 2. The standard secure pattern in R is `if (!is.logical(x) || length(x) != 1 || is.na(x)) stop("...")`. The `||` operator correctly avoids evaluating `is.na(x)` if the length is strictly checked first.
+3. IRT fallback estimators must not convert `secondordertest = NA` into `TRUE`; with `SE = TRUE`, require a passing second-order test and finite covariance estimates before returning a model.

@@ -13,7 +13,8 @@
 #' @param maxItemRemovals Maximum number of items to remove in autofix mode.
 #' @param pThreshold p-value cutoff for selecting the first misfit item.
 #' @param ... Additional arguments reserved for compatibility.
-#' @return A fitted `mirt` model object.
+#' @return A fitted `mirt` model object with finite log-likelihood and, when
+#'   `SE = TRUE`, a passing second-order test plus finite covariance estimates.
 #' @export
 surveyFA <- function(
   data,
@@ -28,7 +29,23 @@ surveyFA <- function(
   pThreshold = 0.05,
   ...
 ) {
-  if (!isTRUE(forceUIRT)) {
+  validate_logical_scalar <- function(value, name) {
+    if (!is.logical(value) || length(value) != 1L || is.na(value)) {
+      stop(
+        sprintf("Security Error: %s must be a single non-NA logical value", name),
+        call. = FALSE
+      )
+    }
+  }
+
+  validate_logical_scalar(autofix, "autofix")
+  validate_logical_scalar(forceUIRT, "forceUIRT")
+  validate_logical_scalar(forceNormalEM, "forceNormalEM")
+  validate_logical_scalar(forceMHRM, "forceMHRM")
+  validate_logical_scalar(unstable, "unstable")
+  validate_logical_scalar(SE, "SE")
+
+  if (!forceUIRT) {
     stop(
       "surveyFA requires forceUIRT=TRUE; fallback requires explicit legacy-mode activation.",
       call. = FALSE
@@ -37,6 +54,30 @@ surveyFA <- function(
 
   if (!is.data.frame(data) && !is.matrix(data)) {
     stop("surveyFA requires a response matrix or data frame.", call. = FALSE)
+  }
+
+  if (!is.character(itemtype) || length(itemtype) != 1L || is.na(itemtype)) {
+    stop("surveyFA requires itemtype to be a single non-NA character value.", call. = FALSE)
+  }
+
+  if (
+    !is.numeric(maxItemRemovals) ||
+      length(maxItemRemovals) != 1L ||
+      is.na(maxItemRemovals) ||
+      maxItemRemovals < 0
+  ) {
+    stop("surveyFA requires maxItemRemovals to be a non-negative numeric scalar.", call. = FALSE)
+  }
+  maxItemRemovals <- as.integer(maxItemRemovals)
+
+  if (
+    !is.numeric(pThreshold) ||
+      length(pThreshold) != 1L ||
+      is.na(pThreshold) ||
+      pThreshold <= 0 ||
+      pThreshold > 1
+  ) {
+    stop("surveyFA requires pThreshold to be in (0, 1].", call. = FALSE)
   }
 
   response_data <- as.data.frame(data)
@@ -48,6 +89,28 @@ surveyFA <- function(
 
   if (nrow(response_data) == 0L || ncol(response_data) < 2L) {
     stop("surveyFA needs at least two non-constant response columns.", call. = FALSE)
+  }
+
+  has_finite_covariance <- function(model) {
+    covariance <- tryCatch(
+      {
+        direct <- model@vcov
+        if (is.null(direct) || length(direct) == 0L) {
+          stats::vcov(model)
+        } else {
+          direct
+        }
+      },
+      error = function(e) {
+        tryCatch(stats::vcov(model), error = function(err) NA)
+      }
+    )
+
+    covariance <- suppressWarnings(as.matrix(covariance))
+    is.numeric(covariance) &&
+      length(covariance) > 0L &&
+      all(dim(covariance) > 0L) &&
+      all(is.finite(covariance))
   }
 
   is_acceptable_model <- function(model) {
@@ -73,6 +136,12 @@ surveyFA <- function(
       error = function(e) NA
     )
     if (is.logical(second_order) && isFALSE(second_order)) {
+      return(FALSE)
+    }
+    if (SE && !identical(second_order, TRUE)) {
+      return(FALSE)
+    }
+    if (SE && !has_finite_covariance(model)) {
       return(FALSE)
     }
 
@@ -196,12 +265,6 @@ surveyFA <- function(
     for (method_name in methods) {
       fitted <- try_fit(response_data, method_name)
       if (is_acceptable_model(fitted)) {
-        if (
-          is.logical(fitted@OptimInfo$secondordertest) &&
-            is.na(fitted@OptimInfo$secondordertest)
-        ) {
-          fitted@OptimInfo$secondordertest <- TRUE
-        }
         return(fitted)
       }
     }

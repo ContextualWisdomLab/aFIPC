@@ -21,17 +21,40 @@ test_that("surveyFA can recover with bounded autofix for messy response data", {
     autofix = TRUE,
     forceUIRT = TRUE,
     forceNormalEM = TRUE,
-    SE = FALSE
+    SE = TRUE
   )
 
+  fitted_vcov <- as.matrix(fitted@vcov)
   expect_true(inherits(fitted, "SingleGroupClass"))
-  expect_true(fitted@OptimInfo$secondordertest)
+  expect_gt(nrow(fitted_vcov), 0)
+  expect_true(all(is.finite(diag(fitted_vcov))))
+  expect_true(isTRUE(fitted@OptimInfo$secondordertest))
 })
 
 test_that("surveyFA errors clearly for unsupported input", {
   expect_error(
     aFIPC::surveyFA(1:10, forceUIRT = TRUE),
     "surveyFA requires a response matrix or data frame"
+  )
+})
+
+test_that("surveyFA validates boolean control flags before estimator dispatch", {
+  raw <- data.frame(
+    item1 = c(0, 1, 0, 1),
+    item2 = c(1, 0, 1, 0)
+  )
+
+  expect_error(
+    aFIPC::surveyFA(raw, autofix = c(TRUE, FALSE)),
+    "Security Error: autofix must be a single non-NA logical value"
+  )
+  expect_error(
+    aFIPC::surveyFA(raw, forceNormalEM = NA),
+    "Security Error: forceNormalEM must be a single non-NA logical value"
+  )
+  expect_error(
+    aFIPC::surveyFA(raw, SE = "TRUE"),
+    "Security Error: SE must be a single non-NA logical value"
   )
 })
 
