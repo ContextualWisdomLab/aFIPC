@@ -84,6 +84,16 @@ autoFIPC <-
     else if (is.data.frame(oldformYData) || is.matrix(oldformYData)) nItems <- ncol(as.data.frame(oldformYData))
     if (!is.na(nItems) && !(length(itemtype) == 1 || length(itemtype) == nItems)) stop(sprintf('Security Error: itemtype must be length 1 or length %d (number of items).', nItems))
 
+    # boolean parameter validation
+    if (!is.logical(tryFitwholeNewItems) || length(tryFitwholeNewItems) != 1 || is.na(tryFitwholeNewItems)) stop("Security Error: tryFitwholeNewItems must be a single non-NA logical value")
+    if (!is.logical(tryFitwholeOldItems) || length(tryFitwholeOldItems) != 1 || is.na(tryFitwholeOldItems)) stop("Security Error: tryFitwholeOldItems must be a single non-NA logical value")
+    if (!is.logical(checkIPD) || length(checkIPD) != 1 || is.na(checkIPD)) stop("Security Error: checkIPD must be a single non-NA logical value")
+    if (!is.logical(tryEM) || length(tryEM) != 1 || is.na(tryEM)) stop("Security Error: tryEM must be a single non-NA logical value")
+    if (!is.logical(freeMEAN) || length(freeMEAN) != 1 || is.na(freeMEAN)) stop("Security Error: freeMEAN must be a single non-NA logical value")
+    if (!is.logical(forceNormalZeroOne) || length(forceNormalZeroOne) != 1 || is.na(forceNormalZeroOne)) stop("Security Error: forceNormalZeroOne must be a single non-NA logical value")
+    if (!is.logical(parameterOverwrite) || length(parameterOverwrite) != 1 || is.na(parameterOverwrite)) stop("Security Error: parameterOverwrite must be a single non-NA logical value")
+    if (!is.logical(empiricalhist) || length(empiricalhist) != 1 || is.na(empiricalhist)) stop("Security Error: empiricalhist must be a single non-NA logical value")
+
     # checking configure
     if (length(newformCommonItemNames) != length(oldformCommonItemNames)) {
       stop('Common Items are not equal')

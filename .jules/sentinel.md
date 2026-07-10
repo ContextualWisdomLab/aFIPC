@@ -39,3 +39,10 @@
 **Prevention:**
 1. `try()` 블록 외부에서 결과 객체를 사용할 때는 항상 해당 객체가 생성되었는지 확인해야 합니다 (`exists('model')`).
 2. 객체의 프로퍼티에 안전하게 접근하려면, 객체가 존재하고 예상되는 타입인지 검증하는 로직을 결합해야 합니다 (예: `(!exists('model') || !isTRUE(model@OptimInfo$secondordertest))`).
+
+## 2024-07-10 - Unvalidated Boolean Flags Lead to Unhandled Downstream Coercion
+**Vulnerability:** Several boolean flags controlling the fundamental algorithmic flow in `autoFIPC` (`tryFitwholeNewItems`, `checkIPD`, `tryEM`, etc.) were used in `if` statements without explicit type validation. If a malicious or unexpected input (e.g., a vector of length > 1, an `NA`, or a character string) was passed to these arguments, R would throw an unhandled `condition has length > 1` exception (crashing the process) or coerce the value unexpectedly (potentially leading to incorrect statistical linking paths or infinite loops).
+**Learning:** Control-flow parameters must be strictly verified before usage. R's dynamic typing means `if (flag)` will fail catastrophically if `flag` is `NA` or `length > 1`.
+**Prevention:**
+1. Always implement explicit, short-circuited runtime type validation for scalar boolean inputs.
+2. The standard secure pattern in R is `if (!is.logical(x) || length(x) != 1 || is.na(x)) stop("...")`. The `||` operator correctly avoids evaluating `is.na(x)` if the length is strictly checked first.
