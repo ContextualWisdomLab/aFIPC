@@ -14,10 +14,10 @@
 #' @param checkIPD do you want to check item parameter drift? default is TRUE
 #' @param tryEM do you want to try EM algorithm when you calibrate model? defalut is TRUE
 #' @param freeMEAN allow freely mean estimation, default is TRUE
-#' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is TRUE
+#' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is FALSE
 #' @param parameterOverwrite don't touch it
 #' @param empiricalhist do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
-#' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt.
+#' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt. Default NULL: in interactive sessions the user will be prompted; set FALSE to explicitly reject (function will stop).
 #' @param ... Additional arguments reserved for future extensions.
 #'
 #' @return the model list of the base form, new form, linked form
@@ -52,6 +52,37 @@ autoFIPC <-
     message('Seongho Bae (seongho@kw.ac.kr)\n')
     try(invisible(gc()), silent = T)
     # garbage cleaning
+
+    # Input validation - Security Enhancement
+    isRealMirtModel <- function(x) {
+      if (!isS4(x) || !methods::is(x, "SingleGroupClass")) return(FALSE)
+      ok <- tryCatch({
+        vals <- mirt::mod2values(x)
+        is.data.frame(vals) || is.matrix(vals)
+      }, error = function(e) FALSE, warning = function(w) FALSE)
+      if (!isTRUE(ok)) return(FALSE)
+      required_slots <- c("OptimInfo", "ParObjects")
+      return(all(required_slots %in% slotNames(x)))
+    }
+    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !isRealMirtModel(newformXData)) {
+      stop("Security Error: newformXData must be a data.frame, matrix, or a valid fitted mirt model")
+    }
+    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !isRealMirtModel(oldformYData)) {
+      stop("Security Error: oldformYData must be a data.frame, matrix, or a valid fitted mirt model")
+    }
+
+    if (!is.character(newformCommonItemNames) && !is.factor(newformCommonItemNames)) {
+      stop("Security Error: newformCommonItemNames must be a character vector")
+    }
+    if (!is.character(oldformCommonItemNames) && !is.factor(oldformCommonItemNames)) {
+      stop("Security Error: oldformCommonItemNames must be a character vector")
+    }
+
+    if (!is.character(itemtype)) stop('Security Error: itemtype must be a character vector')
+    nItems <- NA_integer_
+    if (is.data.frame(newformXData) || is.matrix(newformXData)) nItems <- ncol(as.data.frame(newformXData))
+    else if (is.data.frame(oldformYData) || is.matrix(oldformYData)) nItems <- ncol(as.data.frame(oldformYData))
+    if (!is.na(nItems) && !(length(itemtype) == 1 || length(itemtype) == nItems)) stop(sprintf('Security Error: itemtype must be length 1 or length %d (number of items).', nItems))
 
     # checking configure
     if (length(newformCommonItemNames) != length(oldformCommonItemNames)) {
@@ -182,10 +213,14 @@ autoFIPC <-
         )
       }
 
+      if (!exists("oldFormModel", inherits = FALSE)) {
+        stop("Security Error: Initial estimation of oldFormModel completely failed")
+      }
+
       if (tryFitwholeOldItems == T) {
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
+            itemtype != 'ideal')
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
@@ -208,8 +243,8 @@ autoFIPC <-
         }
 
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
+            itemtype != 'ideal')
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
@@ -230,15 +265,15 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('oldFormModel')) break
+            if (exists('oldFormModel', inherits = FALSE)) break
           }
-          if (!exists('oldFormModel')) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
+          if (!exists('oldFormModel', inherits = FALSE)) stop('Failed to estimate oldFormModel with MHRM after 3 attempts')
         }
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
@@ -255,8 +290,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by normal MMLE/EM'
@@ -274,8 +309,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/QMCEM'
@@ -293,8 +328,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/MHRM'
@@ -312,8 +347,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         stop('Estimation failed. Please check test quality.')
       }
@@ -396,10 +431,14 @@ autoFIPC <-
         )
       }
 
+      if (!exists("newFormModel", inherits = FALSE)) {
+        stop("Security Error: Initial estimation of newFormModel completely failed")
+      }
+
       if (tryFitwholeNewItems) {
         if (
-          !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
+            itemtype != 'ideal')
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
@@ -422,8 +461,8 @@ autoFIPC <-
         }
 
         if (
-          !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
+            itemtype != 'ideal')
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
@@ -444,15 +483,15 @@ autoFIPC <-
                   GenRandomPars = F
                 )
             )
-            if (exists('newFormModel')) break
+            if (exists('newFormModel', inherits = FALSE)) break
           }
-          if (!exists('newFormModel')) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
+          if (!exists('newFormModel', inherits = FALSE)) stop('Failed to estimate newFormModel with MHRM after 3 attempts')
         }
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
@@ -469,8 +508,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by normal MMLE/EM'
@@ -488,8 +527,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/QMCEM'
@@ -507,8 +546,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/MHRM'
@@ -526,8 +565,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
+          itemtype != 'ideal')
       ) {
         stop('Estimation failed. Please check test quality.')
       }
@@ -537,10 +576,8 @@ autoFIPC <-
     NewScaleParms <- mirt::mod2values(newFormModel)
     OldScaleParms <- mirt::mod2values(oldFormModel)
 
-    if (!parameterOverwrite) {
-      NewScaleParms[, "est"] <- TRUE
-      OldScaleParms[, "est"] <- TRUE
-    }
+    # Preserve mirt's structural estimability flags. Forcing every row TRUE
+    # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
 
     NewScaleParms[which(NewScaleParms$item == paste0('GROUP')), "est"] <-
       FALSE
@@ -603,22 +640,14 @@ autoFIPC <-
       # IPD estimation
       IPDParmNames <- OldScaleParms$name
       IPDParmNames <- IPDParmNames[!duplicated(IPDParmNames)]
-      IPDParmNames <-
-        IPDParmNames[
-          -c(
-            grep("^MEAN", IPDParmNames),
-            grep("^COV", IPDParmNames),
-            grep("^ak", IPDParmNames),
-            grep("^d0$", IPDParmNames)
-          )
-        ]
+      IPDParmNames <- IPDParmNames[!grepl("^(MEAN|COV|ak|d0$)", IPDParmNames)]
       IPDParmNames <- as.character(IPDParmNames)
 
       mirt::mirtCluster()
       message('Discovering IPD')
       if (itemtype == 'nominal' | tryEM == T) {
         if (empiricalhist == T) {
-          modIPD_MG <- multipleGroup(
+          modIPD_MG <- mirt::multipleGroup(
             IPDData,
             model = 1,
             group = IPDgroup,
@@ -630,7 +659,7 @@ autoFIPC <-
           )
           try(
             modIPD_DIF <-
-              DIF(
+              mirt::DIF(
                 modIPD_MG,
                 IPDParmNames,
                 scheme = 'drop_sequential',
@@ -640,7 +669,7 @@ autoFIPC <-
               )
           )
         } else {
-          modIPD_MG <- multipleGroup(
+          modIPD_MG <- mirt::multipleGroup(
             IPDData,
             model = 1,
             group = IPDgroup,
@@ -652,7 +681,7 @@ autoFIPC <-
           )
           try(
             modIPD_DIF <-
-              DIF(
+              mirt::DIF(
                 modIPD_MG,
                 IPDParmNames,
                 scheme = 'drop_sequential',
@@ -663,7 +692,7 @@ autoFIPC <-
           )
         }
       } else {
-        modIPD_MG <- multipleGroup(
+        modIPD_MG <- mirt::multipleGroup(
           IPDData,
           model = 1,
           group = IPDgroup,
@@ -674,7 +703,7 @@ autoFIPC <-
         )
         try(
           modIPD_DIF <-
-            DIF(
+            mirt::DIF(
               modIPD_MG,
               IPDParmNames,
               scheme = 'drop_sequential',
@@ -685,7 +714,7 @@ autoFIPC <-
       }
       mirt::mirtCluster(remove = T)
 
-      if (exists('modIPD_DIF')) {
+      if (exists('modIPD_DIF', inherits = FALSE)) {
         modIPD_IPDItem <- names(modIPD_DIF)
         CommonItemList_NOIPD <-
           colnames(IPDData)[!colnames(IPDData) %in% modIPD_IPDItem]
@@ -714,9 +743,13 @@ autoFIPC <-
     newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
     oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
-    for (i in 1:length(oldformCommonItemNames)) {
-      newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
-      oldFormItemName <- oldFormColNames[match(oldformCommonItemNames[i], oldFormColNames)]
+    for (i in seq_along(oldformCommonItemNames)) {
+      newFormItemStr <- newformCommonItemNames[i]
+      oldFormItemStr <- oldformCommonItemNames[i]
+
+      newFormItemName <- newFormColNames[match(newFormItemStr, newFormColNames)]
+      oldFormItemName <- oldFormColNames[match(oldFormItemStr, oldFormColNames)]
+
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
@@ -725,64 +758,49 @@ autoFIPC <-
       ) {
         message(
           'applying ',
-          paste0(newformCommonItemNames[i]),
+          newFormItemStr,
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldFormItemStr,
           ' as common item use'
         )
+
+        newIdx <- which(NewScaleParms$item == newFormItemStr)
+        oldIdx <- which(OldScaleParms$item == oldFormItemStr)
 
         message(
           '   Newform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[newIdx, "value"],
             ' '
           )
         )
         message(
           '   Oldform Parms: ',
           paste0(
-            OldScaleParms[
-              which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-              "value"
-            ],
+            OldScaleParms[oldIdx, "value"],
             ' '
           )
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "value"
-        ] <-
-          OldScaleParms[
-            which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-            "value"
-          ]
+        NewScaleParms[newIdx, "value"] <-
+          OldScaleParms[oldIdx, "value"]
         message(
           '   Linkedform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[newIdx, "value"],
             ' '
           ),
           '\n'
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "est"
-        ] <-
+        NewScaleParms[newIdx, "est"] <-
           FALSE
       } else {
         message(
           'skipping ',
-          paste0(newformCommonItemNames[i]),
+          newFormItemStr,
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldFormItemStr,
           ' as common item use'
         )
       }
@@ -792,9 +810,12 @@ autoFIPC <-
       length(attr(newFormModel@ParObjects$lrPars, 'parnum')) != 0 &&
         length(attr(oldFormModel@ParObjects$lrPars, 'parnum')) != 0
     ) {
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"] <-
-        OldScaleParms[which(OldScaleParms$item == paste0('BETA')), "value"]
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "est"] <-
+      newBetaIdx <- which(NewScaleParms$item == 'BETA')
+      oldBetaIdx <- which(OldScaleParms$item == 'BETA')
+
+      NewScaleParms[newBetaIdx, "value"] <-
+        OldScaleParms[oldBetaIdx, "value"]
+      NewScaleParms[newBetaIdx, "est"] <-
         FALSE
 
       message('applying BETA parameter as linking')
@@ -802,7 +823,7 @@ autoFIPC <-
       message(
         '   Linkedform Parms: ',
         paste0(
-          NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"],
+          NewScaleParms[newBetaIdx, "value"],
           ' '
         ),
         '\n'
@@ -988,9 +1009,9 @@ autoFIPC <-
     # }
 
     # calculate theta
-    ThetaOldform <- fscores(oldFormModel, method = 'MAP')
-    ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
-    ThetaNewform <- fscores(newFormModel, method = 'MAP')
+    ThetaOldform <- mirt::fscores(oldFormModel, method = 'MAP')
+    ThetaLinkedform <- mirt::fscores(LinkedModel, method = 'MAP')
+    ThetaNewform <- mirt::fscores(newFormModel, method = 'MAP')
 
     # calculate expected score
     ExpectedScoreOldform <-
@@ -1022,7 +1043,7 @@ autoFIPC <-
     modelReturn$ThetaLinkedform <- ThetaLinkedform
     if (checkIPD) {
       modelReturn$IPDData <- data.frame(IPDData, IPDgroup)
-      if (exists('CommonItemList_NOIPD')) {
+      if (exists('CommonItemList_NOIPD', inherits = FALSE)) {
         modelReturn$IPDCommonItemList <- IPDItemList[CommonItemList_NOIPD]
       }
     }
