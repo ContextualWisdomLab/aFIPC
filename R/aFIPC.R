@@ -25,7 +25,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' autoFIPC() ## FIXME
+#' autoFIPC(
+#'   newformXData = new_model,
+#'   oldformYData = old_model,
+#'   newformCommonItemNames = common_new,
+#'   oldformCommonItemNames = common_old,
+#'   confirmCommonItems = TRUE
+#' )
 #' }
 autoFIPC <-
   function(
@@ -62,7 +68,7 @@ autoFIPC <-
       }, error = function(e) FALSE, warning = function(w) FALSE)
       if (!isTRUE(ok)) return(FALSE)
       required_slots <- c("OptimInfo", "ParObjects")
-      return(all(required_slots %in% slotNames(x)))
+      return(all(required_slots %in% methods::slotNames(x)))
     }
     if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !isRealMirtModel(newformXData)) {
       stop("Security Error: newformXData must be a data.frame, matrix, or a valid fitted mirt model")
@@ -763,8 +769,8 @@ autoFIPC <-
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-        (length(na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
-            length(na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
+          (length(stats::na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
+            length(stats::na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
         message(
           'applying ',

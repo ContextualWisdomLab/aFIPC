@@ -5,6 +5,10 @@
 ^\.Rprofile$
 ^\.github$
 ^\.github/.*
+^\.codegraph$
+^\.codegraph/.*
+^.*\.Rcheck$
+^.*\.tar\.gz$
 ^\.yamllint\.yml$
 ^AGENTS\.md$
 ^ARCHITECTURE\.md$
