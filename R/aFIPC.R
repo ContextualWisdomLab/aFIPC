@@ -743,9 +743,13 @@ autoFIPC <-
     newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
     oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
-    for (i in 1:length(oldformCommonItemNames)) {
-      newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
-      oldFormItemName <- oldFormColNames[match(oldformCommonItemNames[i], oldFormColNames)]
+    for (i in seq_along(oldformCommonItemNames)) {
+      newFormItemStr <- newformCommonItemNames[i]
+      oldFormItemStr <- oldformCommonItemNames[i]
+
+      newFormItemName <- newFormColNames[match(newFormItemStr, newFormColNames)]
+      oldFormItemName <- oldFormColNames[match(oldFormItemStr, oldFormColNames)]
+
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
@@ -754,64 +758,49 @@ autoFIPC <-
       ) {
         message(
           'applying ',
-          paste0(newformCommonItemNames[i]),
+          newFormItemStr,
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldFormItemStr,
           ' as common item use'
         )
+
+        newIdx <- which(NewScaleParms$item == newFormItemStr)
+        oldIdx <- which(OldScaleParms$item == oldFormItemStr)
 
         message(
           '   Newform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[newIdx, "value"],
             ' '
           )
         )
         message(
           '   Oldform Parms: ',
           paste0(
-            OldScaleParms[
-              which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-              "value"
-            ],
+            OldScaleParms[oldIdx, "value"],
             ' '
           )
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "value"
-        ] <-
-          OldScaleParms[
-            which(OldScaleParms$item == paste0(oldformCommonItemNames[i])),
-            "value"
-          ]
+        NewScaleParms[newIdx, "value"] <-
+          OldScaleParms[oldIdx, "value"]
         message(
           '   Linkedform Parms: ',
           paste0(
-            NewScaleParms[
-              which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-              "value"
-            ],
+            NewScaleParms[newIdx, "value"],
             ' '
           ),
           '\n'
         )
 
-        NewScaleParms[
-          which(NewScaleParms$item == paste0(newformCommonItemNames[i])),
-          "est"
-        ] <-
+        NewScaleParms[newIdx, "est"] <-
           FALSE
       } else {
         message(
           'skipping ',
-          paste0(newformCommonItemNames[i]),
+          newFormItemStr,
           ' <<< ',
-          paste0(oldformCommonItemNames[i]),
+          oldFormItemStr,
           ' as common item use'
         )
       }
@@ -821,9 +810,12 @@ autoFIPC <-
       length(attr(newFormModel@ParObjects$lrPars, 'parnum')) != 0 &&
         length(attr(oldFormModel@ParObjects$lrPars, 'parnum')) != 0
     ) {
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"] <-
-        OldScaleParms[which(OldScaleParms$item == paste0('BETA')), "value"]
-      NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "est"] <-
+      newBetaIdx <- which(NewScaleParms$item == 'BETA')
+      oldBetaIdx <- which(OldScaleParms$item == 'BETA')
+
+      NewScaleParms[newBetaIdx, "value"] <-
+        OldScaleParms[oldBetaIdx, "value"]
+      NewScaleParms[newBetaIdx, "est"] <-
         FALSE
 
       message('applying BETA parameter as linking')
@@ -831,7 +823,7 @@ autoFIPC <-
       message(
         '   Linkedform Parms: ',
         paste0(
-          NewScaleParms[which(NewScaleParms$item == paste0('BETA')), "value"],
+          NewScaleParms[newBetaIdx, "value"],
           ' '
         ),
         '\n'
