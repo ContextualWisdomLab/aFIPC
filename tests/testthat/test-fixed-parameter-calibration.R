@@ -25,6 +25,12 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
   ))
   names(old_data) <- old_item_names
   names(new_data) <- new_item_names
+  old_data[1, ] <- 0
+  old_data[2, ] <- 1
+  new_data[1, ] <- 0
+  new_data[2, ] <- 1
+  old_data[3, old_common_items[1]] <- NA
+  new_data[3, new_common_items[1]] <- NA
 
   old_model <- mirt::mirt(
     old_data,
@@ -97,6 +103,16 @@ test_that("autoFIPC fixes common-item parameters on the old-form scale", {
     expect_equal(linked_fixed$value, old_fixed$value, tolerance = 1e-6)
     expect_false(any(linked_fixed$est))
   }
+
+  # Kim (2006) invariant, second half: parameters of the NON-common new-form
+  # items must stay free (estimated) so they move onto the fixed base scale,
+  # rather than being frozen along with the anchors.
+  new_unique_items <- setdiff(new_item_names, new_common_items)
+  free_new <- linked_values[
+    linked_values$item %in% new_unique_items & linked_values$name %in% c("a1", "d"),
+    "est"
+  ]
+  expect_true(all(free_new))
 
   old_estimates <- old_values[
     old_values$item %in% old_common_items & old_values$name %in% c("a1", "d"),
