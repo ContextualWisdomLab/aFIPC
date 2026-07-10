@@ -14,10 +14,10 @@
 #' @param checkIPD do you want to check item parameter drift? default is TRUE
 #' @param tryEM do you want to try EM algorithm when you calibrate model? defalut is TRUE
 #' @param freeMEAN allow freely mean estimation, default is TRUE
-#' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is TRUE
+#' @param forceNormalZeroOne set the prior distribution follows N(0,1) distribution. default is FALSE
 #' @param parameterOverwrite don't touch it
 #' @param empiricalhist do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
-#' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt.
+#' @param confirmCommonItems set TRUE to accept the supplied common-item pairs without an interactive prompt. Default NULL: in interactive sessions the user will be prompted; set FALSE to explicitly reject (function will stop).
 #' @param ... Additional arguments reserved for future extensions.
 #'
 #' @return the model list of the base form, new form, linked form
@@ -52,6 +52,37 @@ autoFIPC <-
     message('Seongho Bae (seongho@kw.ac.kr)\n')
     try(invisible(gc()), silent = T)
     # garbage cleaning
+
+    # Input validation - Security Enhancement
+    isRealMirtModel <- function(x) {
+      if (!isS4(x) || !methods::is(x, "SingleGroupClass")) return(FALSE)
+      ok <- tryCatch({
+        vals <- mirt::mod2values(x)
+        is.data.frame(vals) || is.matrix(vals)
+      }, error = function(e) FALSE, warning = function(w) FALSE)
+      if (!isTRUE(ok)) return(FALSE)
+      required_slots <- c("OptimInfo", "ParObjects")
+      return(all(required_slots %in% slotNames(x)))
+    }
+    if (!is.data.frame(newformXData) && !is.matrix(newformXData) && !isRealMirtModel(newformXData)) {
+      stop("Security Error: newformXData must be a data.frame, matrix, or a valid fitted mirt model")
+    }
+    if (!is.data.frame(oldformYData) && !is.matrix(oldformYData) && !isRealMirtModel(oldformYData)) {
+      stop("Security Error: oldformYData must be a data.frame, matrix, or a valid fitted mirt model")
+    }
+
+    if (!is.character(newformCommonItemNames) && !is.factor(newformCommonItemNames)) {
+      stop("Security Error: newformCommonItemNames must be a character vector")
+    }
+    if (!is.character(oldformCommonItemNames) && !is.factor(oldformCommonItemNames)) {
+      stop("Security Error: oldformCommonItemNames must be a character vector")
+    }
+
+    if (!is.character(itemtype)) stop('Security Error: itemtype must be a character vector')
+    nItems <- NA_integer_
+    if (is.data.frame(newformXData) || is.matrix(newformXData)) nItems <- ncol(as.data.frame(newformXData))
+    else if (is.data.frame(oldformYData) || is.matrix(oldformYData)) nItems <- ncol(as.data.frame(oldformYData))
+    if (!is.na(nItems) && !(length(itemtype) == 1 || length(itemtype) == nItems)) stop(sprintf('Security Error: itemtype must be length 1 or length %d (number of items).', nItems))
 
     # checking configure
     if (length(newformCommonItemNames) != length(oldformCommonItemNames)) {
@@ -182,10 +213,14 @@ autoFIPC <-
         )
       }
 
+      if (!exists("oldFormModel")) {
+        stop("Security Error: Initial estimation of oldFormModel completely failed")
+      }
+
       if (tryFitwholeOldItems == T) {
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+            itemtype != 'ideal')
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
@@ -208,8 +243,8 @@ autoFIPC <-
         }
 
         if (
-          !oldFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+            itemtype != 'ideal')
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
@@ -237,8 +272,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
@@ -255,8 +290,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by normal MMLE/EM'
@@ -274,8 +309,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/QMCEM'
@@ -293,8 +328,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics by MMLE/MHRM'
@@ -312,8 +347,8 @@ autoFIPC <-
       }
 
       if (
-        !oldFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         stop('Estimation failed. Please check test quality.')
       }
@@ -396,10 +431,14 @@ autoFIPC <-
         )
       }
 
+      if (!exists("newFormModel")) {
+        stop("Security Error: Initial estimation of newFormModel completely failed")
+      }
+
       if (tryFitwholeNewItems) {
         if (
-          !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+            itemtype != 'ideal')
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.'
@@ -422,8 +461,8 @@ autoFIPC <-
         }
 
         if (
-          !newFormModel@OptimInfo$secondordertest &&
-            !itemtype == 'ideal'
+          (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+            itemtype != 'ideal')
         ) {
           message(
             'Estimation failed. estimating new parameters with no prior distribution using  Cai\'s (2010) Metropolis-Hastings Robbins-Monro (MHRM) algorithm. please be patient.'
@@ -451,8 +490,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics'
@@ -469,8 +508,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by normal MMLE/EM'
@@ -488,8 +527,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/QMCEM'
@@ -507,8 +546,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         message(
           'Estimation failed. trying to remove weird items by itemfit statistics again by MMLE/MHRM'
@@ -526,8 +565,8 @@ autoFIPC <-
       }
 
       if (
-        !newFormModel@OptimInfo$secondordertest &&
-          !itemtype == 'ideal'
+        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+          itemtype != 'ideal')
       ) {
         stop('Estimation failed. Please check test quality.')
       }

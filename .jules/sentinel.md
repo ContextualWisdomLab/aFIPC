@@ -17,3 +17,11 @@
 1. Always replace `while (!exists(...))` retries with a bounded `for` loop (e.g., `for (attempt in seq_len(3))`).
 2. Include an explicit check for the success condition inside the loop (`if (exists('model')) break`).
 3. After the loop, verify success and fail securely with an explicit error (`if (!exists('model')) stop(...)`) to prevent unhandled exceptions downstream.
+
+## 2024-07-05 - Missing Input Validation
+**Vulnerability:** The `autoFIPC` function lacked explicit input validation for core arguments like `newformXData`, `oldformYData`, `newformCommonItemNames`, and `itemtype`. When unexpected types (e.g. integer `1` instead of a data structure, or an array for `itemtype`) were provided, the errors propagated dynamically causing unhandled downstream exceptions or potential state leaks depending on internal implementations (like `mirt` and `try` blocks capturing objects unexpectedly). Furthermore, if the base model estimation `try(mirt(...))` entirely failed to produce a model object, the code would later crash when trying to access `@OptimInfo`, leading to untracked exceptions.
+**Learning:** In dynamically typed environments like R, trusting user inputs without explicit runtime validation boundaries allows malformed types to flow deeply into internal logic. This can result in obscure failure modes, leakage of unhandled stack exceptions, or unpredictable behavior across statistical dependencies.
+**Prevention:**
+1. Always enforce explicit boundary checks on public-facing functions (e.g., verifying `is.data.frame`, `is.matrix`, or custom class types).
+2. Fail fast and securely with explicit "Security Error" messages when the data contract is violated, before passing data to third-party statistical engines.
+3. When using `try()` to swallow errors on initial setup, immediately verify the expected object (`exists("model")`) was actually created before accessing its slots or attributes.
