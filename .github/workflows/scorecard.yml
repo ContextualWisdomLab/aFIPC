@@ -7,10 +7,10 @@ on:
   schedule:
     - cron: "27 3 * * 1"
 
-permissions:
-  actions: read
-  contents: read
-  security-events: write
+# scorecard-action refuses to publish results when the workflow grants
+# write permissions at the top level; the analysis job below declares the
+# id-token/security-events writes it needs.
+permissions: read-all
 
 jobs:
   analysis:
