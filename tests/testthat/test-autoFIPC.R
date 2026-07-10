@@ -55,4 +55,15 @@ test_that("autoFIPC validates input types securely", {
     ),
     "Security Error: itemtype must be length 1 or length 1 \\(number of items\\)."
   )
+
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = data.frame(A=1),
+      oldformYData = structure(list(), class = "SingleGroupClass"),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      confirmCommonItems = TRUE
+    ),
+    "Security Error: oldformYData must be a data.frame, matrix, or a valid fitted mirt model"
+  )
 })
