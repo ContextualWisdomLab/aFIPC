@@ -67,6 +67,12 @@ automated fixed item parameter linking
 }
 \examples{
 \dontrun{
-autoFIPC() ## FIXME
+autoFIPC(
+  newformXData = new_model,
+  oldformYData = old_model,
+  newformCommonItemNames = common_new,
+  oldformCommonItemNames = common_old,
+  confirmCommonItems = TRUE
+)
 }
 }

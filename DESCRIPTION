@@ -2,6 +2,7 @@ Package: aFIPC
 Type: Package
 Title: Automated Fixed Item Parameter Linking
 Version: 0.1.0
+Author: Seongho Bae [aut, cre]
 Maintainer: Seongho Bae <seongho@kw.ac.kr>
 Authors@R: person(given = "Seongho", family = "Bae", role = c("aut", "cre"),
     email = "seongho@kw.ac.kr")

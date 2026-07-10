@@ -3,4 +3,3 @@
 export(autoFIPC)
 export(surveyFA)
 import(mirt)
-importFrom(stats,factanal)

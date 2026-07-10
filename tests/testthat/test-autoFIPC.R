@@ -66,4 +66,26 @@ test_that("autoFIPC validates input types securely", {
     ),
     "Security Error: oldformYData must be a data.frame, matrix, or a valid fitted mirt model"
   )
+
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = data.frame(A=1),
+      oldformYData = data.frame(A=2),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      tryFitwholeNewItems = "TRUE"
+    ),
+    "Security Error: tryFitwholeNewItems must be a single non-NA logical value"
+  )
+
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = data.frame(A=1),
+      oldformYData = data.frame(A=2),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      tryEM = NA
+    ),
+    "Security Error: tryEM must be a single non-NA logical value"
+  )
 })
