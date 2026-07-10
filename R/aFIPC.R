@@ -219,7 +219,7 @@ autoFIPC <-
 
       if (tryFitwholeOldItems == T) {
         if (
-          (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+          (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
             itemtype != 'ideal')
         ) {
           message(
@@ -243,7 +243,7 @@ autoFIPC <-
         }
 
         if (
-          (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+          (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
             itemtype != 'ideal')
         ) {
           message(
@@ -272,7 +272,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         message(
@@ -290,7 +290,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         message(
@@ -309,7 +309,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         message(
@@ -328,7 +328,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         message(
@@ -347,7 +347,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("oldFormModel", inherits = FALSE)) || (!oldFormModel@OptimInfo$secondordertest &&
+        (!exists("oldFormModel", inherits = FALSE)) || (!isTRUE(oldFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         stop('Estimation failed. Please check test quality.')
@@ -437,7 +437,7 @@ autoFIPC <-
 
       if (tryFitwholeNewItems) {
         if (
-          (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+          (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
             itemtype != 'ideal')
         ) {
           message(
@@ -461,7 +461,7 @@ autoFIPC <-
         }
 
         if (
-          (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+          (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
             itemtype != 'ideal')
         ) {
           message(
@@ -490,7 +490,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         message(
@@ -508,7 +508,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         message(
@@ -527,7 +527,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         message(
@@ -546,7 +546,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         message(
@@ -565,7 +565,7 @@ autoFIPC <-
       }
 
       if (
-        (!exists("newFormModel", inherits = FALSE)) || (!newFormModel@OptimInfo$secondordertest &&
+        (!exists("newFormModel", inherits = FALSE)) || (!isTRUE(newFormModel@OptimInfo$secondordertest) &&
           itemtype != 'ideal')
       ) {
         stop('Estimation failed. Please check test quality.')
@@ -647,7 +647,7 @@ autoFIPC <-
       message('Discovering IPD')
       if (itemtype == 'nominal' | tryEM == T) {
         if (empiricalhist == T) {
-          modIPD_MG <- multipleGroup(
+          modIPD_MG <- mirt::multipleGroup(
             IPDData,
             model = 1,
             group = IPDgroup,
@@ -659,7 +659,7 @@ autoFIPC <-
           )
           try(
             modIPD_DIF <-
-              DIF(
+              mirt::DIF(
                 modIPD_MG,
                 IPDParmNames,
                 scheme = 'drop_sequential',
@@ -669,7 +669,7 @@ autoFIPC <-
               )
           )
         } else {
-          modIPD_MG <- multipleGroup(
+          modIPD_MG <- mirt::multipleGroup(
             IPDData,
             model = 1,
             group = IPDgroup,
@@ -681,7 +681,7 @@ autoFIPC <-
           )
           try(
             modIPD_DIF <-
-              DIF(
+              mirt::DIF(
                 modIPD_MG,
                 IPDParmNames,
                 scheme = 'drop_sequential',
@@ -692,7 +692,7 @@ autoFIPC <-
           )
         }
       } else {
-        modIPD_MG <- multipleGroup(
+        modIPD_MG <- mirt::multipleGroup(
           IPDData,
           model = 1,
           group = IPDgroup,
@@ -703,7 +703,7 @@ autoFIPC <-
         )
         try(
           modIPD_DIF <-
-            DIF(
+            mirt::DIF(
               modIPD_MG,
               IPDParmNames,
               scheme = 'drop_sequential',
@@ -1009,9 +1009,9 @@ autoFIPC <-
     # }
 
     # calculate theta
-    ThetaOldform <- fscores(oldFormModel, method = 'MAP')
-    ThetaLinkedform <- fscores(LinkedModel, method = 'MAP')
-    ThetaNewform <- fscores(newFormModel, method = 'MAP')
+    ThetaOldform <- mirt::fscores(oldFormModel, method = 'MAP')
+    ThetaLinkedform <- mirt::fscores(LinkedModel, method = 'MAP')
+    ThetaNewform <- mirt::fscores(newFormModel, method = 'MAP')
 
     # calculate expected score
     ExpectedScoreOldform <-
