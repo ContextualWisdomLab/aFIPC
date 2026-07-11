@@ -619,25 +619,19 @@ autoFIPC <-
           rep('newForm', nrow(newformXDataK))
         ))
       IPDItemCount <- 0
-      IPDItemNamesOldForm <- vector()
-      IPDItemNamesNewForm <- vector()
 
       # IPD target item checking
       newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
       oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
-      for (i in 1:length(oldformCommonItemNames)) {
-        newFormItemName <- newFormColNames[match(newformCommonItemNames[i], newFormColNames)]
-        oldFormItemName <- oldFormColNames[match(oldformCommonItemNames[i], oldFormColNames)]
-        if (
-          !is.na(newFormItemName) &&
-          !is.na(oldFormItemName)
-        ) {
-          IPDItemCount <- IPDItemCount + 1
-          IPDItemNamesOldForm[IPDItemCount] <- oldFormItemName
-          IPDItemNamesNewForm[IPDItemCount] <- newFormItemName
-        }
-      }
+      # ⚡ Bolt: Vectorized match() to avoid dynamic array growth overhead inside a for loop
+      idxNew <- match(newformCommonItemNames, newFormColNames)
+      idxOld <- match(oldformCommonItemNames, oldFormColNames)
+      valid_idx <- !is.na(idxNew) & !is.na(idxOld)
+
+      IPDItemNamesNewForm <- newFormColNames[idxNew[valid_idx]]
+      IPDItemNamesOldForm <- oldFormColNames[idxOld[valid_idx]]
+      IPDItemCount <- length(IPDItemNamesNewForm)
 
       # IPD Data generation
       IPDItemList <-
