@@ -757,12 +757,16 @@ autoFIPC <-
     newScaleParmsItemIdxCache <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)
     oldScaleParmsItemIdxCache <- split(seq_len(nrow(OldScaleParms)), OldScaleParms$item)
 
+    # ⚡ Bolt: Vectorize match() outside the loop to avoid repeated array scanning overhead
+    idxNew_all <- match(newformCommonItemNames, newFormColNames)
+    idxOld_all <- match(oldformCommonItemNames, oldFormColNames)
+
     for (i in seq_along(oldformCommonItemNames)) {
       newFormItemStr <- newformCommonItemNames[i]
       oldFormItemStr <- oldformCommonItemNames[i]
 
-      newFormItemName <- newFormColNames[match(newFormItemStr, newFormColNames)]
-      oldFormItemName <- oldFormColNames[match(oldFormItemStr, oldFormColNames)]
+      newFormItemName <- newFormColNames[idxNew_all[i]]
+      oldFormItemName <- oldFormColNames[idxOld_all[i]]
 
       if (
         !is.na(newFormItemName) &&
