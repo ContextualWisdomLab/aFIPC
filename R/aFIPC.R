@@ -759,6 +759,10 @@ autoFIPC <-
     newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
     oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
+    # ⚡ Bolt: Cache parameter indices to avoid O(N) linear search inside loop
+    newScaleParmsItemIdxCache <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)
+    oldScaleParmsItemIdxCache <- split(seq_len(nrow(OldScaleParms)), OldScaleParms$item)
+
     for (i in seq_along(oldformCommonItemNames)) {
       newFormItemStr <- newformCommonItemNames[i]
       oldFormItemStr <- oldformCommonItemNames[i]
@@ -780,34 +784,17 @@ autoFIPC <-
           ' as common item use'
         )
 
-        newIdx <- which(NewScaleParms$item == newFormItemStr)
-        oldIdx <- which(OldScaleParms$item == oldFormItemStr)
+        # ⚡ Bolt: Use cached O(1) dictionary lookups instead of O(N) which() scans
+        newIdx <- newScaleParmsItemIdxCache[[newFormItemStr]]
+        oldIdx <- oldScaleParmsItemIdxCache[[oldFormItemStr]]
 
-        message(
-          '   Newform Parms: ',
-          paste0(
-            NewScaleParms[newIdx, "value"],
-            ' '
-          )
-        )
-        message(
-          '   Oldform Parms: ',
-          paste0(
-            OldScaleParms[oldIdx, "value"],
-            ' '
-          )
-        )
+        # ⚡ Bolt: Remove unnecessary paste0() array string generation overhead
+        message('   Newform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '))
+        message('   Oldform Parms: ', paste(OldScaleParms[oldIdx, "value"], collapse = ' '))
 
         NewScaleParms[newIdx, "value"] <-
           OldScaleParms[oldIdx, "value"]
-        message(
-          '   Linkedform Parms: ',
-          paste0(
-            NewScaleParms[newIdx, "value"],
-            ' '
-          ),
-          '\n'
-        )
+        message('   Linkedform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '), '\n')
 
         NewScaleParms[newIdx, "est"] <-
           FALSE
