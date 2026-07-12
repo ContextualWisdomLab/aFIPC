@@ -595,19 +595,15 @@ autoFIPC <-
     # Preserve mirt's structural estimability flags. Forcing every row TRUE
     # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
 
-    NewScaleParms[which(NewScaleParms$item == paste0('GROUP')), "est"] <-
-      FALSE
-    OldScaleParms[which(OldScaleParms$item == paste0('GROUP')), "est"] <-
-      FALSE
+    NewScaleParms[NewScaleParms$item == 'GROUP', "est"] <- FALSE
+    OldScaleParms[OldScaleParms$item == 'GROUP', "est"] <- FALSE
 
-    NewScaleParms[which(NewScaleParms$name == "COV_11"), "est"] <-
-      TRUE
-    OldScaleParms[which(OldScaleParms$name == "COV_11"), "est"] <-
-      TRUE
+    NewScaleParms[NewScaleParms$name == "COV_11", "est"] <- TRUE
+    OldScaleParms[OldScaleParms$name == "COV_11", "est"] <- TRUE
 
     if (itemtype == 'Rasch') {
-      NewScaleParms[which(NewScaleParms$name == "a1"), "est"] <- FALSE
-      OldScaleParms[which(OldScaleParms$name == "a1"), "est"] <- FALSE
+      NewScaleParms[NewScaleParms$name == "a1", "est"] <- FALSE
+      OldScaleParms[OldScaleParms$name == "a1", "est"] <- FALSE
     }
 
     #IPD
@@ -811,8 +807,8 @@ autoFIPC <-
       length(attr(newFormModel@ParObjects$lrPars, 'parnum')) != 0 &&
         length(attr(oldFormModel@ParObjects$lrPars, 'parnum')) != 0
     ) {
-      newBetaIdx <- which(NewScaleParms$item == 'BETA')
-      oldBetaIdx <- which(OldScaleParms$item == 'BETA')
+      newBetaIdx <- NewScaleParms$item == 'BETA'
+      oldBetaIdx <- OldScaleParms$item == 'BETA'
 
       NewScaleParms[newBetaIdx, "value"] <-
         OldScaleParms[oldBetaIdx, "value"]
@@ -850,18 +846,18 @@ autoFIPC <-
     if (forceNormalZeroOne) {
       freeMEAN <- F
 
-      NewScaleParms[which(NewScaleParms$name == "COV_11"), "est"] <-
-        FALSE
-      OldScaleParms[which(OldScaleParms$name == "COV_11"), "est"] <-
-        FALSE
-      NewScaleParms[which(NewScaleParms$name == "MEAN_11"), "est"] <-
-        FALSE
-      OldScaleParms[which(OldScaleParms$name == "MEAN_11"), "est"] <-
-        FALSE
-      NewScaleParms[which(NewScaleParms$name == "COV_11"), "value"] <-
-        1
-      OldScaleParms[which(OldScaleParms$name == "MEAN_11"), "value"] <-
-        0
+      new_cov11_idx <- NewScaleParms$name == "COV_11"
+      old_cov11_idx <- OldScaleParms$name == "COV_11"
+      new_mean11_idx <- NewScaleParms$name == "MEAN_11"
+      old_mean11_idx <- OldScaleParms$name == "MEAN_11"
+
+      NewScaleParms[new_cov11_idx, "est"] <- FALSE
+      OldScaleParms[old_cov11_idx, "est"] <- FALSE
+      NewScaleParms[new_mean11_idx, "est"] <- FALSE
+      OldScaleParms[old_mean11_idx, "est"] <- FALSE
+
+      NewScaleParms[new_cov11_idx, "value"] <- 1
+      OldScaleParms[old_mean11_idx, "value"] <- 0
     }
     if (freeMEAN == T) {
       LinkedModelSyntax <-
@@ -872,10 +868,8 @@ autoFIPC <-
           'MEAN = F1'
         ))
 
-      NewScaleParms[which(NewScaleParms$name == "MEAN_1"), "est"] <-
-        TRUE
-      OldScaleParms[which(OldScaleParms$name == "MEAN_1"), "est"] <-
-        TRUE
+      NewScaleParms[NewScaleParms$name == "MEAN_1", "est"] <- TRUE
+      OldScaleParms[OldScaleParms$name == "MEAN_1", "est"] <- TRUE
     } else {
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
