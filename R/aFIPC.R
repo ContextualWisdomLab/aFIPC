@@ -91,6 +91,9 @@ autoFIPC <-
     if (!is.na(nItems) && !(length(itemtype) == 1 || length(itemtype) == nItems)) stop(sprintf('Security Error: itemtype must be length 1 or length %d (number of items).', nItems))
 
     # boolean parameter validation
+    if (!is.null(newformBILOGprior) && (!is.logical(newformBILOGprior) || length(newformBILOGprior) != 1 || is.na(newformBILOGprior))) stop("Security Error: newformBILOGprior must be a single non-NA logical value or NULL")
+    if (!is.null(oldformBILOGprior) && (!is.logical(oldformBILOGprior) || length(oldformBILOGprior) != 1 || is.na(oldformBILOGprior))) stop("Security Error: oldformBILOGprior must be a single non-NA logical value or NULL")
+    if (!is.null(confirmCommonItems) && (!is.logical(confirmCommonItems) || length(confirmCommonItems) != 1 || is.na(confirmCommonItems))) stop("Security Error: confirmCommonItems must be a single non-NA logical value or NULL")
     if (!is.logical(tryFitwholeNewItems) || length(tryFitwholeNewItems) != 1 || is.na(tryFitwholeNewItems)) stop("Security Error: tryFitwholeNewItems must be a single non-NA logical value")
     if (!is.logical(tryFitwholeOldItems) || length(tryFitwholeOldItems) != 1 || is.na(tryFitwholeOldItems)) stop("Security Error: tryFitwholeOldItems must be a single non-NA logical value")
     if (!is.logical(checkIPD) || length(checkIPD) != 1 || is.na(checkIPD)) stop("Security Error: checkIPD must be a single non-NA logical value")
