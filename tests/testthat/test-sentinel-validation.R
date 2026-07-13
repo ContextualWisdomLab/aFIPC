@@ -1,3 +1,5 @@
+library(mockery)
+
 test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGprior, and confirmCommonItems", {
   # newformBILOGprior
   expect_error(
