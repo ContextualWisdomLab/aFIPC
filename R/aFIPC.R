@@ -141,7 +141,8 @@ autoFIPC <-
       }
       for (attempt in seq_len(3)) {
         n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-        if (grepl("^[0-9]+$", n)) {
+        # Security: Strict input validation to prevent coercion crashes
+        if (grepl("^[12]$", n)) {
           return(as.integer(n))
         }
       }
@@ -171,7 +172,8 @@ autoFIPC <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
+            # Security: Strict input validation to prevent coercion crashes
+            if (grepl("^[12]$", n)) {
               return(as.integer(n))
             }
           }
@@ -390,7 +392,8 @@ autoFIPC <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
+            # Security: Strict input validation to prevent coercion crashes
+            if (grepl("^[12]$", n)) {
               return(as.integer(n))
             }
           }
