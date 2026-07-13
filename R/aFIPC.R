@@ -849,6 +849,10 @@ autoFIPC <-
     }
 
     message('\nestimating Linked Form Eq(X) parameters')
+
+    # ⚡ Bolt: Cache subsetted dataframe to avoid repeated O(N) memory copies during mirt model setup
+    linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]
+
     if (forceNormalZeroOne) {
       freeMEAN <- F
 
@@ -869,7 +873,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
+          ncol(linkedFormData),
           '\n',
           'MEAN = F1'
         ))
@@ -880,7 +884,7 @@ autoFIPC <-
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
           'F1 = 1-',
-          ncol(newformXDataK[colnames(newFormModel@Data$data)]),
+          ncol(linkedFormData),
           '\n'
         ))
     }
@@ -900,7 +904,7 @@ autoFIPC <-
 
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = linkedFormData,
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'EM',
@@ -920,7 +924,7 @@ autoFIPC <-
       } else {
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = linkedFormData,
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'EM',
@@ -947,7 +951,7 @@ autoFIPC <-
         # LinkedModel <- oldFormModel
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = linkedFormData,
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'MHRM',
@@ -967,7 +971,7 @@ autoFIPC <-
       } else {
         LinkedModel <-
           mirt::mirt(
-            data = newformXDataK[colnames(newFormModel@Data$data)],
+            data = linkedFormData,
             LinkedModelSyntax,
             itemtype = newFormModel@Model$itemtype,
             method = 'MHRM',
@@ -991,7 +995,7 @@ autoFIPC <-
     #   message('Estimation failed. estimating new parameters with no prior distribution using quasi-Monte Carlo EM estimation. please be patient.')
     #
     #   rm(LinkedModel)
-    #   try(LinkedModel <- mirt::mirt(data = newformXDataK[colnames(newFormModel@Data$data)], LinkedModelSyntax, itemtype = newFormModel@Model$itemtype, SE = T, method = 'QMCEM', accelerate = 'squarem', technical = list(NCYCLES = 1e+5), pars = NewScaleParms, GenRandomPars = F))
+    #   try(LinkedModel <- mirt::mirt(data = linkedFormData, LinkedModelSyntax, itemtype = newFormModel@Model$itemtype, SE = T, method = 'QMCEM', accelerate = 'squarem', technical = list(NCYCLES = 1e+5), pars = NewScaleParms, GenRandomPars = F))
     # }
     #
     # if(!LinkedModel@OptimInfo$secondordertest){
@@ -999,7 +1003,7 @@ autoFIPC <-
     #
     #   try(rm(LinkedModel), silent = TRUE)
     #   for (attempt in seq_len(3)) {
-    #     try(LinkedModel <- mirt::mirt(data = newformXDataK[colnames(newFormModel@Data$data)], LinkedModelSyntax, itemtype = newFormModel@Model$itemtype, SE = T, method = 'MHRM', accelerate = 'squarem', technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000), pars = NewScaleParms, GenRandomPars = T))
+    #     try(LinkedModel <- mirt::mirt(data = linkedFormData, LinkedModelSyntax, itemtype = newFormModel@Model$itemtype, SE = T, method = 'MHRM', accelerate = 'squarem', technical = list(NCYCLES = 1e+5, MHRM_SE_draws = 200000), pars = NewScaleParms, GenRandomPars = T))
     #     if (exists('LinkedModel')) break
     #   }
     #   if (!exists('LinkedModel')) stop('Failed to estimate LinkedModel with MHRM after 3 attempts')
