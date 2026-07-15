@@ -1,4 +1,3 @@
-library(aFIPC)
 test_that("autoFIPC raises error in non-interactive session for inputs", {
   # interactive() should be FALSE by default in testthat environments
   expect_error(

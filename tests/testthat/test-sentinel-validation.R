@@ -1,4 +1,5 @@
-test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGprior, and confirmCommonItems", {
+
+test_that("aFIPC::autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGprior, and confirmCommonItems", {
   # newformBILOGprior
   expect_error(
     aFIPC::autoFIPC(
@@ -36,7 +37,8 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
   )
 })
 
-test_that("autoFIPC handles DoS via oversized integer in readline using regex validation", {
+
+test_that("aFIPC::autoFIPC handles DoS via oversized integer in readline using regex validation", {
   # Mock interactive to return TRUE so we reach readline
   mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
 
