@@ -89,3 +89,23 @@ test_that("autoFIPC validates input types securely", {
     "Security Error: tryEM must be a single non-NA logical value"
   )
 })
+
+library(mockery)
+test_that("interactive inputs are securely validated", {
+  mock_readline <- mockery::mock("3", "3", "3", "3", "1", "3", "3", "3", "3", "1", "3", "3", "3", "3", "1")
+  mockery::stub(aFIPC::autoFIPC, "readline", mock_readline)
+  # simulate interactive session
+  mockery::stub(aFIPC::autoFIPC, "interactive", TRUE)
+
+  # Check validation limits failure when 3 is supplied repeatedly
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = data.frame(A=1),
+      oldformYData = data.frame(A=2),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      confirmCommonItems = NULL
+    ),
+    "Too many invalid common item confirmation attempts"
+  )
+})
