@@ -232,7 +232,8 @@ surveyFA <- function(
       names(p_values) <- rownames(fit_df)
       if (any(!is.na(p_values))) {
         p_values[is.na(p_values)] <- 1
-        candidate <- names(sort(p_values, decreasing = FALSE))[1L]
+        # ⚡ Bolt: Use which.min() for O(N) lookup instead of O(N log N) sort()
+        candidate <- names(which.min(p_values))
         if (!is.na(candidate) && p_values[[candidate]] < pThreshold) {
           return(candidate)
         }
