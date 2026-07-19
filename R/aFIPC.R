@@ -598,15 +598,16 @@ autoFIPC <-
     # Preserve mirt's structural estimability flags. Forcing every row TRUE
     # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
 
-    NewScaleParms[NewScaleParms$item == 'GROUP', "est"] <- FALSE
-    OldScaleParms[OldScaleParms$item == 'GROUP', "est"] <- FALSE
+    # ⚡ Bolt: Use direct vector subsetting (O(1)) instead of 2D data frame assignment to avoid `[<-.data.frame` dispatch overhead
+    NewScaleParms$est[NewScaleParms$item == 'GROUP'] <- FALSE
+    OldScaleParms$est[OldScaleParms$item == 'GROUP'] <- FALSE
 
-    NewScaleParms[NewScaleParms$name == "COV_11", "est"] <- TRUE
-    OldScaleParms[OldScaleParms$name == "COV_11", "est"] <- TRUE
+    NewScaleParms$est[NewScaleParms$name == "COV_11"] <- TRUE
+    OldScaleParms$est[OldScaleParms$name == "COV_11"] <- TRUE
 
     if (itemtype == 'Rasch') {
-      NewScaleParms[NewScaleParms$name == "a1", "est"] <- FALSE
-      OldScaleParms[OldScaleParms$name == "a1", "est"] <- FALSE
+      NewScaleParms$est[NewScaleParms$name == "a1"] <- FALSE
+      OldScaleParms$est[OldScaleParms$name == "a1"] <- FALSE
     }
 
     #IPD
@@ -641,9 +642,10 @@ autoFIPC <-
       colnames(IPDData) <- paste0('X', 1:IPDItemCount)
       print(IPDItemNamesOldForm)
       print(IPDItemNamesNewForm)
+      # ⚡ Bolt: Fix range evaluation for row assignments
       IPDData[1:nrow(oldformYDataK), ] <-
         oldformYDataK[, IPDItemNamesOldForm]
-      IPDData[nrow(oldformYDataK) + 1:nrow(newformXDataK), ] <-
+      IPDData[(nrow(oldformYDataK) + 1):(nrow(oldformYDataK) + nrow(newformXDataK)), ] <-
         newformXDataK[, IPDItemNamesNewForm]
 
       # IPD estimation
@@ -789,11 +791,12 @@ autoFIPC <-
         message('   Newform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '))
         message('   Oldform Parms: ', paste(OldScaleParms[oldIdx, "value"], collapse = ' '))
 
-        NewScaleParms[newIdx, "value"] <-
-          OldScaleParms[oldIdx, "value"]
-        message('   Linkedform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '), '\n')
+        # ⚡ Bolt: Direct vector subsetting
+        NewScaleParms$value[newIdx] <-
+          OldScaleParms$value[oldIdx]
+        message('   Linkedform Parms: ', paste(NewScaleParms$value[newIdx], collapse = ' '), '\n')
 
-        NewScaleParms[newIdx, "est"] <-
+        NewScaleParms$est[newIdx] <-
           FALSE
       } else {
         message(
@@ -813,9 +816,10 @@ autoFIPC <-
       newBetaIdx <- NewScaleParms$item == 'BETA'
       oldBetaIdx <- OldScaleParms$item == 'BETA'
 
-      NewScaleParms[newBetaIdx, "value"] <-
-        OldScaleParms[oldBetaIdx, "value"]
-      NewScaleParms[newBetaIdx, "est"] <-
+      # ⚡ Bolt: Direct vector subsetting
+      NewScaleParms$value[newBetaIdx] <-
+        OldScaleParms$value[oldBetaIdx]
+      NewScaleParms$est[newBetaIdx] <-
         FALSE
 
       message('applying BETA parameter as linking')
@@ -823,7 +827,7 @@ autoFIPC <-
       message(
         '   Linkedform Parms: ',
         paste0(
-          NewScaleParms[newBetaIdx, "value"],
+          NewScaleParms$value[newBetaIdx],
           ' '
         ),
         '\n'
@@ -858,13 +862,14 @@ autoFIPC <-
       new_mean11_idx <- NewScaleParms$name == "MEAN_11"
       old_mean11_idx <- OldScaleParms$name == "MEAN_11"
 
-      NewScaleParms[new_cov11_idx, "est"] <- FALSE
-      OldScaleParms[old_cov11_idx, "est"] <- FALSE
-      NewScaleParms[new_mean11_idx, "est"] <- FALSE
-      OldScaleParms[old_mean11_idx, "est"] <- FALSE
+      # ⚡ Bolt: Direct vector subsetting
+      NewScaleParms$est[new_cov11_idx] <- FALSE
+      OldScaleParms$est[old_cov11_idx] <- FALSE
+      NewScaleParms$est[new_mean11_idx] <- FALSE
+      OldScaleParms$est[old_mean11_idx] <- FALSE
 
-      NewScaleParms[new_cov11_idx, "value"] <- 1
-      OldScaleParms[old_mean11_idx, "value"] <- 0
+      NewScaleParms$value[new_cov11_idx] <- 1
+      OldScaleParms$value[old_mean11_idx] <- 0
     }
     if (freeMEAN == T) {
       LinkedModelSyntax <-
@@ -875,8 +880,8 @@ autoFIPC <-
           'MEAN = F1'
         ))
 
-      NewScaleParms[NewScaleParms$name == "MEAN_1", "est"] <- TRUE
-      OldScaleParms[OldScaleParms$name == "MEAN_1", "est"] <- TRUE
+      NewScaleParms$est[NewScaleParms$name == "MEAN_1"] <- TRUE
+      OldScaleParms$est[OldScaleParms$name == "MEAN_1"] <- TRUE
     } else {
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
