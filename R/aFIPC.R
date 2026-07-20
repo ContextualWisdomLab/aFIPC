@@ -1,3 +1,10 @@
+.is_binary_prompt_choice <- function(value) {
+  is.character(value) &&
+    length(value) == 1L &&
+    !is.na(value) &&
+    grepl("^[12]$", value)
+}
+
 #' automated fixed item parameter linking
 #'
 #' @import mirt
@@ -141,7 +148,7 @@ autoFIPC <-
       }
       for (attempt in seq_len(3)) {
         n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-        if (grepl("^[0-9]+$", n)) {
+        if (.is_binary_prompt_choice(n)) {
           return(as.integer(n))
         }
       }
@@ -171,7 +178,7 @@ autoFIPC <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
+            if (.is_binary_prompt_choice(n)) {
               return(as.integer(n))
             }
           }
@@ -390,7 +397,7 @@ autoFIPC <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
+            if (.is_binary_prompt_choice(n)) {
               return(as.integer(n))
             }
           }
