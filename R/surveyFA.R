@@ -1,3 +1,12 @@
+.name_of_minimum <- function(values) {
+  minimum_index <- which.min(values)
+  value_names <- names(values)
+  if (length(minimum_index) != 1L || is.null(value_names)) {
+    return(NA_character_)
+  }
+  value_names[[minimum_index]]
+}
+
 #' @title surveyFA
 #' @description Fallback calibration helper used when direct model estimation in
 #'   `autoFIPC()` fails.
@@ -232,9 +241,9 @@ surveyFA <- function(
       names(p_values) <- rownames(fit_df)
       if (any(!is.na(p_values))) {
         p_values[is.na(p_values)] <- 1
-        # ⚡ Bolt: Replace O(N log N) sorting with O(N) linear search for min element
-        candidate <- names(which.min(p_values))
-        if (!is.na(candidate) && length(candidate) > 0L && p_values[[candidate]] < pThreshold) {
+        # Find the minimum in one pass instead of sorting every item-fit value.
+        candidate <- .name_of_minimum(p_values)
+        if (!is.na(candidate) && p_values[[candidate]] < pThreshold) {
           return(candidate)
         }
       }
