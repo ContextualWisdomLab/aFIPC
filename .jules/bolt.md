@@ -16,3 +16,7 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+
+## 2024-07-21 - [데이터프레임 서브셋팅 없이 컬럼 이름 추출 최적화]
+**Learning:** R에서 단순히 컬럼 이름만 추출하기 위해 `colnames(df[cols])` 처럼 데이터프레임을 서브셋팅하면 불필요한 O(N) 메모리 복사 및 할당 오버헤드가 발생하며, 특히 반복문 내에서 성능 저하를 야기합니다. 또한, `intersect(A, B)`의 순서는 `A`에 등장하는 순서를 따르므로 기존 배열의 순서를 유지하려면 인자 순서에 유의해야 합니다.
+**Action:** 불필요한 서브셋팅 대신 `intersect(cols, colnames(df))` 와 같이 사용하여 메모리 오버헤드 없이 순서가 보존된 컬럼 이름만 효율적으로 찾아내어 활용합니다.
