@@ -1,3 +1,45 @@
+.validate_scale_parameter_table <- function(parameters, label) {
+  if (!is.data.frame(parameters)) {
+    stop(
+      sprintf("Security Error: %s parameter table must be a data.frame", label),
+      call. = FALSE
+    )
+  }
+
+  required_columns <- c("item", "name", "value", "est")
+  missing_columns <- setdiff(required_columns, names(parameters))
+  if (length(missing_columns) > 0) {
+    stop(
+      sprintf(
+        "Security Error: %s parameter table is missing required column(s): %s",
+        label,
+        paste(missing_columns, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(parameters)
+}
+
+.prepare_scale_parameters <- function(new_parameters, old_parameters, itemtype) {
+  .validate_scale_parameter_table(new_parameters, "new-form")
+  .validate_scale_parameter_table(old_parameters, "old-form")
+
+  new_parameters$est[new_parameters$item == 'GROUP'] <- FALSE
+  old_parameters$est[old_parameters$item == 'GROUP'] <- FALSE
+
+  new_parameters$est[new_parameters$name == "COV_11"] <- TRUE
+  old_parameters$est[old_parameters$name == "COV_11"] <- TRUE
+
+  if (itemtype == 'Rasch') {
+    new_parameters$est[new_parameters$name == "a1"] <- FALSE
+    old_parameters$est[old_parameters$name == "a1"] <- FALSE
+  }
+
+  list(new = new_parameters, old = old_parameters)
+}
+
 #' automated fixed item parameter linking
 #'
 #' @import mirt
@@ -597,17 +639,14 @@ autoFIPC <-
 
     # Preserve mirt's structural estimability flags. Forcing every row TRUE
     # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
-
-    NewScaleParms$est[NewScaleParms$item == 'GROUP'] <- FALSE
-    OldScaleParms$est[OldScaleParms$item == 'GROUP'] <- FALSE
-
-    NewScaleParms$est[NewScaleParms$name == "COV_11"] <- TRUE
-    OldScaleParms$est[OldScaleParms$name == "COV_11"] <- TRUE
-
-    if (itemtype == 'Rasch') {
-      NewScaleParms$est[NewScaleParms$name == "a1"] <- FALSE
-      OldScaleParms$est[OldScaleParms$name == "a1"] <- FALSE
-    }
+    prepared_parameters <- .prepare_scale_parameters(
+      NewScaleParms,
+      OldScaleParms,
+      itemtype
+    )
+    NewScaleParms <- prepared_parameters$new
+    OldScaleParms <- prepared_parameters$old
+    rm(prepared_parameters)
 
     #IPD
     if (checkIPD == T) {
@@ -785,7 +824,7 @@ autoFIPC <-
         newIdx <- newScaleParmsItemIdxCache[[newFormItemStr]]
         oldIdx <- oldScaleParmsItemIdxCache[[oldFormItemStr]]
 
-        # ⚡ Bolt: Remove unnecessary paste0() array string generation overhead
+        # ⚡ Bolt: Avoid two-dimensional data.frame value extraction overhead
         message('   Newform Parms: ', paste(NewScaleParms$value[newIdx], collapse = ' '))
         message('   Oldform Parms: ', paste(OldScaleParms$value[oldIdx], collapse = ' '))
 
