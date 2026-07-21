@@ -74,7 +74,8 @@ See `ARCHITECTURE.md` for the full map. Essentials:
   imports `mirt` and `methods` (`DESCRIPTION`).
 - `man/` — generated `.Rd` docs for the exported functions.
 - `tests/testthat/` — testthat suite, driven by `tests/testthat.R`.
-- `packrat/` — historical vendored dependency tree; opt-in only.
+- `packrat/` — historical dependency lock and source cache; opt-in only. The
+  generated `packrat/lib` installation tree is ignored and never committed.
 - `.github/workflows/` — `r.yml` (R CMD check), `code-quality.yml`
   (yamllint + markdownlint + actionlint), `security-audit.yml` (gitleaks +
   actionlint). All action refs are pinned to full commit SHAs.
@@ -106,9 +107,9 @@ Summarized from `AGENTS.md` and `CONTRIBUTING.md`; read those for detail.
   `confirmCommonItems = TRUE` in non-interactive contexts (the tests assert
   that implicit approval fails).
 - A failing `trivy-fs` in the Security Scan gate is a real finding, not a
-  flake: bump the offending vendored dependency under `packrat/`, or add a
-  narrow, path-scoped, commented entry to `.trivyignore.yaml`. Never weaken
-  the gate. (`trivy.yaml` skips `packrat/lib` for local scans.)
+  flake: bump the offending tracked dependency source under `packrat/src`, or
+  add a narrow, path-scoped, commented entry to `.trivyignore.yaml`. Never
+  weaken the gate. Generated `packrat/lib` content must remain untracked.
 - New copyleft dependencies (GPL/AGPL/LGPL) are not accepted; never commit
   secrets.
 - Use the PR template (`.github/PULL_REQUEST_TEMPLATE.md`): include risk

@@ -23,14 +23,21 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Lint workflow YAML
-        run: |
-          python3 -m pip install --user yamllint
-          python3 -m yamllint .yamllint.yml .github/dependabot.yml .github/workflows/*.yml
+        uses: ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c
+        with:
+          file_or_dir: .yamllint.yml .github/dependabot.yml .github/workflows/*.yml
 
       - name: Lint markdown docs
-        run: |
-          npm install -g markdownlint-cli2@0.18.1
-          markdownlint-cli2 README.md AGENTS.md ARCHITECTURE.md CLAUDE.md CONTRIBUTING.md .github/**/*.md docs/**/*.md
+        uses: DavidAnson/markdownlint-cli2-action@6bf21b07787794f89a243495939cd651942aeabe
+        with:
+          globs: |
+            README.md
+            AGENTS.md
+            ARCHITECTURE.md
+            CLAUDE.md
+            CONTRIBUTING.md
+            .github/**/*.md
+            docs/**/*.md
 
       - name: Lint GitHub workflows
         run: |
