@@ -78,3 +78,64 @@ test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)",
   expect_identical(actual_old, legacy_old)
   expect_identical(actual_new, legacy_new)
 })
+
+test_that("direct parameter-column assignment preserves table semantics (#156)", {
+  new_parameters <- data.frame(
+    item = c("GROUP", "item_1", "item_1", "item_2", "BETA", "GROUP"),
+    name = c("MEAN_1", "a1", "d", "COV_11", "beta", "MEAN_11"),
+    value = c(0, 0.8, -0.4, 0.9, 0.2, 0.1),
+    est = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE),
+    stringsAsFactors = FALSE
+  )
+  old_parameters <- data.frame(
+    item = c("GROUP", "old_1", "old_1", "old_2", "BETA", "GROUP"),
+    name = c("MEAN_1", "a1", "d", "COV_11", "beta", "MEAN_11"),
+    value = c(0, 1.1, -0.7, 1.2, 0.5, -0.1),
+    est = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE),
+    stringsAsFactors = FALSE
+  )
+
+  legacy_new <- new_parameters
+  legacy_old <- old_parameters
+  direct_new <- new_parameters
+  direct_old <- old_parameters
+
+  legacy_new[legacy_new$item == "GROUP", "est"] <- FALSE
+  legacy_old[legacy_old$item == "GROUP", "est"] <- FALSE
+  direct_new$est[direct_new$item == "GROUP"] <- FALSE
+  direct_old$est[direct_old$item == "GROUP"] <- FALSE
+
+  legacy_new[legacy_new$name == "COV_11", "est"] <- TRUE
+  legacy_old[legacy_old$name == "COV_11", "est"] <- TRUE
+  direct_new$est[direct_new$name == "COV_11"] <- TRUE
+  direct_old$est[direct_old$name == "COV_11"] <- TRUE
+
+  new_anchor <- legacy_new$item == "item_1"
+  old_anchor <- legacy_old$item == "old_1"
+  legacy_new[new_anchor, "value"] <- legacy_old[old_anchor, "value"]
+  legacy_new[new_anchor, "est"] <- FALSE
+  direct_new$value[new_anchor] <- direct_old$value[old_anchor]
+  direct_new$est[new_anchor] <- FALSE
+
+  new_beta <- legacy_new$item == "BETA"
+  old_beta <- legacy_old$item == "BETA"
+  legacy_new[new_beta, "value"] <- legacy_old[old_beta, "value"]
+  legacy_new[new_beta, "est"] <- FALSE
+  direct_new$value[new_beta] <- direct_old$value[old_beta]
+  direct_new$est[new_beta] <- FALSE
+
+  legacy_new[legacy_new$name == "COV_11", "value"] <- 1
+  legacy_old[legacy_old$name == "MEAN_11", "value"] <- 0
+  direct_new$value[direct_new$name == "COV_11"] <- 1
+  direct_old$value[direct_old$name == "MEAN_11"] <- 0
+
+  legacy_new[legacy_new$name == "MEAN_1", "est"] <- TRUE
+  legacy_old[legacy_old$name == "MEAN_1", "est"] <- TRUE
+  direct_new$est[direct_new$name == "MEAN_1"] <- TRUE
+  direct_old$est[direct_old$name == "MEAN_1"] <- TRUE
+
+  expect_identical(direct_new, legacy_new)
+  expect_identical(direct_old, legacy_old)
+  expect_type(direct_new$value, "double")
+  expect_type(direct_new$est, "logical")
+})
