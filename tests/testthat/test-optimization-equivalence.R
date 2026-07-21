@@ -78,3 +78,149 @@ test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)",
   expect_identical(actual_old, legacy_old)
   expect_identical(actual_new, legacy_new)
 })
+
+test_that("Direct column assignment matches 2D assignment behavior", {
+  # Mock Data setup equivalent to scale parms
+  NewScaleParms_2D <- data.frame(
+    item = c("GROUP", "Item1", "BETA", "Item2"),
+    name = c("MEAN_1", "a1", "COV_11", "d"),
+    value = c(0, 1.5, 1, -0.5),
+    est = c(TRUE, TRUE, FALSE, TRUE),
+    stringsAsFactors = FALSE
+  )
+  OldScaleParms_2D <- NewScaleParms_2D
+  OldScaleParms_2D$value <- c(1, 2.0, 0, -1.0)
+
+  NewScaleParms_1D <- NewScaleParms_2D
+  OldScaleParms_1D <- OldScaleParms_2D
+
+  # 2D Assignment (Legacy)
+  NewScaleParms_2D[NewScaleParms_2D$item == 'GROUP', "est"] <- FALSE
+  OldScaleParms_2D[OldScaleParms_2D$item == 'GROUP', "est"] <- FALSE
+  NewScaleParms_2D[NewScaleParms_2D$name == "COV_11", "est"] <- TRUE
+  OldScaleParms_2D[OldScaleParms_2D$name == "COV_11", "est"] <- TRUE
+  NewScaleParms_2D[NewScaleParms_2D$name == "a1", "est"] <- FALSE
+  OldScaleParms_2D[OldScaleParms_2D$name == "a1", "est"] <- FALSE
+
+  newBetaIdx <- NewScaleParms_2D$item == 'BETA'
+  oldBetaIdx <- OldScaleParms_2D$item == 'BETA'
+  NewScaleParms_2D[newBetaIdx, "value"] <- OldScaleParms_2D[oldBetaIdx, "value"]
+  NewScaleParms_2D[newBetaIdx, "est"] <- FALSE
+
+  # 1D Assignment (Optimized)
+  NewScaleParms_1D$est[NewScaleParms_1D$item == 'GROUP'] <- FALSE
+  OldScaleParms_1D$est[OldScaleParms_1D$item == 'GROUP'] <- FALSE
+  NewScaleParms_1D$est[NewScaleParms_1D$name == "COV_11"] <- TRUE
+  OldScaleParms_1D$est[OldScaleParms_1D$name == "COV_11"] <- TRUE
+  NewScaleParms_1D$est[NewScaleParms_1D$name == "a1"] <- FALSE
+  OldScaleParms_1D$est[OldScaleParms_1D$name == "a1"] <- FALSE
+
+  newBetaIdx_1D <- NewScaleParms_1D$item == 'BETA'
+  oldBetaIdx_1D <- OldScaleParms_1D$item == 'BETA'
+  NewScaleParms_1D$value[newBetaIdx_1D] <- OldScaleParms_1D$value[oldBetaIdx_1D]
+  NewScaleParms_1D$est[newBetaIdx_1D] <- FALSE
+
+  expect_identical(NewScaleParms_2D, NewScaleParms_1D)
+  expect_identical(OldScaleParms_2D, OldScaleParms_1D)
+
+  # Check type preservation
+  expect_type(NewScaleParms_1D$value, "double")
+  expect_type(NewScaleParms_1D$est, "logical")
+})
+
+test_that("direct parameter-column assignment preserves table semantics (#156)", {
+  new_parameters <- data.frame(
+    item = c("GROUP", "item_1", "item_1", "item_2", "BETA", "GROUP"),
+    name = c("MEAN_1", "a1", "d", "COV_11", "beta", "MEAN_11"),
+    value = c(0, 0.8, -0.4, 0.9, 0.2, 0.1),
+    est = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE),
+    stringsAsFactors = FALSE
+  )
+  old_parameters <- data.frame(
+    item = c("GROUP", "old_1", "old_1", "old_2", "BETA", "GROUP"),
+    name = c("MEAN_1", "a1", "d", "COV_11", "beta", "MEAN_11"),
+    value = c(0, 1.1, -0.7, 1.2, 0.5, -0.1),
+    est = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE),
+    stringsAsFactors = FALSE
+  )
+
+  legacy_new <- new_parameters
+  legacy_old <- old_parameters
+  direct_new <- new_parameters
+  direct_old <- old_parameters
+
+  legacy_new[legacy_new$item == "GROUP", "est"] <- FALSE
+  legacy_old[legacy_old$item == "GROUP", "est"] <- FALSE
+  direct_new$est[direct_new$item == "GROUP"] <- FALSE
+  direct_old$est[direct_old$item == "GROUP"] <- FALSE
+
+  legacy_new[legacy_new$name == "COV_11", "est"] <- TRUE
+  legacy_old[legacy_old$name == "COV_11", "est"] <- TRUE
+  direct_new$est[direct_new$name == "COV_11"] <- TRUE
+  direct_old$est[direct_old$name == "COV_11"] <- TRUE
+
+  new_anchor <- legacy_new$item == "item_1"
+  old_anchor <- legacy_old$item == "old_1"
+  direct_new_anchor <- direct_new$item == "item_1"
+  direct_old_anchor <- direct_old$item == "old_1"
+  legacy_new[new_anchor, "value"] <- legacy_old[old_anchor, "value"]
+  legacy_new[new_anchor, "est"] <- FALSE
+  direct_new$value[direct_new_anchor] <- direct_old$value[direct_old_anchor]
+  direct_new$est[direct_new_anchor] <- FALSE
+
+  new_beta <- legacy_new$item == "BETA"
+  old_beta <- legacy_old$item == "BETA"
+  direct_new_beta <- direct_new$item == "BETA"
+  direct_old_beta <- direct_old$item == "BETA"
+  legacy_new[new_beta, "value"] <- legacy_old[old_beta, "value"]
+  legacy_new[new_beta, "est"] <- FALSE
+  direct_new$value[direct_new_beta] <- direct_old$value[direct_old_beta]
+  direct_new$est[direct_new_beta] <- FALSE
+
+  expect_identical(direct_new, legacy_new)
+  expect_identical(direct_old, legacy_old)
+})
+
+test_that("scale-parameter preparation validates schema and preserves Rasch semantics (#156)", {
+  parameters <- data.frame(
+    item = c("GROUP", "item_1", "item_2"),
+    name = c("MEAN_1", "a1", "COV_11"),
+    value = c(0, 1, 1),
+    est = c(TRUE, TRUE, FALSE),
+    stringsAsFactors = FALSE
+  )
+
+  legacy_new <- parameters
+  legacy_old <- parameters
+  legacy_new[legacy_new$item == "GROUP", "est"] <- FALSE
+  legacy_old[legacy_old$item == "GROUP", "est"] <- FALSE
+  legacy_new[legacy_new$name == "COV_11", "est"] <- TRUE
+  legacy_old[legacy_old$name == "COV_11", "est"] <- TRUE
+  legacy_new[legacy_new$name == "a1", "est"] <- FALSE
+  legacy_old[legacy_old$name == "a1", "est"] <- FALSE
+
+  actual <- aFIPC:::.prepare_scale_parameters(parameters, parameters, "Rasch")
+
+  expect_identical(actual$new, legacy_new)
+  expect_identical(actual$old, legacy_old)
+  expect_false(actual$new$est[actual$new$name == "a1"])
+
+  expect_error(
+    aFIPC:::.prepare_scale_parameters(
+      as.matrix(parameters),
+      parameters,
+      "Rasch"
+    ),
+    "new-form parameter table must be a data.frame",
+    fixed = TRUE
+  )
+
+  for (missing_column in c("item", "name", "value", "est")) {
+    incomplete <- parameters[setdiff(names(parameters), missing_column)]
+    expect_error(
+      aFIPC:::.prepare_scale_parameters(incomplete, parameters, "Rasch"),
+      paste0("missing required column\\(s\\): ", missing_column),
+      fixed = FALSE
+    )
+  }
+})

@@ -1,3 +1,45 @@
+.validate_scale_parameter_table <- function(parameters, label) {
+  if (!is.data.frame(parameters)) {
+    stop(
+      sprintf("Security Error: %s parameter table must be a data.frame", label),
+      call. = FALSE
+    )
+  }
+
+  required_columns <- c("item", "name", "value", "est")
+  missing_columns <- setdiff(required_columns, names(parameters))
+  if (length(missing_columns) > 0) {
+    stop(
+      sprintf(
+        "Security Error: %s parameter table is missing required column(s): %s",
+        label,
+        paste(missing_columns, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(parameters)
+}
+
+.prepare_scale_parameters <- function(new_parameters, old_parameters, itemtype) {
+  .validate_scale_parameter_table(new_parameters, "new-form")
+  .validate_scale_parameter_table(old_parameters, "old-form")
+
+  new_parameters$est[new_parameters$item == 'GROUP'] <- FALSE
+  old_parameters$est[old_parameters$item == 'GROUP'] <- FALSE
+
+  new_parameters$est[new_parameters$name == "COV_11"] <- TRUE
+  old_parameters$est[old_parameters$name == "COV_11"] <- TRUE
+
+  if (itemtype == 'Rasch') {
+    new_parameters$est[new_parameters$name == "a1"] <- FALSE
+    old_parameters$est[old_parameters$name == "a1"] <- FALSE
+  }
+
+  list(new = new_parameters, old = old_parameters)
+}
+
 #' automated fixed item parameter linking
 #'
 #' @import mirt
@@ -64,7 +106,7 @@ autoFIPC <-
       if (!isS4(x) || !methods::is(x, "SingleGroupClass")) return(FALSE)
       ok <- tryCatch({
         vals <- mirt::mod2values(x)
-        is.data.frame(vals) || is.matrix(vals)
+        is.data.frame(vals)
       }, error = function(e) FALSE, warning = function(w) FALSE)
       if (!isTRUE(ok)) return(FALSE)
       required_slots <- c("OptimInfo", "ParObjects")
@@ -597,17 +639,14 @@ autoFIPC <-
 
     # Preserve mirt's structural estimability flags. Forcing every row TRUE
     # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
-
-    NewScaleParms[NewScaleParms$item == 'GROUP', "est"] <- FALSE
-    OldScaleParms[OldScaleParms$item == 'GROUP', "est"] <- FALSE
-
-    NewScaleParms[NewScaleParms$name == "COV_11", "est"] <- TRUE
-    OldScaleParms[OldScaleParms$name == "COV_11", "est"] <- TRUE
-
-    if (itemtype == 'Rasch') {
-      NewScaleParms[NewScaleParms$name == "a1", "est"] <- FALSE
-      OldScaleParms[OldScaleParms$name == "a1", "est"] <- FALSE
-    }
+    prepared_parameters <- .prepare_scale_parameters(
+      NewScaleParms,
+      OldScaleParms,
+      itemtype
+    )
+    NewScaleParms <- prepared_parameters$new
+    OldScaleParms <- prepared_parameters$old
+    rm(prepared_parameters)
 
     #IPD
     if (checkIPD == T) {
@@ -785,15 +824,15 @@ autoFIPC <-
         newIdx <- newScaleParmsItemIdxCache[[newFormItemStr]]
         oldIdx <- oldScaleParmsItemIdxCache[[oldFormItemStr]]
 
-        # ⚡ Bolt: Remove unnecessary paste0() array string generation overhead
-        message('   Newform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '))
-        message('   Oldform Parms: ', paste(OldScaleParms[oldIdx, "value"], collapse = ' '))
+        # ⚡ Bolt: Use cached rows with direct column access to avoid 2D dispatch
+        message('   Newform Parms: ', paste(NewScaleParms$value[newIdx], collapse = ' '))
+        message('   Oldform Parms: ', paste(OldScaleParms$value[oldIdx], collapse = ' '))
 
-        NewScaleParms[newIdx, "value"] <-
-          OldScaleParms[oldIdx, "value"]
-        message('   Linkedform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '), '\n')
+        NewScaleParms$value[newIdx] <-
+          OldScaleParms$value[oldIdx]
+        message('   Linkedform Parms: ', paste(NewScaleParms$value[newIdx], collapse = ' '), '\n')
 
-        NewScaleParms[newIdx, "est"] <-
+        NewScaleParms$est[newIdx] <-
           FALSE
       } else {
         message(
@@ -813,9 +852,9 @@ autoFIPC <-
       newBetaIdx <- NewScaleParms$item == 'BETA'
       oldBetaIdx <- OldScaleParms$item == 'BETA'
 
-      NewScaleParms[newBetaIdx, "value"] <-
-        OldScaleParms[oldBetaIdx, "value"]
-      NewScaleParms[newBetaIdx, "est"] <-
+      NewScaleParms$value[newBetaIdx] <-
+        OldScaleParms$value[oldBetaIdx]
+      NewScaleParms$est[newBetaIdx] <-
         FALSE
 
       message('applying BETA parameter as linking')
@@ -823,7 +862,7 @@ autoFIPC <-
       message(
         '   Linkedform Parms: ',
         paste0(
-          NewScaleParms[newBetaIdx, "value"],
+          NewScaleParms$value[newBetaIdx],
           ' '
         ),
         '\n'
@@ -858,13 +897,13 @@ autoFIPC <-
       new_mean11_idx <- NewScaleParms$name == "MEAN_11"
       old_mean11_idx <- OldScaleParms$name == "MEAN_11"
 
-      NewScaleParms[new_cov11_idx, "est"] <- FALSE
-      OldScaleParms[old_cov11_idx, "est"] <- FALSE
-      NewScaleParms[new_mean11_idx, "est"] <- FALSE
-      OldScaleParms[old_mean11_idx, "est"] <- FALSE
+      NewScaleParms$est[new_cov11_idx] <- FALSE
+      OldScaleParms$est[old_cov11_idx] <- FALSE
+      NewScaleParms$est[new_mean11_idx] <- FALSE
+      OldScaleParms$est[old_mean11_idx] <- FALSE
 
-      NewScaleParms[new_cov11_idx, "value"] <- 1
-      OldScaleParms[old_mean11_idx, "value"] <- 0
+      NewScaleParms$value[new_cov11_idx] <- 1
+      OldScaleParms$value[old_mean11_idx] <- 0
     }
     if (freeMEAN == T) {
       LinkedModelSyntax <-
@@ -875,8 +914,8 @@ autoFIPC <-
           'MEAN = F1'
         ))
 
-      NewScaleParms[NewScaleParms$name == "MEAN_1", "est"] <- TRUE
-      OldScaleParms[OldScaleParms$name == "MEAN_1", "est"] <- TRUE
+      NewScaleParms$est[NewScaleParms$name == "MEAN_1"] <- TRUE
+      OldScaleParms$est[OldScaleParms$name == "MEAN_1"] <- TRUE
     } else {
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
