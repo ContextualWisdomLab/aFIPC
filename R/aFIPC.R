@@ -620,8 +620,9 @@ autoFIPC <-
       IPDItemCount <- 0
 
       # IPD target item checking
-      newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
-      oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+      # ⚡ Bolt: Replace dataframe subsetting with intersect() to avoid O(N) memory copy overhead
+      newFormColNames <- intersect(colnames(newFormModel@Data$data), colnames(newformXDataK))
+      oldFormColNames <- intersect(colnames(oldFormModel@Data$data), colnames(oldformYDataK))
 
       # ⚡ Bolt: Vectorized match() to avoid dynamic array growth overhead inside a for loop
       idxNew <- match(newformCommonItemNames, newFormColNames)
@@ -749,8 +750,9 @@ autoFIPC <-
       }
     }
 
-    newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
-    oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+    # ⚡ Bolt: Replace dataframe subsetting with intersect() to avoid O(N) memory copy overhead
+    newFormColNames <- intersect(colnames(newFormModel@Data$data), colnames(newformXDataK))
+    oldFormColNames <- intersect(colnames(oldFormModel@Data$data), colnames(oldformYDataK))
 
     # ⚡ Bolt: Cache parameter indices to avoid O(N) linear search inside loop
     newScaleParmsItemIdxCache <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)
