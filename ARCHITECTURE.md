@@ -12,7 +12,8 @@ metadata and CI are wired, and which parts are safe to evolve.
 - `DESCRIPTION` - Package metadata (name, version, imports, license)
 - `NAMESPACE` - Export map for package functions
 - `man/` - Generated R documentation (`.Rd` files)
-- `packrat/` - Historical dependency lock/vendor directory
+- `packrat/` - Historical dependency lock and source cache. The installed
+  `packrat/lib` tree is generated locally, ignored, and never committed.
 - `.github/workflows/` - CI + security automation
 - `.github/SECURITY.md` - Vulnerability reporting policy
 - `.github/PULL_REQUEST_TEMPLATE.md` - PR review checklist template

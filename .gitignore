@@ -16,3 +16,8 @@ task_agent_mapping.json
 
 # local package build artifacts
 aFIPC_*.tar.gz
+
+# generated packrat libraries (restore from packrat.lock + packrat/src)
+packrat/lib/
+packrat/lib-R/
+packrat/lib-ext/

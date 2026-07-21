@@ -11,7 +11,8 @@ preserve numerical behavior while modernizing repository operations
 
 - `R/aFIPC.R`: core `autoFIPC()` implementation
 - `DESCRIPTION`, `NAMESPACE`, `man/`: package metadata and generated docs
-- `packrat/`: historical dependency lock/vendor directory
+- `packrat/`: historical dependency lock and source cache; restored libraries
+  are generated locally and not tracked
 - `.github/workflows/`: CI/security automation
 
 ## Development status
@@ -19,7 +20,8 @@ preserve numerical behavior while modernizing repository operations
 - Algorithmic core is legacy but trusted for historical outputs.
 - Operational guardrails are now maintained via GitHub Actions and Dependabot.
 - Legacy `packrat` bootstrap is opt-in via `AFIPC_ENABLE_PACKRAT=true`.
-- Broken host-specific `packrat/lib-R` symlinks were removed for portable builds.
+- `packrat/init.R` can rebuild the ignored `packrat/lib` tree from the tracked
+  lock file and source cache; host-specific installed binaries are not committed.
 - Architectural and agent operation docs are available in:
   - `ARCHITECTURE.md`
   - `AGENTS.md`
