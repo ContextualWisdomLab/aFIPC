@@ -16,3 +16,6 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2026-07-21 - R 언어에서 최솟값/최댓값 탐색 시 불필요한 정렬 오버헤드 제거
+**Learning:** R에서 벡터의 최솟값이나 최댓값을 찾기 위해 전체 요소를 정렬하는 `sort(x)[1]` 또는 `names(sort(x))[1]` 방식을 사용하면 O(N log N)의 불필요한 시간 복잡도와 정렬 오버헤드가 발생합니다. 이는 크기가 큰 벡터에서 성능 저하를 일으킵니다.
+**Action:** 단순히 최솟값 또는 최댓값의 인덱스(또는 이름)만 필요한 경우에는 `which.min(x)` 또는 `which.max(x)`를 사용하여 O(N) 선형 탐색으로 최적화함으로써 성능을 향상시킵니다.
