@@ -176,3 +176,47 @@ test_that("direct parameter-column assignment preserves table semantics (#156)",
   expect_identical(direct_new, legacy_new)
   expect_identical(direct_old, legacy_old)
 })
+
+test_that("scale-parameter preparation validates schema and preserves Rasch semantics (#156)", {
+  parameters <- data.frame(
+    item = c("GROUP", "item_1", "item_2"),
+    name = c("MEAN_1", "a1", "COV_11"),
+    value = c(0, 1, 1),
+    est = c(TRUE, TRUE, FALSE),
+    stringsAsFactors = FALSE
+  )
+
+  legacy_new <- parameters
+  legacy_old <- parameters
+  legacy_new[legacy_new$item == "GROUP", "est"] <- FALSE
+  legacy_old[legacy_old$item == "GROUP", "est"] <- FALSE
+  legacy_new[legacy_new$name == "COV_11", "est"] <- TRUE
+  legacy_old[legacy_old$name == "COV_11", "est"] <- TRUE
+  legacy_new[legacy_new$name == "a1", "est"] <- FALSE
+  legacy_old[legacy_old$name == "a1", "est"] <- FALSE
+
+  actual <- aFIPC:::.prepare_scale_parameters(parameters, parameters, "Rasch")
+
+  expect_identical(actual$new, legacy_new)
+  expect_identical(actual$old, legacy_old)
+  expect_false(actual$new$est[actual$new$name == "a1"])
+
+  expect_error(
+    aFIPC:::.prepare_scale_parameters(
+      as.matrix(parameters),
+      parameters,
+      "Rasch"
+    ),
+    "new-form parameter table must be a data.frame",
+    fixed = TRUE
+  )
+
+  for (missing_column in c("item", "name", "value", "est")) {
+    incomplete <- parameters[setdiff(names(parameters), missing_column)]
+    expect_error(
+      aFIPC:::.prepare_scale_parameters(incomplete, parameters, "Rasch"),
+      paste0("missing required column\\(s\\): ", missing_column),
+      fixed = FALSE
+    )
+  }
+})

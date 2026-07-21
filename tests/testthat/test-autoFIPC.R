@@ -11,33 +11,6 @@ test_that("autoFIPC raises error in non-interactive session for inputs", {
   )
 })
 
-test_that("autoFIPC validates required parameter columns fail-fast", {
-  old_model <- mirt::mirt(data.frame(Item1 = c(1,0,1,0,1,0), Item2 = c(1,1,0,0,1,1), Item3 = c(0,0,1,1,0,0)), 1, verbose=FALSE, TOL = 0.5)
-  new_model <- mirt::mirt(data.frame(Item1 = c(1,0,1,0,1,0), Item2 = c(1,1,0,0,1,1), Item3 = c(0,0,1,1,0,0)), 1, verbose=FALSE, TOL = 0.5)
-
-  common_new <- paste0("Item", 1:2)
-  common_old <- paste0("Item", 1:2)
-
-  # We use mockery to stub out mirt::mod2values so we can return broken dataframes
-
-  mockery::stub(autoFIPC, 'mirt::mod2values', function(x) {
-    df <- data.frame(item="Item1", name="a1", value=1)
-    # missing 'est'
-    return(df)
-  })
-
-  expect_error(
-    autoFIPC(
-      newformXData = new_model,
-      oldformYData = old_model,
-      newformCommonItemNames = common_new,
-      oldformCommonItemNames = common_old,
-      confirmCommonItems = TRUE
-    ),
-    "Security Error: parameter scale objects must have 'item', 'name', 'value', 'est' columns"
-  )
-})
-
 test_that("autoFIPC does not implicitly approve supplied common items", {
   expect_error(
     aFIPC::autoFIPC(
