@@ -161,17 +161,21 @@ test_that("direct parameter-column assignment preserves table semantics (#156)",
 
   new_anchor <- legacy_new$item == "item_1"
   old_anchor <- legacy_old$item == "old_1"
+  direct_new_anchor <- direct_new$item == "item_1"
+  direct_old_anchor <- direct_old$item == "old_1"
   legacy_new[new_anchor, "value"] <- legacy_old[old_anchor, "value"]
   legacy_new[new_anchor, "est"] <- FALSE
-  direct_new$value[new_anchor] <- direct_old$value[old_anchor]
-  direct_new$est[new_anchor] <- FALSE
+  direct_new$value[direct_new_anchor] <- direct_old$value[direct_old_anchor]
+  direct_new$est[direct_new_anchor] <- FALSE
 
   new_beta <- legacy_new$item == "BETA"
   old_beta <- legacy_old$item == "BETA"
+  direct_new_beta <- direct_new$item == "BETA"
+  direct_old_beta <- direct_old$item == "BETA"
   legacy_new[new_beta, "value"] <- legacy_old[old_beta, "value"]
   legacy_new[new_beta, "est"] <- FALSE
-  direct_new$value[new_beta] <- direct_old$value[old_beta]
-  direct_new$est[new_beta] <- FALSE
+  direct_new$value[direct_new_beta] <- direct_old$value[direct_old_beta]
+  direct_new$est[direct_new_beta] <- FALSE
 
   expect_identical(direct_new, legacy_new)
   expect_identical(direct_old, legacy_old)
