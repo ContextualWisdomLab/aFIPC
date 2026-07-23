@@ -1,3 +1,18 @@
-## 2026-07-23 - Dataframe 2D Subsetting to 1D Vector Assignment Optimization
-**Learning:** In R, updating a specific column based on a conditional match is significantly faster using direct vector subsetting (e.g., `df$col[df$idx == 'val'] <- new_val`) compared to two-dimensional subsetting (e.g., `df[df$idx == 'val', 'col'] <- new_val`). Direct vector assignment bypasses the `[<-.data.frame` method dispatch overhead in favor of O(1) list access and C-level vector modification.
-**Action:** When updating specific columns of a dataframe in performance-critical loops or setup functions in R, always extract the column first with `$` and perform 1D subsetting.
+## 2024-07-04 - R 언어에서 루프 내 데이터 프레임 탐색 병목 최적화
+**Learning:** R에서 루프를 돌면서 매번 데이터 프레임을 서브셋팅(subsetting)하는 작업은 복사 오버헤드로 인해 매우 느려질 수 있습니다. 특히 공통 문항 수가 많아질 경우 O(N^2)의 비효율을 초래합니다.
+**Action:** 루프 내에서 수행하던 데이터 프레임 조회를 루프 외부에서 한 번에 `as.character(unlist(...))`로 처리하는 벡터 연산으로 변경하여 타입 변환 없이 O(1) 수준으로 성능을 크게 향상시킬 수 있습니다.
+## 2024-07-07 - R 언어에서 데이터 프레임의 특정 항목 탐색을 캐싱하여 O(N) 검색 병목 최적화
+**Learning:** R에서 반복문 내부에서 특정 조건을 만족하는 데이터의 위치를 찾기 위해 `which()`를 여러 번 반복 호출하는 것은 O(N) 시간 복잡도를 가져 매번 불필요한 배열 스캔을 유발합니다. 이는 루프의 반복 횟수가 많고, 탐색해야할 데이터가 클 수록 성능 저하의 주 원인이 됩니다.
+**Action:** 조건에 맞는 인덱스를 최초 탐색 시 변수에 캐싱(`newIdx`, `oldIdx` 등)하여 저장하고 이후 동일한 데이터 접근 시 캐싱된 인덱스를 사용함으로써 O(1) 수준으로 성능을 향상시킬 수 있습니다. 추가로 스칼라 값에 대한 불필요한 `paste0()` 함수 호출을 제거하여 오버헤드를 줄입니다.
+## 2024-07-08 - R 언어에서 루프 내 인덱스 검색(which) O(N) 병목 최적화
+**Learning:** R에서 반복문 내부에서 특정 조건을 만족하는 데이터의 위치를 찾기 위해 `which()`를 여러 번 호출하면 매번 O(N)의 선형 탐색(linear scan)이 발생하여 데이터 크기가 클수록 성능이 크게 저하됩니다. 또한 `paste0()`를 이용한 불필요한 배열 단위 문자열 생성은 반복문 오버헤드를 가중시킵니다.
+**Action:** 조건에 맞는 인덱스를 최초 한 번 `split(seq_len(nrow(df)), df$column)`를 통해 리스트 형태로 캐싱(dictionary lookup)하여 루프 외부에서 O(1) 검색 체계로 만들고, 스칼라 값에 대한 불필요한 `paste0()` 함수 호출을 최적화(`paste(..., collapse=' ')`)하여 오버헤드를 줄입니다.
+## 2026-07-11 - R 언어에서 루프 내 벡터 동적 확장 및 조건부 탐색 최적화
+**Learning:** R에서 for 루프 내에 동적으로 벡터 크기를 늘리면서 (`vector[i] <- value`) 조건을 검사하는 것은 O(N^2)의 복사 오버헤드(copy-on-modify)를 발생시키며 매 반복마다 `match()` 스캔을 수행하면 성능 저하를 초래합니다.
+**Action:** 루프 외부에 벡터화된 `match()`를 한 번만 수행하여 유효한 인덱스를 찾고, 벡터 인덱싱(`vector[idx]`)으로 한 번에 데이터를 추출하여 불필요한 루프 오버헤드 및 동적 메모리 재할당을 방지하여 O(1) 수준으로 성능을 개선해야 합니다.
+## 2024-07-12 - R 언어에서 데이터프레임 서브셋팅 시 불필요한 which() 및 반복 평가 제거
+**Learning:** 데이터 프레임의 특정 로우(row)를 변경할 때 `df[which(df$col == "val"), ]`와 같이 `which()`를 사용하면 내부적으로 추가 함수 호출 및 논리 벡터 평가 오버헤드가 발생합니다. 또한, 여러 값을 업데이트하기 위해 동일한 조건식을 연속으로 사용하면 매번 동일한 O(N) 논리 벡터 평가가 중복해서 일어납니다. 불필요한 `paste0("GROUP")` 호출도 오버헤드를 더합니다.
+**Action:** `which()`를 생략하고 직접 논리 인덱싱(`df$col == "val"`)을 사용하며, 동일한 조건식을 두 번 이상 연속으로 사용할 경우 해당 논리 벡터를 변수에 캐싱(`idx <- df$col == "val"`)하여 여러 번 재사용함으로써 중복된 O(N) 선형 스캔을 피하고 성능을 최적화해야 합니다. 또한 불필요한 문자열 연산을 제거합니다.
+## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
+**Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
+**Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
