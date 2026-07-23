@@ -42,7 +42,7 @@ jobs:
           needs: check
 
       - name: Run R CMD check
-        uses: r-lib/actions/check-r-package@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
+        uses: r-lib/actions/check-r-package@v2
         with:
           args: 'c("--no-manual", "--as-cran")'
           error-on: '"error"'
