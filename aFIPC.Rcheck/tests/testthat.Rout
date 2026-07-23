@@ -1,0 +1,275 @@
+
+R version 4.3.3 (2024-02-29) -- "Angel Food Cake"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(testthat)
+> library(aFIPC)
+>
+> test_check("aFIPC")
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+Checking correspond common item names
+  newformCommonItemNames  to oldformCommonItemNames
+1                      A <<<                      A
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+Checking correspond common item names
+  newformCommonItemNames  to oldformCommonItemNames
+1                      A <<<                      A
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+Checking correspond common item names
+  newformCommonItemNames  to oldformCommonItemNames
+1             new_item_1 <<<             old_item_1
+2             new_item_2 <<<             old_item_2
+3             new_item_3 <<<             old_item_3
+4             new_item_4 <<<             old_item_4
+applying new_item_1 <<< old_item_1 as common item use
+   Newform Parms: 0.689057418292447 -1.03220958416224 0 1
+   Oldform Parms: 0.674102475830901 -1.10778203005959 0 1
+   Linkedform Parms: 0.674102475830901 -1.10778203005959 0 1
+
+applying new_item_2 <<< old_item_2 as common item use
+   Newform Parms: 1.11536732592214 -0.322940894113837 0 1
+   Oldform Parms: 1.07912678437456 -0.378183601236488 0 1
+   Linkedform Parms: 1.07912678437456 -0.378183601236488 0 1
+
+applying new_item_3 <<< old_item_3 as common item use
+   Newform Parms: 1.45623211223432 0.201531764066528 0 1
+   Oldform Parms: 1.20226583324019 0.221623816018471 0 1
+   Linkedform Parms: 1.20226583324019 0.221623816018471 0 1
+
+applying new_item_4 <<< old_item_4 as common item use
+   Newform Parms: 0.988215018535118 0.85056303707673 0 1
+   Oldform Parms: 0.96501042569443 0.962437963185778 0 1
+   Linkedform Parms: 0.96501042569443 0.962437963185778 0 1
+
+
+estimating Linked Form Eq(X) parameters
+   group       item     class   name parnum  value lbound ubound   est const
+1    all new_item_1      dich     a1      1  0.674   -Inf    Inf FALSE  none
+2    all new_item_1      dich      d      2 -1.108   -Inf    Inf FALSE  none
+3    all new_item_1      dich      g      3  0.000      0      1 FALSE  none
+4    all new_item_1      dich      u      4  1.000      0      1 FALSE  none
+5    all new_item_2      dich     a1      5  1.079   -Inf    Inf FALSE  none
+6    all new_item_2      dich      d      6 -0.378   -Inf    Inf FALSE  none
+7    all new_item_2      dich      g      7  0.000      0      1 FALSE  none
+8    all new_item_2      dich      u      8  1.000      0      1 FALSE  none
+9    all new_item_3      dich     a1      9  1.202   -Inf    Inf FALSE  none
+10   all new_item_3      dich      d     10  0.222   -Inf    Inf FALSE  none
+11   all new_item_3      dich      g     11  0.000      0      1 FALSE  none
+12   all new_item_3      dich      u     12  1.000      0      1 FALSE  none
+13   all new_item_4      dich     a1     13  0.965   -Inf    Inf FALSE  none
+14   all new_item_4      dich      d     14  0.962   -Inf    Inf FALSE  none
+15   all new_item_4      dich      g     15  0.000      0      1 FALSE  none
+16   all new_item_4      dich      u     16  1.000      0      1 FALSE  none
+17   all new_item_5      dich     a1     17  0.788   -Inf    Inf  TRUE  none
+18   all new_item_5      dich      d     18 -0.148   -Inf    Inf  TRUE  none
+19   all new_item_5      dich      g     19  0.000      0      1 FALSE  none
+20   all new_item_5      dich      u     20  1.000      0      1 FALSE  none
+21   all new_item_6      dich     a1     21  1.358   -Inf    Inf  TRUE  none
+22   all new_item_6      dich      d     22  0.953   -Inf    Inf  TRUE  none
+23   all new_item_6      dich      g     23  0.000      0      1 FALSE  none
+24   all new_item_6      dich      u     24  1.000      0      1 FALSE  none
+25   all      GROUP GroupPars MEAN_1     25  0.000   -Inf    Inf FALSE  none
+26   all      GROUP GroupPars COV_11     26  1.000      0    Inf FALSE  none
+   nconst prior.type prior_1 prior_2
+1    none       none     NaN     NaN
+2    none       none     NaN     NaN
+3    none       none     NaN     NaN
+4    none       none     NaN     NaN
+5    none       none     NaN     NaN
+6    none       none     NaN     NaN
+7    none       none     NaN     NaN
+8    none       none     NaN     NaN
+9    none       none     NaN     NaN
+10   none       none     NaN     NaN
+11   none       none     NaN     NaN
+12   none       none     NaN     NaN
+13   none       none     NaN     NaN
+14   none       none     NaN     NaN
+15   none       none     NaN     NaN
+16   none       none     NaN     NaN
+17   none       none     NaN     NaN
+18   none       none     NaN     NaN
+19   none       none     NaN     NaN
+20   none       none     NaN     NaN
+21   none       none     NaN     NaN
+22   none       none     NaN     NaN
+23   none       none     NaN     NaN
+24   none       none     NaN     NaN
+25   none       none     NaN     NaN
+26   none       none     NaN     NaN
+with MMLE/EM approach. please be patient.
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+Checking correspond common item names
+  newformCommonItemNames  to oldformCommonItemNames
+1                  Item1 <<<                  Item1
+2                  Item2 <<<                  Item2
+3                  Item3 <<<                  Item3
+4                  Item4 <<<                  Item4
+5                  Item5 <<<                  Item5
+applying Item1 <<< Item1 as common item use
+   Newform Parms: 1.74479587011154 -0.229830303823777 0 1
+   Oldform Parms: 1.23306030131211 1.54699968554366 0 1
+   Linkedform Parms: 1.23306030131211 1.54699968554366 0 1
+
+applying Item2 <<< Item2 as common item use
+   Newform Parms: 2.02730789652665 -0.449959116975887 0 1
+   Oldform Parms: 2.1373738639105 0.434887961243092 0 1
+   Linkedform Parms: 2.1373738639105 0.434887961243092 0 1
+
+applying Item3 <<< Item3 as common item use
+   Newform Parms: 1.16162016294731 -0.950310799362582 0 1
+   Oldform Parms: 0.888002112315578 -1.67066275105325 0 1
+   Linkedform Parms: 0.888002112315578 -1.67066275105325 0 1
+
+applying Item4 <<< Item4 as common item use
+   Newform Parms: 0.88060115182748 -0.519399917717007 0 1
+   Oldform Parms: 0.906233351916562 -0.435615062098089 0 1
+   Linkedform Parms: 0.906233351916562 -0.435615062098089 0 1
+
+applying Item5 <<< Item5 as common item use
+   Newform Parms: 0.647383565020617 1.71624629842243 0 1
+   Oldform Parms: 1.94579958694407 -0.505680005464324 0 1
+   Linkedform Parms: 1.94579958694407 -0.505680005464324 0 1
+
+
+estimating Linked Form Eq(X) parameters
+   group      item     class   name parnum  value lbound ubound   est const
+1    all     Item1      dich     a1      1  1.233   -Inf    Inf FALSE  none
+2    all     Item1      dich      d      2  1.547   -Inf    Inf FALSE  none
+3    all     Item1      dich      g      3  0.000      0      1 FALSE  none
+4    all     Item1      dich      u      4  1.000      0      1 FALSE  none
+5    all     Item2      dich     a1      5  2.137   -Inf    Inf FALSE  none
+6    all     Item2      dich      d      6  0.435   -Inf    Inf FALSE  none
+7    all     Item2      dich      g      7  0.000      0      1 FALSE  none
+8    all     Item2      dich      u      8  1.000      0      1 FALSE  none
+9    all     Item3      dich     a1      9  0.888   -Inf    Inf FALSE  none
+10   all     Item3      dich      d     10 -1.671   -Inf    Inf FALSE  none
+11   all     Item3      dich      g     11  0.000      0      1 FALSE  none
+12   all     Item3      dich      u     12  1.000      0      1 FALSE  none
+13   all     Item4      dich     a1     13  0.906   -Inf    Inf FALSE  none
+14   all     Item4      dich      d     14 -0.436   -Inf    Inf FALSE  none
+15   all     Item4      dich      g     15  0.000      0      1 FALSE  none
+16   all     Item4      dich      u     16  1.000      0      1 FALSE  none
+17   all     Item5      dich     a1     17  1.946   -Inf    Inf FALSE  none
+18   all     Item5      dich      d     18 -0.506   -Inf    Inf FALSE  none
+19   all     Item5      dich      g     19  0.000      0      1 FALSE  none
+20   all     Item5      dich      u     20  1.000      0      1 FALSE  none
+21   all  NewItem6      dich     a1     21  1.626   -Inf    Inf  TRUE  none
+22   all  NewItem6      dich      d     22 -0.835   -Inf    Inf  TRUE  none
+23   all  NewItem6      dich      g     23  0.000      0      1 FALSE  none
+24   all  NewItem6      dich      u     24  1.000      0      1 FALSE  none
+25   all  NewItem7      dich     a1     25  0.877   -Inf    Inf  TRUE  none
+26   all  NewItem7      dich      d     26  0.003   -Inf    Inf  TRUE  none
+27   all  NewItem7      dich      g     27  0.000      0      1 FALSE  none
+28   all  NewItem7      dich      u     28  1.000      0      1 FALSE  none
+29   all  NewItem8      dich     a1     29  1.539   -Inf    Inf  TRUE  none
+30   all  NewItem8      dich      d     30 -0.276   -Inf    Inf  TRUE  none
+31   all  NewItem8      dich      g     31  0.000      0      1 FALSE  none
+32   all  NewItem8      dich      u     32  1.000      0      1 FALSE  none
+33   all  NewItem9      dich     a1     33  1.153   -Inf    Inf  TRUE  none
+34   all  NewItem9      dich      d     34 -1.580   -Inf    Inf  TRUE  none
+35   all  NewItem9      dich      g     35  0.000      0      1 FALSE  none
+36   all  NewItem9      dich      u     36  1.000      0      1 FALSE  none
+37   all NewItem10      dich     a1     37  2.227   -Inf    Inf  TRUE  none
+38   all NewItem10      dich      d     38 -0.474   -Inf    Inf  TRUE  none
+39   all NewItem10      dich      g     39  0.000      0      1 FALSE  none
+40   all NewItem10      dich      u     40  1.000      0      1 FALSE  none
+41   all     GROUP GroupPars MEAN_1     41  0.000   -Inf    Inf  TRUE  none
+42   all     GROUP GroupPars COV_11     42  1.000      0    Inf  TRUE  none
+   nconst prior.type prior_1 prior_2
+1    none       none     NaN     NaN
+2    none       none     NaN     NaN
+3    none       none     NaN     NaN
+4    none       none     NaN     NaN
+5    none       none     NaN     NaN
+6    none       none     NaN     NaN
+7    none       none     NaN     NaN
+8    none       none     NaN     NaN
+9    none       none     NaN     NaN
+10   none       none     NaN     NaN
+11   none       none     NaN     NaN
+12   none       none     NaN     NaN
+13   none       none     NaN     NaN
+14   none       none     NaN     NaN
+15   none       none     NaN     NaN
+16   none       none     NaN     NaN
+17   none       none     NaN     NaN
+18   none       none     NaN     NaN
+19   none       none     NaN     NaN
+20   none       none     NaN     NaN
+21   none       none     NaN     NaN
+22   none       none     NaN     NaN
+23   none       none     NaN     NaN
+24   none       none     NaN     NaN
+25   none       none     NaN     NaN
+26   none       none     NaN     NaN
+27   none       none     NaN     NaN
+28   none       none     NaN     NaN
+29   none       none     NaN     NaN
+30   none       none     NaN     NaN
+31   none       none     NaN     NaN
+32   none       none     NaN     NaN
+33   none       none     NaN     NaN
+34   none       none     NaN     NaN
+35   none       none     NaN     NaN
+36   none       none     NaN     NaN
+37   none       none     NaN     NaN
+38   none       none     NaN     NaN
+39   none       none     NaN     NaN
+40   none       none     NaN     NaN
+41   none       none     NaN     NaN
+42   none       none     NaN     NaN
+with MMLE/EM approach. please be patient.
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+automated Fixed Item Parameter Calibration: aFIPC 0.2
+Seongho Bae (seongho@kw.ac.kr)
+
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 55 ]
+>
+> proc.time()
+   user  system elapsed
+ 23.064  16.334  39.382
