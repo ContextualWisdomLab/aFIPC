@@ -22,3 +22,6 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
+^\.semgrepignore$
+^\.\.Rcheck$
+^\.\.Rcheck/.*
