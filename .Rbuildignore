@@ -22,3 +22,14 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
+^.*\.semgrepignore$
+^.*\.yamllint\.yml$
+^.*\.gitleaks\.toml$
+^.*trivy\.yaml$
+^.*CLAUDE\.md$
+^.*\.jules.*$
+^.*\.Jules.*$
+^.*AGENTS\.md$
+^.*ARCHITECTURE\.md$
+^.*CONTRIBUTING\.md$
+^.*\.github.*$
