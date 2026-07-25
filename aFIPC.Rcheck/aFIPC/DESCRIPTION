@@ -15,5 +15,5 @@ Encoding: UTF-8
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-07-25 16:50:44 UTC; jules
-Built: R 4.3.3; ; 2026-07-25 16:50:46 UTC; unix
+Packaged: 2026-07-25 17:06:25 UTC; jules
+Built: R 4.3.3; ; 2026-07-25 17:06:27 UTC; unix
