@@ -82,3 +82,39 @@ test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
     "could not estimate a valid model after bounded recovery attempts"
   )
 })
+
+test_that("surveyFA correctly finds minimum variance item", {
+  skip_if_not_installed("mirt")
+
+  raw <- as.data.frame(
+    mirt::simdata(
+      a = matrix(c(1.00, 1.20, 0.95), ncol = 1),
+      d = c(-1.0, -0.45, -0.10),
+      itemtype = rep("2PL", 3),
+      N = 100
+    )
+  )
+  names(raw) <- c("item1", "item2", "item3")
+
+  # Inject an item with almost zero variance to trigger var() min path
+  raw$item3 <- rep(0, nrow(raw))
+  raw$item3[1] <- 1
+  raw$item3[2] <- 2
+  raw$item3[3] <- 3
+
+  expect_error(
+    suppressWarnings(
+      aFIPC::surveyFA(
+        data = raw,
+        autofix = TRUE,
+        forceUIRT = TRUE,
+        itemtype = "2PL",
+        maxItemRemovals = 1,
+        forceNormalEM = TRUE,
+        SE = TRUE,
+        pThreshold = 0.000000001
+      )
+    ),
+    "could not estimate a valid model after bounded recovery attempts"
+  )
+})
