@@ -598,30 +598,30 @@ autoFIPC <-
     # Preserve mirt's structural estimability flags. Forcing every row TRUE
     # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
 
-    NewScaleParms$est[NewScaleParms$item == 'GROUP'] <- FALSE
-    OldScaleParms$est[OldScaleParms$item == 'GROUP'] <- FALSE
+    NewScaleParms[NewScaleParms$item == 'GROUP', "est"] <- FALSE
+    OldScaleParms[OldScaleParms$item == 'GROUP', "est"] <- FALSE
 
-    NewScaleParms$est[NewScaleParms$name == "COV_11"] <- TRUE
-    OldScaleParms$est[OldScaleParms$name == "COV_11"] <- TRUE
+    NewScaleParms[NewScaleParms$name == "COV_11", "est"] <- TRUE
+    OldScaleParms[OldScaleParms$name == "COV_11", "est"] <- TRUE
 
     if (itemtype == 'Rasch') {
-      NewScaleParms$est[NewScaleParms$name == "a1"] <- FALSE
-      OldScaleParms$est[OldScaleParms$name == "a1"] <- FALSE
+      NewScaleParms[NewScaleParms$name == "a1", "est"] <- FALSE
+      OldScaleParms[OldScaleParms$name == "a1", "est"] <- FALSE
     }
 
     #IPD
     if (checkIPD == T) {
       # config
       IPDgroup <-
-        factor(c(
+        as.factor(c(
           rep('oldForm', nrow(oldformYDataK)),
           rep('newForm', nrow(newformXDataK))
-        ), levels = c('oldForm', 'newForm'))
+        ))
       IPDItemCount <- 0
 
       # IPD target item checking
-      newFormColNames <- intersect(colnames(newformXDataK), colnames(newFormModel@Data$data))
-      oldFormColNames <- intersect(colnames(oldformYDataK), colnames(oldFormModel@Data$data))
+      newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
+      oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
       # ⚡ Bolt: Vectorized match() to avoid dynamic array growth overhead inside a for loop
       idxNew <- match(newformCommonItemNames, newFormColNames)
@@ -749,8 +749,8 @@ autoFIPC <-
       }
     }
 
-    newFormColNames <- intersect(colnames(newformXDataK), colnames(newFormModel@Data$data))
-    oldFormColNames <- intersect(colnames(oldformYDataK), colnames(oldFormModel@Data$data))
+    newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
+    oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
     # ⚡ Bolt: Cache parameter indices to avoid O(N) linear search inside loop
     newScaleParmsItemIdxCache <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)
@@ -786,14 +786,14 @@ autoFIPC <-
         oldIdx <- oldScaleParmsItemIdxCache[[oldFormItemStr]]
 
         # ⚡ Bolt: Remove unnecessary paste0() array string generation overhead
-        message('   Newform Parms: ', paste(NewScaleParms$value[newIdx], collapse = ' '))
-        message('   Oldform Parms: ', paste(OldScaleParms$value[oldIdx], collapse = ' '))
+        message('   Newform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '))
+        message('   Oldform Parms: ', paste(OldScaleParms[oldIdx, "value"], collapse = ' '))
 
-        NewScaleParms$value[newIdx] <-
-          OldScaleParms$value[oldIdx]
-        message('   Linkedform Parms: ', paste(NewScaleParms$value[newIdx], collapse = ' '), '\n')
+        NewScaleParms[newIdx, "value"] <-
+          OldScaleParms[oldIdx, "value"]
+        message('   Linkedform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '), '\n')
 
-        NewScaleParms$est[newIdx] <-
+        NewScaleParms[newIdx, "est"] <-
           FALSE
       } else {
         message(
@@ -813,9 +813,9 @@ autoFIPC <-
       newBetaIdx <- NewScaleParms$item == 'BETA'
       oldBetaIdx <- OldScaleParms$item == 'BETA'
 
-      NewScaleParms$value[newBetaIdx] <-
-        OldScaleParms$value[oldBetaIdx]
-      NewScaleParms$est[newBetaIdx] <-
+      NewScaleParms[newBetaIdx, "value"] <-
+        OldScaleParms[oldBetaIdx, "value"]
+      NewScaleParms[newBetaIdx, "est"] <-
         FALSE
 
       message('applying BETA parameter as linking')
@@ -858,13 +858,13 @@ autoFIPC <-
       new_mean11_idx <- NewScaleParms$name == "MEAN_11"
       old_mean11_idx <- OldScaleParms$name == "MEAN_11"
 
-      NewScaleParms$est[new_cov11_idx] <- FALSE
-      OldScaleParms$est[old_cov11_idx] <- FALSE
-      NewScaleParms$est[new_mean11_idx] <- FALSE
-      OldScaleParms$est[old_mean11_idx] <- FALSE
+      NewScaleParms[new_cov11_idx, "est"] <- FALSE
+      OldScaleParms[old_cov11_idx, "est"] <- FALSE
+      NewScaleParms[new_mean11_idx, "est"] <- FALSE
+      OldScaleParms[old_mean11_idx, "est"] <- FALSE
 
-      NewScaleParms$value[new_cov11_idx] <- 1
-      OldScaleParms$value[old_mean11_idx] <- 0
+      NewScaleParms[new_cov11_idx, "value"] <- 1
+      OldScaleParms[old_mean11_idx, "value"] <- 0
     }
     if (freeMEAN == T) {
       LinkedModelSyntax <-
@@ -875,8 +875,8 @@ autoFIPC <-
           'MEAN = F1'
         ))
 
-      NewScaleParms$est[NewScaleParms$name == "MEAN_1"] <- TRUE
-      OldScaleParms$est[OldScaleParms$name == "MEAN_1"] <- TRUE
+      NewScaleParms[NewScaleParms$name == "MEAN_1", "est"] <- TRUE
+      OldScaleParms[OldScaleParms$name == "MEAN_1", "est"] <- TRUE
     } else {
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
