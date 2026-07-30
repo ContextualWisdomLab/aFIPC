@@ -141,7 +141,10 @@ autoFIPC <-
       }
       for (attempt in seq_len(3)) {
         n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-        if (grepl("^[0-9]+$", n)) {
+        # 🛡️ Sentinel Security Context:
+        # Strictly bound input to exactly '1' or '2' to prevent integer overflow
+        # where large numbers coerce to NA and cause unhandled condition crashes.
+        if (grepl("^[12]$", n)) {
           return(as.integer(n))
         }
       }
@@ -171,7 +174,10 @@ autoFIPC <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
+            # 🛡️ Sentinel Security Context:
+            # Strictly bound input to exactly '1' or '2' to prevent integer overflow
+            # where large numbers coerce to NA and cause unhandled condition crashes.
+            if (grepl("^[12]$", n)) {
               return(as.integer(n))
             }
           }
@@ -390,7 +396,10 @@ autoFIPC <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
+            # 🛡️ Sentinel Security Context:
+            # Strictly bound input to exactly '1' or '2' to prevent integer overflow
+            # where large numbers coerce to NA and cause unhandled condition crashes.
+            if (grepl("^[12]$", n)) {
               return(as.integer(n))
             }
           }
