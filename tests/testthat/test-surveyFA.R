@@ -82,3 +82,49 @@ test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
     "could not estimate a valid model after bounded recovery attempts"
   )
 })
+
+test_that("surveyFA input validation errors", {
+  dat <- data.frame(a=c(1,0,1), b=c(0,1,1))
+  expect_error(surveyFA(data=dat, autofix="TRUE"), "Security Error: autofix must be a single non-NA logical value")
+  expect_error(surveyFA(data=dat, forceUIRT=FALSE), "surveyFA requires forceUIRT=TRUE")
+  expect_error(surveyFA(data=123), "surveyFA requires a response matrix or data frame")
+  expect_error(surveyFA(data=dat, itemtype=123), "surveyFA requires itemtype to be a single non-NA character value")
+  expect_error(surveyFA(data=dat, maxItemRemovals="3"), "surveyFA requires maxItemRemovals to be a non-negative numeric scalar")
+  expect_error(surveyFA(data=dat, pThreshold=2), "surveyFA requires pThreshold to be in \\(0, 1\\]")
+})
+
+test_that("surveyFA method fallbacks", {
+  dat <- data.frame(a=c(1,0,1,0), b=c(0,1,1,1), c=c(0,0,1,1))
+
+  mock_mirt <- function(data, model, itemtype, SE, GenRandomPars, method, technical, empiricalhist=FALSE) {
+    if (method == "QMCEM") stop("Forced QMCEM error")
+    if (method == "MHRM") stop("Forced MHRM error")
+    if (method == "EM") {
+       mod <- new("SingleGroupClass")
+       mod@OptimInfo$converged <- TRUE
+       mod@Fit$logLik <- -100
+       mod@OptimInfo$secondordertest <- TRUE
+       mod@vcov <- matrix(1, 3, 3)
+       return(mod)
+    }
+  }
+
+  testthat::local_mocked_bindings(mirt = mock_mirt, .package = "mirt")
+
+  # When forceNormalEM = TRUE, it tries EM first and succeeds.
+  suppressWarnings(res <- surveyFA(dat, forceNormalEM = TRUE, SE = TRUE))
+  expect_true(inherits(res, "SingleGroupClass"))
+
+  # When unstable = TRUE, it tries QMCEM (fails), MHRM (fails), EM (succeeds)
+  suppressWarnings(res2 <- surveyFA(dat, unstable = TRUE, SE = TRUE))
+  expect_true(inherits(res2, "SingleGroupClass"))
+
+  # Test autofix branch where EM fails and we need to drop items
+  mock_mirt_fail <- function(...) { stop("All fail") }
+  mock_itemfit <- function(...) { data.frame(p.value=c(0.01, 0.5, 0.5), row.names=c("a","b","c")) }
+
+  testthat::local_mocked_bindings(mirt = mock_mirt_fail, .package = "mirt")
+  testthat::local_mocked_bindings(itemfit = mock_itemfit, .package = "mirt")
+
+  expect_error(suppressWarnings(surveyFA(dat, maxItemRemovals=1)), "surveyFA fallback could not estimate a valid model")
+})
