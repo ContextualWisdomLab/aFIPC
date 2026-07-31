@@ -24,3 +24,17 @@
 ^trivy\.yaml$
 ^test_.*\.R$
 ^\.semgrepignore$
+^packrat/
+^\.git/
+^\..*Rcheck/
+^actionlint
+^gitleaks
+^.*\.tar\.gz$
+^.*_checksums\.txt$
+^AGENTS\.md$
+^ARCHITECTURE\.md$
+^CLAUDE\.md$
+^CONTRIBUTING\.md$
+^aFIPC\.Rproj$
+^docs/
+^trivy\.yaml$
