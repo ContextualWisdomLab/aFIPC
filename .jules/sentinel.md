@@ -12,3 +12,8 @@
 **Vulnerability:** Inadvertently committing `.tar.gz` and extracted binaries (like `actionlint` or `gitleaks`) into the repository.
 **Learning:** During test runs or script execution, tools might be downloaded into the root directory. If the tree isn't cleaned up (or if they are not explicitly gitignored), they can accidentally be committed via blind `git commit -a` or tracked if created locally.
 **Prevention:** Avoid explicitly `git add`ing them. Also, use temporary directories to download binaries instead of the repo root or make sure to delete them after use.
+
+## 2026-08-01 - Delete temporary binaries and archives after use
+**Vulnerability:** Inadvertently leaving downloaded script files and archives (like `actionlint` or `gitleaks`) in the repository during agent runs.
+**Learning:** Tools or archives downloaded during intermediate verification steps (like linting or secrets scanning) can persist and cause unexpected CI verification failures (like R CMD check reporting undeclared executable files).
+**Prevention:** Remove any downloaded temporary files (e.g., `rm actionlint actionlint_1.7.10_linux_amd64.tar.gz`) from the repository root immediately after their respective tasks are completed.
