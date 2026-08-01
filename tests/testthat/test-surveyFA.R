@@ -82,3 +82,85 @@ test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
     "could not estimate a valid model after bounded recovery attempts"
   )
 })
+
+test_that("surveyFA properly triggers fallback when autofix is disabled and covers item removal", {
+  skip_if_not_installed("mirt")
+  set.seed(20260702)
+
+  # Intentionally messy data to force failure on standard methods
+  raw <- as.data.frame(
+    matrix(
+      c(rep(1, 20), rep(0, 20), rbinom(160, 1, 0.5)),
+      ncol = 5
+    )
+  )
+  names(raw) <- paste0("item", 1:5)
+  raw$item6 <- 0 # Constant column
+
+  # Force failure without autofix
+  expect_error(
+    suppressWarnings(
+      aFIPC::surveyFA(
+        data = raw,
+        autofix = FALSE,
+        forceUIRT = TRUE,
+        forceNormalEM = FALSE,
+        forceMHRM = TRUE, # Cover forceMHRM branch
+        unstable = FALSE,
+        SE = TRUE,
+        itemtype = "2PL",
+        maxItemRemovals = 2
+      )
+    ),
+    "could not estimate a valid model after bounded recovery attempts"
+  )
+
+  # Trigger unstable branch and force NormalEM=FALSE
+  expect_error(
+     suppressWarnings(
+        aFIPC::surveyFA(
+          data = raw,
+          autofix = TRUE,
+          forceUIRT = TRUE,
+          forceNormalEM = FALSE,
+          forceMHRM = FALSE,
+          unstable = FALSE,
+          SE = TRUE,
+          itemtype = "2PL",
+          maxItemRemovals = 2
+        )
+      ),
+      "could not estimate a valid model after bounded recovery attempts"
+  )
+
+  # Trigger legacy forceUIRT warning
+  expect_error(
+    aFIPC::surveyFA(data=raw, forceUIRT = FALSE),
+    "surveyFA requires forceUIRT=TRUE"
+  )
+
+  # Check invalid itemtype
+  expect_error(
+    aFIPC::surveyFA(data=raw, itemtype = c("2PL", "3PL")),
+    "surveyFA requires itemtype to be a single non-NA character value"
+  )
+
+  # Check invalid maxItemRemovals
+  expect_error(
+    aFIPC::surveyFA(data=raw, maxItemRemovals = -1),
+    "surveyFA requires maxItemRemovals to be a non-negative numeric scalar"
+  )
+
+  # Check invalid pThreshold
+  expect_error(
+    aFIPC::surveyFA(data=raw, pThreshold = 1.5),
+    "surveyFA requires pThreshold to be in \\(0, 1\\]"
+  )
+
+  # Check insufficient non-constant columns
+  bad_raw <- data.frame(item1 = rep(1, 10), item2 = rep(2, 10))
+  expect_error(
+    aFIPC::surveyFA(bad_raw, forceUIRT=TRUE),
+    "surveyFA needs at least two non-constant response columns"
+  )
+})
