@@ -19,3 +19,6 @@
 ## 2024-08-01 - R 언어에서 최솟값(또는 최댓값) 검색 시 sort() 대신 which.min() / which.max() 사용으로 선형 검색 최적화
 **Learning:** R에서 최솟값(또는 최댓값)을 가지는 원소나 해당 원소의 이름을 찾을 때, `sort(x)[1]` 또는 `names(sort(x))[1]`를 사용하면 O(N log N)의 시간 복잡도를 가지는 전체 정렬 오버헤드가 발생하여 불필요하게 성능이 저하됩니다.
 **Action:** 전체 정렬 대신 `which.min(x)` 또는 `which.max(x)`를 사용하여 (예: `names(x)[which.min(x)]`), O(N)의 선형 시간 복잡도로 즉각 최솟값/최댓값을 찾을 수 있도록 최적화해야 합니다.
+## 2024-08-01 - R CMD check의 Non-standard files/directories found at top level 오류 해결
+**Learning:** `R CMD check` 실행 시 저장소 루트(top level)에 패키지와 무관한 스크립트 파일(`test_dummy.R`, `test_validation.R`)이나 설정 파일(`.semgrepignore`)이 있을 경우 `Non-standard files/directories found at top level`이라는 `NOTE`를 발생시킵니다.
+**Action:** 패키지 구성 요소가 아닌 루트 경로의 추가 파일이나 디렉토리(예: `test_dummy.R`, `test_validation.R`, `.semgrepignore`)는 `.Rbuildignore` 파일에 정규식으로 등록(`^test_dummy\.R$`)하여 패키지 빌드 및 검사 과정에서 무시하도록 처리해야 합니다.
