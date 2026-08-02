@@ -1,1 +1,4 @@
-packrat/**
+# Semgrep ignore file
+packrat/
+tests/
+.github/dependabot.yml
