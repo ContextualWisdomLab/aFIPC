@@ -30,7 +30,7 @@ jobs:
       - name: Lint markdown docs
         run: |
           npm install -g markdownlint-cli2@0.18.1
-          markdownlint-cli2 README.md AGENTS.md ARCHITECTURE.md CLAUDE.md CONTRIBUTING.md .github/**/*.md docs/**/*.md
+          markdownlint-cli2 README.md AGENTS.md ARCHITECTURE.md CLAUDE.md CONTRIBUTING.md .github/**/*.md docs/**/*.md .jules/*.md
 
       - name: Lint GitHub workflows
         run: |
