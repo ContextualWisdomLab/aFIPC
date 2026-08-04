@@ -91,7 +91,7 @@ Applies to every agent (Claude, Codex, Cursor, opencode, ...) working in this re
   DOM-decomposes emails and files into a persisted knowledge graph). Every
   component is a **standalone program that must ALSO work as a git submodule**,
   grown separately and together.
-- Sibling components: **waf-ids-ai-soc** (WAF/IDS/AI SOC/LB/APIM),
+- Sibling components: **wardnet** (WAF/IDS/AI SOC/LB/APIM),
   **clearfolio** (document viewer), **pg-erd-cloud** (ERD tool),
   **contextual-orchestrator** (LLM cost/perf/upstream-LB gateway, beyond
   LiteLLM), **codec-carver** (STT/omni-modal speech-video codec),
