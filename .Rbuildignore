@@ -20,4 +20,9 @@
 ^\.jules/
 ^docs/
 ^trivy\.yaml$
+^packrat$
+^packrat/
+^\.semgrepignore$
+^\.markdownlint\.yaml$
+^packrat$
 ^packrat/
