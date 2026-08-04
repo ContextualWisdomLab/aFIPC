@@ -38,8 +38,11 @@ jobs:
       # ponytail: source-build stringfish BEFORE dependency setup — packages built
       # from source during install (e.g. SimDesign) load it at build time and die
       # on the broken prebuilt binary (oneTBB ABI skew). Drop with the step below.
+      # repos= is explicit because R_PROFILE_USER=/dev/null blanks setup-r's repos.
       - name: Source-build stringfish (RcppParallel oneTBB ABI skew)
-        run: Rscript -e 'install.packages("stringfish", type = "source")'
+        run: >-
+          Rscript -e 'install.packages("stringfish", type = "source",
+          repos = "https://cloud.r-project.org")'
 
       - name: Set up R package dependencies
         uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
@@ -54,7 +57,7 @@ jobs:
       - name: Rebuild RcppParallel-linked packages from source (oneTBB ABI skew)
         run: >-
           Rscript -e 'bad <- tools::dependsOnPkgs("RcppParallel", dependencies = "LinkingTo");
-          if (length(bad)) install.packages(bad, type = "source")'
+          if (length(bad)) install.packages(bad, type = "source", repos = "https://cloud.r-project.org")'
 
       - name: Run R CMD check
         uses: r-lib/actions/check-r-package@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
