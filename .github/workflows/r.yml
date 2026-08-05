@@ -37,6 +37,12 @@ jobs:
           r-version: release
           use-public-rspm: true
 
+      - name: Disable needrestart
+        run: |
+          sudo mkdir -p /etc/needrestart/conf.d
+          echo "$nrconf{restart} = 'a';" | sudo tee /etc/needrestart/conf.d/99-disable.conf
+          echo "$nrconf{ui} = 'NonInteractive';" | sudo tee -a /etc/needrestart/conf.d/99-disable.conf
+
       - name: Set up R package dependencies
         uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
         with:
