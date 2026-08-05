@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       R_PROFILE_USER: /dev/null
+      NEEDRESTART_MODE: a
+      DEBIAN_FRONTEND: noninteractive
 
     steps:
       - name: Harden runner
