@@ -31,3 +31,5 @@
 ^gitleaks_checksums\.txt$
 ^actionlint_.*
 ^gitleaks_.*
+^tests/testthat/_snaps$
+^tests/testthat/_snaps/.*
