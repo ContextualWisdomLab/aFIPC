@@ -790,7 +790,7 @@ autoFIPC <-
         message('   Oldform Parms: ', paste(OldScaleParms[oldIdx, "value"], collapse = ' '))
 
         NewScaleParms$value[newIdx] <-
-          OldScaleParms$value[oldIdx]
+          OldScaleParms[oldIdx, "value"]
         message('   Linkedform Parms: ', paste(NewScaleParms[newIdx, "value"], collapse = ' '), '\n')
 
         NewScaleParms$est[newIdx] <-
@@ -814,7 +814,7 @@ autoFIPC <-
       oldBetaIdx <- OldScaleParms$item == 'BETA'
 
       NewScaleParms$value[newBetaIdx] <-
-        OldScaleParms$value[oldBetaIdx]
+        OldScaleParms[oldBetaIdx, "value"]
       NewScaleParms$est[newBetaIdx] <-
         FALSE
 
