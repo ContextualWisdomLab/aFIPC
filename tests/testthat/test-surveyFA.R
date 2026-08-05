@@ -58,8 +58,26 @@ test_that("surveyFA validates boolean control flags before estimator dispatch", 
   )
 })
 
+test_that("minimum named selection preserves prior sort semantics", {
+  normalized_cases <- list(
+    c(item_a = 0.40, item_b = 0.10, item_c = 0.30),
+    c(item_a = 0.10, item_b = 0.10, item_c = 0.20),
+    c(item_a = 1.00, item_b = 0.20, item_c = 1.00),
+    c(item_a = -0.50, item_b = 0.00, item_c = 0.50)
+  )
+
+  for (p_values in normalized_cases) {
+    prior_candidate <- names(sort(p_values, decreasing = FALSE))[1L]
+    expect_identical(
+      aFIPC:::.minimum_named_value(p_values),
+      prior_candidate
+    )
+  }
+})
+
 test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
   skip_if_not_installed("mirt")
+  set.seed(20260726)
 
   raw <- as.data.frame(
     matrix(
@@ -83,8 +101,9 @@ test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
   )
 })
 
-test_that("surveyFA correctly finds minimum variance item", {
+test_that("surveyFA removes the minimum-variance binary item", {
   skip_if_not_installed("mirt")
+  set.seed(20260727)
 
   raw <- as.data.frame(
     mirt::simdata(
@@ -96,11 +115,9 @@ test_that("surveyFA correctly finds minimum variance item", {
   )
   names(raw) <- c("item1", "item2", "item3")
 
-  # Inject an item with almost zero variance to trigger var() min path
-  raw$item3 <- rep(0, nrow(raw))
-  raw$item3[1] <- 1
-  raw$item3[2] <- 2
-  raw$item3[3] <- 3
+  # Keep the 2PL input binary while making item3 the deterministic variance minimum.
+  raw$item3 <- rep(0L, nrow(raw))
+  raw$item3[1:3] <- 1L
 
   expect_error(
     suppressWarnings(
@@ -115,6 +132,6 @@ test_that("surveyFA correctly finds minimum variance item", {
         pThreshold = 0.000000001
       )
     ),
-    "could not estimate a valid model after bounded recovery attempts"
+    "could not estimate a valid model after bounded recovery attempts.*Removed items: item3"
   )
 })
