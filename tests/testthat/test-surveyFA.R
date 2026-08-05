@@ -73,6 +73,10 @@ test_that("minimum named selection preserves prior sort semantics", {
       prior_candidate
     )
   }
+  expect_identical(
+    aFIPC:::.minimum_named_value(setNames(numeric(), character())),
+    NA_character_
+  )
 })
 
 test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
