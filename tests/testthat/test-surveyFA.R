@@ -62,9 +62,11 @@ test_that("minimum named selection preserves prior sort semantics", {
   normalized_cases <- list(
     c(item_a = 0.40, item_b = 0.10, item_c = 0.30),
     c(item_a = 0.10, item_b = 0.10, item_c = 0.20),
-    c(item_a = 1.00, item_b = 0.20, item_c = 1.00),
     c(item_a = -0.50, item_b = 0.00, item_c = 0.50)
   )
+  missing_case <- c(item_a = NA_real_, item_b = 0.20, item_c = 0.30)
+  missing_case[is.na(missing_case)] <- 1
+  normalized_cases[[length(normalized_cases) + 1L]] <- missing_case
 
   for (p_values in normalized_cases) {
     prior_candidate <- names(sort(p_values, decreasing = FALSE))[1L]
