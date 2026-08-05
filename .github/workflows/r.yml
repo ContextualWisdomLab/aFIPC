@@ -40,10 +40,6 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          # Invalidate the pre-RcppParallel 6/TBB ABI cache cohort. A prefix
-          # restore kept stringfish linked to the old TBB after RcppParallel
-          # upgraded, causing SimDesign to fail during lazy loading.
-          cache-version: "2"
 
       - name: Run R CMD check
         uses: r-lib/actions/check-r-package@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
