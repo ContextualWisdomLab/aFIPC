@@ -22,14 +22,3 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
-^\.semgrepignore$
-^actionlint$
-^actionlint_1\.7\.10_linux_amd64\.tar\.gz$
-^actionlint_checksums\.txt$
-^gitleaks$
-^gitleaks_8\.24\.2_linux_x64\.tar\.gz$
-^gitleaks_checksums\.txt$
-^actionlint_.*
-^gitleaks_.*
-^tests/testthat/_snaps$
-^tests/testthat/_snaps/.*
