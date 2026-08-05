@@ -25,3 +25,12 @@
 ^\.semgrepignore$
 ^actionlint_.*$
 ^gitleaks_.*$
+^actionlint_.*$
+^gitleaks_.*$
+^gitleaks$
+^actionlint$
+^\.semgrepignore$
+^actionlint_.*$
+^gitleaks_.*$
+^gitleaks$
+^actionlint$
