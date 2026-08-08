@@ -864,7 +864,7 @@ autoFIPC <-
       OldScaleParms$est[old_mean11_idx] <- FALSE
 
       NewScaleParms$value[new_cov11_idx] <- 1
-      OldScaleParms$value[old_mean11_idx] <- 0
+      NewScaleParms$value[new_mean11_idx] <- 0
     }
     if (freeMEAN == T) {
       LinkedModelSyntax <-
