@@ -1,6 +1,6 @@
 name: Security Audit (private-safe)
 
-on:
+"on":
   push:
     branches: ["master", "main"]
   pull_request:
