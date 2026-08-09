@@ -89,3 +89,24 @@ test_that("autoFIPC validates input types securely", {
     "Security Error: tryEM must be a single non-NA logical value"
   )
 })
+
+test_that("binary prompt choices reject overflow and malformed values", {
+  expect_identical(aFIPC:::parseBinaryChoice("1"), 1L)
+  expect_identical(aFIPC:::parseBinaryChoice("2"), 2L)
+
+  invalid_values <- list(
+    "0",
+    "3",
+    "01",
+    "2147483648",
+    paste0(strrep("9", 10000L)),
+    "1\n2",
+    "",
+    NA_character_,
+    c("1", "2"),
+    1
+  )
+  for (value in invalid_values) {
+    expect_identical(aFIPC:::parseBinaryChoice(value), NA_integer_)
+  }
+})
