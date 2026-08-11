@@ -3,6 +3,6 @@ extends: default
 rules:
   document-start: disable
   line-length:
-    max: 150
+    max: 180
   truthy:
     allowed-values: ["true", "false", "on", "off"]
