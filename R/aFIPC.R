@@ -615,7 +615,7 @@ autoFIPC <-
       # ⚡ Bolt: Use explicit factor() with levels instead of as.factor() to avoid automatic level inference overhead
       IPDgroup <- factor(
         rep(c('oldForm', 'newForm'), c(nrow(oldformYDataK), nrow(newformXDataK))),
-        levels = c('oldForm', 'newForm')
+        levels = c('newForm', 'oldForm')
       )
       IPDItemCount <- 0
 
