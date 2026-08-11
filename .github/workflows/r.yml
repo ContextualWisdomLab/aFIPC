@@ -66,7 +66,8 @@ jobs:
             R CMD INSTALL "$archive"
             rm -f "$archive"
 
-            Rscript -e "stopifnot(as.character(packageVersion('$package')) == '$version'); cat(normalizePath(find.package('$package')), '\n')"
+            Rscript -e \
+              "stopifnot(as.character(packageVersion('$package')) == '$version'); cat(normalizePath(find.package('$package')), '\n')"
           }
 
           install_verified_source \
