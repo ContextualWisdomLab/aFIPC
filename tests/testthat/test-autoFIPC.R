@@ -89,3 +89,27 @@ test_that("autoFIPC validates input types securely", {
     "Security Error: tryEM must be a single non-NA logical value"
   )
 })
+
+test_that("autoFIPC factors missing common items", {
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = data.frame(A=1),
+      oldformYData = data.frame(A=2),
+      newformCommonItemNames = c('A', 'B'),
+      oldformCommonItemNames = c('A')
+    ),
+    "Common Items are not equal"
+  )
+})
+
+test_that("autoFIPC catches 0 length common items", {
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = data.frame(A=1),
+      oldformYData = data.frame(A=2),
+      newformCommonItemNames = character(0),
+      oldformCommonItemNames = character(0)
+    ),
+    "Please provide common item names"
+  )
+})

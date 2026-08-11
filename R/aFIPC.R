@@ -612,11 +612,11 @@ autoFIPC <-
     #IPD
     if (checkIPD == T) {
       # config
-      IPDgroup <-
-        as.factor(c(
-          rep('oldForm', nrow(oldformYDataK)),
-          rep('newForm', nrow(newformXDataK))
-        ))
+      # ⚡ Bolt: Use explicit factor() with levels instead of as.factor() to avoid automatic level inference overhead
+      IPDgroup <- factor(
+        rep(c('oldForm', 'newForm'), c(nrow(oldformYDataK), nrow(newformXDataK))),
+        levels = c('oldForm', 'newForm')
+      )
       IPDItemCount <- 0
 
       # IPD target item checking
@@ -1044,7 +1044,9 @@ autoFIPC <-
     modelReturn$ThetaNewform <- ThetaNewform
     modelReturn$ThetaLinkedform <- ThetaLinkedform
     if (checkIPD) {
-      modelReturn$IPDData <- data.frame(IPDData, IPDgroup)
+      # ⚡ Bolt: Append column using direct list assignment instead of O(N) data.frame() concatenation
+      modelReturn$IPDData <- IPDData
+      modelReturn$IPDData$IPDgroup <- IPDgroup
       if (exists('CommonItemList_NOIPD', inherits = FALSE)) {
         modelReturn$IPDCommonItemList <- IPDItemList[CommonItemList_NOIPD]
       }
