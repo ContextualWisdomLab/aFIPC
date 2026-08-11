@@ -31,6 +31,8 @@ jobs:
 
       - name: Install system dependencies
         run: |
+          sudo mkdir -p /etc/needrestart/conf.d/
+          echo "\$nrconf{restart} = 'a';" | sudo tee /etc/needrestart/conf.d/restart.conf > /dev/null
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
             libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
