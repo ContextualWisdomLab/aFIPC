@@ -17,6 +17,7 @@ test_that("intersect column name extraction works properly in autoFIPC", {
     oldformYData = oldformYData,
     newformCommonItemNames = c('Item1', 'Item2', 'Item3'),
     oldformCommonItemNames = c('Item1', 'Item2', 'Item3'),
+    itemtype = '2PL',
     confirmCommonItems = TRUE,
     tryEM = TRUE,
     checkIPD = FALSE,
