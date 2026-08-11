@@ -70,7 +70,7 @@ Applies to every agent (Claude, Codex, Cursor, opencode, ...) working in this re
   its `private-key` suppression path-scoped in `.trivyignore.yaml` and do not
   blanket-ignore the rule.
 - A local `trivy` scan with a stale DB misses findings: run
-  `trivy --download-db-only` first, and scan the **merge ref**, not the PR head.
+  `trivy --download-db-only` first, and scan the **merge ref**, not just the PR head.
 - The org `code_scanning` ruleset is intentionally **CodeQL-only** (multiple
   code-scanning tools cannot converge on one PR ref). Gating is by the Security
   Scan **job result**, not the `code_scanning` rule; do not add tools to that rule.
