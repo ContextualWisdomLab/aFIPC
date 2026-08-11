@@ -53,6 +53,9 @@ jobs:
       - name: Set up R package dependencies
         uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
         with:
+          # Native package caches can outlive the runner's TBB ABI and make
+          # qs2 fail to load while SimDesign is installed.
+          cache: false
           extra-packages: any::rcmdcheck
           needs: check
 
