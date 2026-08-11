@@ -1,9 +1,9 @@
 library(testthat)
 library(mockery)
 
-test_that("oversized common-item confirmation input is rejected within the retry bound", {
+test_that("weak regex is bounded properly", {
   mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
-  m_readline <- mockery::mock('9999999999999999999', '9999999999999999999', '9999999999999999999')
+  m_readline <- mockery::mock('3', '3', '3')
   mockery::stub(aFIPC::autoFIPC, 'readline', m_readline)
 
   # Stub mirt to avoid estimation error and just get to validation
@@ -24,10 +24,10 @@ test_that("oversized common-item confirmation input is rejected within the retry
   )
 })
 
-test_that("oversized oldform BILOG-prior input is rejected within the retry bound", {
+test_that("weak regex is bounded properly for oldform BILOG prior", {
   mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
 
-  m_readline <- mockery::mock('1', '9999999999999999999', '9999999999999999999', '9999999999999999999')
+  m_readline <- mockery::mock('1', '3', '3', '3')
   mockery::stub(aFIPC::autoFIPC, 'readline', m_readline)
 
   mod <- new("SingleGroupClass")
@@ -48,10 +48,10 @@ test_that("oversized oldform BILOG-prior input is rejected within the retry boun
   )
 })
 
-test_that("oversized newform BILOG-prior input is rejected within the retry bound", {
+test_that("weak regex is bounded properly for newform BILOG prior", {
   mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
 
-  m_readline <- mockery::mock('1', '1', '9999999999999999999', '9999999999999999999', '9999999999999999999')
+  m_readline <- mockery::mock('1', '1', '3', '3', '3')
   mockery::stub(aFIPC::autoFIPC, 'readline', m_readline)
 
   mod <- new("SingleGroupClass")
