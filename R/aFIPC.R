@@ -1,3 +1,11 @@
+.build_ipd_group <- function(old_count, new_count) {
+  factor(
+    rep(c('oldForm', 'newForm'), c(old_count, new_count)),
+    levels = c('newForm', 'oldForm')
+  )
+}
+
+
 #' automated fixed item parameter linking
 #'
 #' @import mirt
@@ -612,10 +620,9 @@ autoFIPC <-
     #IPD
     if (checkIPD == T) {
       # config
-      # ⚡ Bolt: Use explicit factor() with levels instead of as.factor() to avoid automatic level inference overhead
-      IPDgroup <- factor(
-        rep(c('oldForm', 'newForm'), c(nrow(oldformYDataK), nrow(newformXDataK))),
-        levels = c('oldForm', 'newForm')
+      IPDgroup <- .build_ipd_group(
+        nrow(oldformYDataK),
+        nrow(newformXDataK)
       )
       IPDItemCount <- 0
 
