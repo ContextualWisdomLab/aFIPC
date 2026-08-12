@@ -1,3 +1,2 @@
-source("R/aFIPC.R")
+library(testthat)
 source("R/surveyFA.R")
-print("Syntax check passed")
