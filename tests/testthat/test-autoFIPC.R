@@ -113,3 +113,14 @@ test_that("autoFIPC catches 0 length common items", {
     "Please provide common item names"
   )
 })
+
+
+test_that("IPD groups preserve the new form as mirt reference level", {
+  groups <- aFIPC:::.build_ipd_group(old_count = 2L, new_count = 3L)
+
+  expect_identical(levels(groups), c("newForm", "oldForm"))
+  expect_identical(
+    as.character(groups),
+    c("oldForm", "oldForm", "newForm", "newForm", "newForm")
+  )
+})
