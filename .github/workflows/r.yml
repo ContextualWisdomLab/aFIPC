@@ -43,20 +43,13 @@ jobs:
           r-version: release
           use-public-rspm: true
 
-      - name: Pre-install older Deriv version to avoid R >= 4.3.0 compilation errors
-        run: |
-          Rscript -e "install.packages(
-            'https://cran.r-project.org/src/contrib/Archive/Deriv/Deriv_4.1.3.tar.gz',
-            repos=NULL, type='source'
-          )"
-
       - name: Set up R package dependencies
         uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
         with:
           # Native package caches can outlive the runner's TBB ABI and make
           # qs2 fail to load while SimDesign is installed.
           cache: false
-          extra-packages: any::rcmdcheck
+          extra-packages: any::rcmdcheck url::https://cran.r-project.org/src/contrib/Archive/Deriv/Deriv_4.1.3.tar.gz
           needs: check
 
       - name: Run R CMD check
