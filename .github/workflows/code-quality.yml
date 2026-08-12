@@ -34,7 +34,7 @@ jobs:
 
       - name: Lint GitHub workflows
         run: |
-          ACTIONLINT_VERSION="1.7.10"
+          ACTIONLINT_VERSION="1.7.1"
           ACTIONLINT_FILE="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
           ACTIONLINT_BASE_URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
           curl -sSLo "$ACTIONLINT_FILE" "${ACTIONLINT_BASE_URL}/${ACTIONLINT_FILE}"
