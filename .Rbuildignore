@@ -22,3 +22,7 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
+^\.Jules(/.*)?$
+^\.jules(/.*)?$
+^\.jules(/.*)?$
+^\.Jules(/.*)?$
