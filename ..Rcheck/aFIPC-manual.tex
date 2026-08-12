@@ -1,0 +1,157 @@
+\nonstopmode{}
+\documentclass[letterpaper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8]{inputenc} % @SET ENCODING@
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `aFIPC'}}
+\par\bigskip{\large \today}
+\end{center}
+\inputencoding{utf8}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdftitle = {aFIPC: Automated Fixed Item Parameter Linking}}}{}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdfauthor = {Seongho Bae}}}{}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Automated Fixed Item Parameter Linking}
+\item[Version]\AsIs{0.1.0}
+\item[Author]\AsIs{Seongho Bae [aut, cre]}
+\item[Maintainer]\AsIs{Seongho Bae }\email{seongho@kw.ac.kr}\AsIs{}
+\item[Description]\AsIs{Automates fixed item parameter linking for test linking under
+the item response theory paradigm using mirt package estimates.}
+\item[License]\AsIs{GPL-3 | file LICENSE}
+\item[Imports]\AsIs{mirt, methods}
+\item[Suggests]\AsIs{testthat (>= 3.0.0)}
+\item[Encoding]\AsIs{UTF-8}
+\item[Config/testthat/edition]\AsIs{3}
+\item[Config/roxygen2/version]\AsIs{8.0.0}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{autoFIPC}{automated fixed item parameter linking}{autoFIPC}
+%
+\begin{Description}
+automated fixed item parameter linking
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+autoFIPC(
+  newformXData,
+  oldformYData,
+  newformCommonItemNames,
+  oldformCommonItemNames,
+  itemtype = "3PL",
+  newformBILOGprior = NULL,
+  oldformBILOGprior = NULL,
+  tryFitwholeNewItems = T,
+  tryFitwholeOldItems = T,
+  checkIPD = T,
+  tryEM = T,
+  freeMEAN = T,
+  forceNormalZeroOne = F,
+  parameterOverwrite = F,
+  empiricalhist = F,
+  confirmCommonItems = NULL,
+  ...
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{newformXData}] new form data X
+
+\item[\code{oldformYData}] old form (base form) data Y
+
+\item[\code{newformCommonItemNames}] Common item variable names in new form data
+
+\item[\code{oldformCommonItemNames}] Common item variable names in old (base) form data
+
+\item[\code{itemtype}] itemtype of calibration
+
+\item[\code{newformBILOGprior}] using BILOG-MG prior when try to calibrate 3PL model? if you want, set the this to TRUE
+
+\item[\code{oldformBILOGprior}] using BILOG-MG prior when try to calibrate 3PL model? if you want, set the this to TRUE
+
+\item[\code{tryFitwholeNewItems}] do you want to try calibrate new form data? default is TRUE
+
+\item[\code{tryFitwholeOldItems}] do you want to try calibrate base form data? default is TRUE
+
+\item[\code{checkIPD}] do you want to check item parameter drift? default is TRUE
+
+\item[\code{tryEM}] do you want to try EM algorithm when you calibrate model? defalut is TRUE
+
+\item[\code{freeMEAN}] allow freely mean estimation, default is TRUE
+
+\item[\code{forceNormalZeroOne}] set the prior distribution follows N(0,1) distribution. default is FALSE
+
+\item[\code{parameterOverwrite}] don't touch it
+
+\item[\code{empiricalhist}] do you want to use empirical histogram method when tryEM = TRUE? default is FALSE
+
+\item[\code{confirmCommonItems}] set TRUE to accept the supplied common-item pairs without an interactive prompt. Default NULL: in interactive sessions the user will be prompted; set FALSE to explicitly reject (function will stop).
+
+\item[\code{...}] Additional arguments reserved for future extensions.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+the model list of the base form, new form, linked form
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+autoFIPC(
+  newformXData = new_model,
+  oldformYData = old_model,
+  newformCommonItemNames = common_new,
+  oldformCommonItemNames = common_old,
+  confirmCommonItems = TRUE
+)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{surveyFA}{surveyFA}{surveyFA}
+%
+\begin{Description}
+Fallback calibration helper used when direct \code{autoFIPC()} estimation fails.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+surveyFA(data, autofix = TRUE, forceUIRT = TRUE, forceNormalEM = FALSE,
+  forceMHRM = FALSE, unstable = FALSE, SE = TRUE, itemtype = "2PL",
+  maxItemRemovals = 3L, pThreshold = 0.05, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{data}] A response matrix or data frame.
+\item[\code{autofix}] When TRUE, remove least-fitting items and retry calibration.
+\item[\code{forceUIRT}] Kept for legacy compatibility; fallback requires TRUE.
+\item[\code{forceNormalEM}] Force normal EM/MMLE estimation for fallback attempts.
+\item[\code{forceMHRM}] Force MHRM-based estimation for fallback attempts.
+\item[\code{unstable}] Use a permissive estimator sequence including QMCEM and MHRM.
+\item[\code{SE}] Whether to request standard errors from \code{mirt}.
+\item[\code{itemtype}] IRT item type for fallback estimation.
+\item[\code{maxItemRemovals}] Maximum number of items to remove in autofix mode.
+\item[\code{pThreshold}] p-value cutoff for selecting misfitting items.
+\item[\code{...}] Additional arguments reserved for compatibility.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A fitted \code{mirt} model object with finite log-likelihood and, when
+\code{SE = TRUE}, a passing second-order test plus finite covariance estimates.
+\end{Value}
+\printindex{}
+\end{document}
