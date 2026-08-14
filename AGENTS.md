@@ -108,12 +108,15 @@ Applies to every agent (Claude, Codex, Cursor, opencode, ...) working in this re
   permitted; otherwise cite, link, and summarize.
 <!-- END cwl-agent-guidance -->
 
-## Code-owner review gates — disabled (on hold)
+## Independent review gate
 
-As of 2026-08-04, code-owner review requirements
-(`require_code_owner_reviews` in branch protection,
-`require_code_owner_review` in rulesets) are disabled across the
-ContextualWisdomLab org: there is a single maintainer (solo developer), so
-a code-owner approval gate can never be satisfied. This is ON HOLD until
-the org has multiple maintainers — do NOT re-enable these settings or add
-CODEOWNERS-based merge gates before then.
+- Do not add a human-only CODEOWNERS approval requirement while this repository
+  has one human maintainer; that configuration creates an unsatisfiable gate.
+- The organization ruleset still requires at least one approval from an actor
+  other than the last pusher. Satisfy it through an authenticated independent
+  review app or another qualified maintainer; never self-approve or bypass it.
+- Treat approval as current-head evidence. A new commit invalidates the previous
+  approval and requires review of the new head together with all required checks.
+- The central PR scheduler may request review, update stale branches, and enable
+  auto-merge, but it must not weaken required checks, dismiss valid findings, or
+  merge with unresolved review threads.
