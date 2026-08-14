@@ -1,7 +1,9 @@
 test_that("R CMD check uses an active reviewed dependency cache generation", {
-  workflow_path <- testthat::test_path(
-    "..", "..", ".github", "workflows", "r.yml"
+  repository_root <- Sys.getenv(
+    "GITHUB_WORKSPACE",
+    unset = testthat::test_path("..", "..")
   )
+  workflow_path <- file.path(repository_root, ".github", "workflows", "r.yml")
   workflow_lines <- readLines(workflow_path, warn = FALSE)
   dependency_step <- grep(
     "r-lib/actions/setup-r-dependencies@",
