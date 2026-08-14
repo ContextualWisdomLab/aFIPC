@@ -16,15 +16,7 @@ concurrency:
 
 jobs:
   check:
-    # Pin to jammy (22.04): Posit P3M publishes precompiled Linux binaries for
-    # the current R release on jammy, but not yet for noble (24.04, the current
-    # ubuntu-latest). On noble, pak falls back to source-building the mirt ->
-    # SimDesign -> qs -> stringfish chain, and the source-built stringfish.so
-    # then fails to load with an Intel TBB ABI mismatch (undefined symbol
-    # tbb::internal::concurrent_vector_base_v3::internal_grow_by), aborting
-    # dependency install before R CMD check ever runs. Jammy binaries avoid the
-    # source compile entirely. Revisit once P3M ships noble binaries for these.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       R_PROFILE_USER: /dev/null
 
