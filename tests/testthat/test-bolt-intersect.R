@@ -1,23 +1,45 @@
-test_that("intersect column name extraction works properly in autoFIPC", {
+test_that("model metadata preserves linked-form column order", {
   skip_if_not_installed("mirt")
   set.seed(42)
 
-  a <- matrix(c(1, 1.2, 0.8, 1.5, 0.9, 1.1, 1.0, 1.3), ncol=1)
-  d <- matrix(c(1, -1, 0, 0.5, -0.5, 0, 0.2, -0.2), ncol=1)
-  oldformYData <- mirt::simdata(a, d, 250, itemtype = '2PL')
-  colnames(oldformYData) <- paste0("Item", 1:8)
+  old_discrimination <- matrix(
+    c(1, 1.2, 0.8, 1.5, 0.9, 1.1, 1.0, 1.3),
+    ncol = 1
+  )
+  old_intercept <- matrix(
+    c(1, -1, 0, 0.5, -0.5, 0, 0.2, -0.2),
+    ncol = 1
+  )
+  oldform_data <- mirt::simdata(
+    old_discrimination,
+    old_intercept,
+    250,
+    itemtype = "2PL"
+  )
+  colnames(oldform_data) <- paste0("Item", 1:8)
 
-  a2 <- matrix(c(1, 1.2, 0.8, 1.0, 1.3), ncol=1)
-  d2 <- matrix(c(1, -1, 0, 0.2, -0.2), ncol=1)
-  newformXData <- mirt::simdata(a2, d2, 250, itemtype = '2PL')
-  colnames(newformXData) <- c("Item1", "Item2", "Item3", "NewItem1", "NewItem2")
+  new_discrimination <- matrix(c(1, 1.2, 0.8, 1.0, 1.3), ncol = 1)
+  new_intercept <- matrix(c(1, -1, 0, 0.2, -0.2), ncol = 1)
+  newform_data <- mirt::simdata(
+    new_discrimination,
+    new_intercept,
+    250,
+    itemtype = "2PL"
+  )
+  colnames(newform_data) <- c(
+    "Item1",
+    "Item2",
+    "Item3",
+    "NewItem1",
+    "NewItem2"
+  )
 
   result <- aFIPC::autoFIPC(
-    newformXData = newformXData,
-    oldformYData = oldformYData,
-    newformCommonItemNames = c('Item1', 'Item2', 'Item3'),
-    oldformCommonItemNames = c('Item1', 'Item2', 'Item3'),
-    itemtype = '2PL',
+    newformXData = newform_data,
+    oldformYData = oldform_data,
+    newformCommonItemNames = c("Item1", "Item2", "Item3"),
+    oldformCommonItemNames = c("Item1", "Item2", "Item3"),
+    itemtype = "2PL",
     confirmCommonItems = TRUE,
     tryEM = TRUE,
     checkIPD = FALSE,
@@ -27,6 +49,13 @@ test_that("intersect column name extraction works properly in autoFIPC", {
     tryFitwholeNewItems = FALSE
   )
 
-  expect_true(!is.null(result$LinkedModel))
-  expect_true(methods::is(result$LinkedModel, "SingleGroupClass"))
+  expect_s4_class(result$LinkedModel, "SingleGroupClass")
+  expect_identical(
+    colnames(result$newFormModel@Data$data),
+    colnames(newform_data)
+  )
+  expect_identical(
+    colnames(result$LinkedModel@Data$data),
+    colnames(newform_data)
+  )
 })
