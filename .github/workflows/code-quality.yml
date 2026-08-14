@@ -22,6 +22,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
+      - name: Verify Packrat source-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f packrat/packrat.lock
+          test -f packrat/init.R
+          test -d packrat/src/packrat
+
+          tracked_generated="$({
+            git ls-files \
+              'packrat/lib/**' \
+              'packrat/lib-R/**' \
+              'packrat/lib-ext/**'
+          } || true)"
+          if [[ -n "$tracked_generated" ]]; then
+            printf '%s\n' \
+              'Generated Packrat installation artifacts must not be tracked:' \
+              "$tracked_generated" >&2
+            exit 1
+          fi
+
       - name: Lint workflow YAML
         uses: ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c
         with:
