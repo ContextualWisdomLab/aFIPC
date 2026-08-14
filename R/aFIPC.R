@@ -767,11 +767,13 @@ autoFIPC <-
       newFormItemName <- newFormColNames[idxNew_all[i]]
       oldFormItemName <- oldFormColNames[idxOld_all[i]]
 
+      # ⚡ Bolt: `stats::na.omit` 호출로 인한 복사 및 속성 할당 오버헤드를 줄이기 위해
+      # 벡터화된 논리 검사 `!is.na()`와 `sum()`을 사용하여 고유값 개수를 O(N) 최적화로 셈.
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-          (length(stats::na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
-            length(stats::na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
+          (sum(!is.na(unique(newFormModel@Data$data[, newFormItemName]))) ==
+            sum(!is.na(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
         message(
           'applying ',
