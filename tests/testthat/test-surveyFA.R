@@ -14,7 +14,9 @@ test_that("surveyFA can recover with bounded autofix for messy response data", {
     )
   )
   names(raw) <- paste0("item", seq_len(ncol(raw)))
+  raw$item1[1] <- NA
   raw$item11 <- 1
+  raw$item12 <- NA
 
   fitted <- aFIPC::surveyFA(
     data = raw,
@@ -26,6 +28,9 @@ test_that("surveyFA can recover with bounded autofix for messy response data", {
 
   fitted_vcov <- as.matrix(fitted@vcov)
   expect_true(inherits(fitted, "SingleGroupClass"))
+  expect_true("item1" %in% colnames(fitted@Data$data))
+  expect_false("item11" %in% colnames(fitted@Data$data))
+  expect_false("item12" %in% colnames(fitted@Data$data))
   expect_gt(nrow(fitted_vcov), 0)
   expect_true(all(is.finite(diag(fitted_vcov))))
   expect_true(isTRUE(fitted@OptimInfo$secondordertest))

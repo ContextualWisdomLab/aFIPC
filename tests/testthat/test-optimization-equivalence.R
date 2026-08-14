@@ -7,7 +7,7 @@
 #
 # Audited refactors:
 #   * #56 (fc8bbfb): response-category count guard rewritten from
-#       length(levels(as.factor(x)))  ->  length(na.omit(unique(x)))
+#       length(na.omit(unique(x)))  ->  sum(!is.na(unique(x)))
 #     Both count DISTINCT NON-MISSING response categories. This guard decides
 #     whether an old/new common-item pair may be linked (Kim, 2006: an anchor
 #     item must share the same response structure on both forms).
@@ -23,6 +23,7 @@ test_that("category-count guard counts distinct non-missing categories (#56)", {
     dichotomous       = c(0, 1, 0, 1, 1, 0),
     trichotomous_w_na = c(0, 1, 2, NA, 2, 1, 0),
     constant          = c(0, 0, 0, 0),
+    all_missing       = c(NA, NA, NA),
     four_category_w_na = c(0, 1, 2, 3, 3, NA, 1)
   )
 
@@ -31,22 +32,23 @@ test_that("category-count guard counts distinct non-missing categories (#56)", {
     dichotomous        = 2L,
     trichotomous_w_na  = 3L,
     constant           = 1L,
+    all_missing        = 0L,
     four_category_w_na = 4L
   )
 
   new_idiom <- vapply(
     vecs,
-    function(x) length(na.omit(unique(x))),
+    function(x) sum(!is.na(unique(x))),
     integer(1)
   )
   legacy_idiom <- vapply(
     vecs,
-    function(x) length(levels(as.factor(x))),
+    function(x) length(na.omit(unique(x))),
     integer(1)
   )
 
   expect_equal(new_idiom, expected)
-  # The refactor must remain equivalent to the pre-#56 expression.
+  # The optimization must remain equivalent to the previous production idiom.
   expect_equal(unname(new_idiom), unname(legacy_idiom))
 })
 

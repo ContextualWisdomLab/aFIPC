@@ -49,6 +49,7 @@ parameter calibration and test linking.
   mapping. Otherwise call it a UI kit, wireframe, or draft.
 
 <!-- BEGIN cwl-agent-guidance -->
+
 ## Agent guidance (CWL governance)
 
 Applies to every agent (Claude, Codex, Cursor, opencode, ...) working in this repo.
