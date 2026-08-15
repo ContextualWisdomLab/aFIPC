@@ -23,3 +23,8 @@
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
 ^\.markdownlint\.json$
+^actionlint$
+^actionlint_checksums\.txt$
+^test_dummy\.R$
+^test_validation\.R$
+^\.semgrepignore$
