@@ -19,3 +19,6 @@
 ## 2024-08-15 - Vectorized data.frame subsetting avoids O(N) method dispatch overhead
 **Learning:** In R, two-dimensional subsetting of data frames (e.g., `df[df$item == 'GROUP', "est"] <- FALSE`) incurs significant overhead because it invokes the `[<-.data.frame` method dispatch, checks dimensions, and often creates deep copies.
 **Action:** Replace two-dimensional data frame subsetting with direct vector subsetting (e.g., `df$est[df$item == 'GROUP'] <- FALSE`) which uses O(1) list access and C-level vector modification, providing substantial performance improvements inside loops or with large datasets.
+## 2024-08-15 - Vectorized data.frame subsetting avoids O(N) method dispatch overhead
+**Learning:** In R, two-dimensional subsetting of data frames (e.g., `df[df$item == 'GROUP', "est"] <- FALSE`) incurs significant overhead because it invokes the `[<-.data.frame` method dispatch, checks dimensions, and often creates deep copies.
+**Action:** Replace two-dimensional data frame subsetting with direct vector subsetting (e.g., `df$est[df$item == 'GROUP'] <- FALSE`) which uses O(1) list access and C-level vector modification, providing substantial performance improvements inside loops or with large datasets.
