@@ -9,7 +9,15 @@ should move onto that base scale.
 This follows the fixed parameter calibration framing in Kim (2006): old
 operational or anchor item parameters are treated as known values during the
 new-form calibration so the new form is calibrated directly on the established
-scale. The package test `test-fixed-parameter-calibration.R` reproduces this
+scale. FIPC is one published linking design among others. Separate
+calibration plus a Stocking and Lord (1983) or Haebara (1980)
+characteristic-curve transformation, and concurrent calibration of both
+forms, are alternatives surveyed by Kolen and Brennan (2014).
+`autoFIPC()` implements FIPC only: it copies old-form anchor values,
+holds them fixed, and re-estimates free new-form parameters in `mirt`.
+It does not estimate a Stocking–Lord or Haebara linking transformation.
+
+The package test `test-fixed-parameter-calibration.R` reproduces this
 contract with generated 2PL data:
 
 1. Generate old-form and new-form responses from known true item parameters.
@@ -70,12 +78,75 @@ pinned to hand-computed reference values in
 contract (anchors fixed to old-form values, non-anchors left free) is pinned in
 `tests/testthat/test-fixed-parameter-calibration.R`.
 
+## Relation to other linking methods
+
+Kolen and Brennan (2014) organize common IRT linking designs as:
+
+- **Separate calibration + characteristic-curve transformation.**
+  Each form is calibrated freely. A linear transformation is then
+  chosen to match test characteristic curves (Stocking & Lord, 1983)
+  or item characteristic curves (Haebara, 1980).
+- **Concurrent calibration.** Both forms are estimated in one run with
+  shared parameters for common items.
+- **Fixed item parameter calibration (FIPC).** Anchor parameters from
+  the old form are treated as known and held fixed while the new form
+  is calibrated onto that scale (Kim, 2006; see also Kim & Kolen,
+  2019, for a later multiple-group FIPC application).
+
+`R/aFIPC.R` implements the third design. There is no Stocking–Lord or
+Haebara objective, and no post-calibration slope/intercept estimator.
+A previous draft cited a non-existent Kim and Kolen (2010) *Journal of
+Educational Measurement* article titled "Linking item parameters to a
+base scale." That record is withdrawn. The title belongs to Kang and
+Petersen (2012).
+
+Linked scores still fall under the interpretation limits in the
+*Standards for Educational and Psychological Testing* (AERA, APA, &
+NCME, 2014). Estimation of free parameters uses `mirt` MML-EM
+(Chalmers, 2012; Bock & Aitkin, 1981). See `docs/adr/` for the
+accepted method decisions.
+
 ## References
 
-- Kim, S. (2006). A comparative study of IRT fixed parameter calibration
-  methods. Journal of Educational Measurement, 43(4), 355-381.
-- Chalmers, R. P. `mirt::fixedCalib` documentation. The implementation note
-  describes fixed-item calibration methods based on Kim (2006) and points to
-  `multipleGroup` for more flexible anchor-item calibration.
-- Kim, S., & Kolen, M. J. (2010). Linking item parameters to a base scale.
-  Journal of Educational Measurement, 47(2), 164-181.
+Kim, S. (2006). A comparative study of IRT fixed parameter calibration
+methods. *Journal of Educational Measurement, 43*(4), 355–381.
+<https://doi.org/10.1111/j.1745-3984.2006.00021.x>
+
+Stocking, M. L., & Lord, F. M. (1983). Developing a common metric in
+item response theory. *Applied Psychological Measurement, 7*(2),
+201–210. <https://doi.org/10.1177/014662168300700208>
+
+Haebara, T. (1980). Equating logistic ability scales by a weighted
+least squares method. *Japanese Psychological Research, 22*(3),
+144–149. <https://doi.org/10.4992/psycholres1954.22.144>
+
+Kolen, M. J., & Brennan, R. L. (2014). *Test equating, scaling, and
+linking: Methods and practices* (3rd ed.). Springer.
+<https://doi.org/10.1007/978-1-4939-0317-7>
+
+Kim, S., & Kolen, M. J. (2019). Application of IRT fixed parameter
+calibration to multiple-group test data. *Applied Measurement in
+Education, 32*(4), 310–324.
+<https://doi.org/10.1080/08957347.2019.1660344>
+
+Kang, T., & Petersen, N. S. (2012). Linking item parameters to a base
+scale. *Asia Pacific Education Review, 13*(2), 311–321.
+<https://doi.org/10.1007/s12564-011-9197-2>
+
+Chalmers, R. P. (2012). mirt: A multidimensional item response theory
+package for the R environment. *Journal of Statistical Software,
+48*(6), 1–29. <https://doi.org/10.18637/jss.v048.i06>
+
+Bock, R. D., & Aitkin, M. (1981). Marginal maximum likelihood
+estimation of item parameters: Application of an EM algorithm.
+*Psychometrika, 46*(4), 443–459.
+<https://doi.org/10.1007/BF02293801>
+
+American Educational Research Association, American Psychological
+Association, & National Council on Measurement in Education. (2014).
+*Standards for educational and psychological testing*. American
+Educational Research Association.
+
+Chalmers, R. P. `mirt::fixedCalib` documentation. The implementation
+note describes fixed-item calibration methods based on Kim (2006) and
+points to `multipleGroup` for more flexible anchor-item calibration.
