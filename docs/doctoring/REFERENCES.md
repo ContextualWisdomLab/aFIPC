@@ -23,23 +23,46 @@ DOI) rather than reproduced from memory.
 - Chalmers, R. P. (2012). mirt: A multidimensional item response theory
   package for the R environment. *Journal of Statistical Software, 48*(6),
   1–29. <https://doi.org/10.18637/jss.v048.i06>
+- Haebara, T. (1980). Equating logistic ability scales by a weighted
+  least squares method. *Japanese Psychological Research, 22*(3),
+  144–149. <https://doi.org/10.4992/psycholres1954.22.144>
+- Kang, T., & Petersen, N. S. (2012). Linking item parameters to a base
+  scale. *Asia Pacific Education Review, 13*(2), 311–321.
+  <https://doi.org/10.1007/s12564-011-9197-2>
 - Kim, S. (2006). A comparative study of IRT fixed parameter calibration
   methods. *Journal of Educational Measurement, 43*(4), 355–381.
   <https://doi.org/10.1111/j.1745-3984.2006.00021.x>
-- Kim, S., & Kolen, M. J. (2010). Linking item parameters to a base scale.
-  *Journal of Educational Measurement, 47*(2), 164–181.
-  <https://doi.org/10.1111/j.1745-3984.2010.00106.x>
+- Kim, S., & Kolen, M. J. (2019). Application of IRT fixed parameter
+  calibration to multiple-group test data. *Applied Measurement in
+  Education, 32*(4), 310–324.
+  <https://doi.org/10.1080/08957347.2019.1660344>
+- Kolen, M. J., & Brennan, R. L. (2014). *Test equating, scaling, and
+  linking: Methods and practices* (3rd ed.). Springer.
+  <https://doi.org/10.1007/978-1-4939-0317-7>
 - Mislevy, R. J., & Wu, P.-K. (1996). *Missing responses and IRT ability
   estimation: Omits, choice, time limits, and adaptive testing* (ETS Research
   Report No. RR-96-30-ONR). Educational Testing Service.
   <https://doi.org/10.1002/j.2333-8504.1996.tb01708.x>
+- Stocking, M. L., & Lord, F. M. (1983). Developing a common metric in
+  item response theory. *Applied Psychological Measurement, 7*(2),
+  201–210. <https://doi.org/10.1177/014662168300700208>
+
+A previous draft listed Kim and Kolen (2010), "Linking item parameters
+to a base scale," *Journal of Educational Measurement, 47*(2), 164–181.
+That bibliographic record is not a real JEM article and is not kept.
+The title belongs to Kang and Petersen (2012). A real Kim and Kolen
+FIPC paper is Kim and Kolen (2019). Stocking and Lord (1983) and
+Haebara (1980) are the canonical characteristic-curve linking methods
+that FIPC is an alternative to; the tests below pin FIPC (Kim, 2006),
+not a Stocking–Lord or Haebara transformation estimator.
 
 ## How each test file is grounded
 
 - `test-kim2006-fixed-anchor-invariant.R` — Fixed-item-parameter linking
   invariant: anchors keep their old-form values and stay fixed while
   non-anchors are estimated onto the base scale (Kim, 2006; Bock & Aitkin,
-  1981; Chalmers, 2012).
+  1981; Chalmers, 2012). This is FIPC, not Stocking–Lord (1983) or
+  Haebara (1980) characteristic-curve transformation.
 - `test-se-hessian-vcov-preservation.R` — `SE = TRUE` observed-information /
   covariance matrix and the second-order optimality test are preserved through
   linking on the old, new, and linked models (Bock & Aitkin, 1981; Cai, 2010;
