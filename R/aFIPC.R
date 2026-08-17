@@ -767,11 +767,13 @@ autoFIPC <-
       newFormItemName <- newFormColNames[idxNew_all[i]]
       oldFormItemName <- oldFormColNames[idxOld_all[i]]
 
+      # ⚡ Bolt: stats::na.omit()의 메서드 디스패치 및 반환 객체(na.action) 할당을 피하고
+      # 빠르고 단순한 논리 인덱싱(logical indexing)으로 고유(unique) non-NA 값 개수 측정하여 루프 성능 개선
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-          (length(stats::na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
-            length(stats::na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
+          (sum(!is.na(unique(newFormModel@Data$data[, newFormItemName]))) ==
+            sum(!is.na(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
         message(
           'applying ',

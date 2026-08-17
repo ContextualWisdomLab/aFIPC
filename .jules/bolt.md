@@ -16,3 +16,9 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2025-02-13 - R 언어에서 고유한 Non-NA 값 개수 계산 시 불필요한 stats::na.omit 호출 오버헤드 최적화
+**Learning:** `length(unique(stats::na.omit(x)))` 또는 `length(stats::na.omit(unique(x)))`와 같이 `stats::na.omit`을 사용해 고유한 non-NA 값의 개수를 세면, `na.omit` 함수 내부의 메서드 디스패치(method dispatch)와 `na.action` 속성(attribute) 할당 및 메모리 할당으로 인해 성능 오버헤드가 발생합니다. 특히 반복적으로 이 작업이 수행되는 루프 내부에서는 심각한 병목이 될 수 있습니다.
+**Action:** `stats::na.omit` 함수 호출을 제거하고 대신 `sum(!is.na(unique(x)))` 형태의 단순한 논리 인덱스 합산(logical index summing)으로 변경하여, 불필요한 속성 할당과 함수 호출 오버헤드를 줄이고 연산 속도를 비약적으로 높입니다.
+## 2025-02-13 - R 언어에서 고유한 Non-NA 값 개수 계산 시 불필요한 stats::na.omit 호출 오버헤드 최적화
+**Learning:** `length(unique(stats::na.omit(x)))` 또는 `length(stats::na.omit(unique(x)))`와 같이 `stats::na.omit`을 사용해 고유한 non-NA 값의 개수를 세면, `na.omit` 함수 내부의 메서드 디스패치(method dispatch)와 `na.action` 속성(attribute) 할당 및 메모리 할당으로 인해 성능 오버헤드가 발생합니다. 특히 반복적으로 이 작업이 수행되는 루프 내부에서는 심각한 병목이 될 수 있습니다.
+**Action:** `stats::na.omit` 함수 호출을 제거하고 대신 `sum(!is.na(unique(x)))` 형태의 단순한 논리 인덱스 합산(logical index summing)으로 변경하여, 불필요한 속성 할당과 함수 호출 오버헤드를 줄이고 연산 속도를 비약적으로 높입니다.

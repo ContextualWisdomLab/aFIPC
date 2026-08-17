@@ -83,7 +83,9 @@ surveyFA <- function(
   response_data <- as.data.frame(data)
   response_data <-
     response_data[, vapply(response_data, function(column) {
-      nunique <- length(unique(stats::na.omit(column)))
+      # ⚡ Bolt: stats::na.omit()의 메서드 디스패치 및 반환 객체(na.action) 오버헤드를 피하고
+      # 빠르고 단순한 논리 인덱싱(logical indexing)으로 고유(unique) non-NA 값 개수 측정
+      nunique <- sum(!is.na(unique(column)))
       nunique >= 2L
     }, logical(1L))]
 
