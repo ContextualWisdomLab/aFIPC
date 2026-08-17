@@ -112,29 +112,33 @@ test_that("FIPC recovers generating parameters at bounded RMSE", {
   old_anchor_est <- item_ad_values(old_values, old_common_items)
   linked_anchor_est <- item_ad_values(linked_values, new_common_items)
   anchor_copy_rmse <- rmse(linked_anchor_est, old_anchor_est)
-  expect_lt(anchor_copy_rmse, 1e-6)
 
   old_recovery_rmse <- rmse(
     old_anchor_est,
     item_ad_truth(old_a, old_d, seq_along(old_common_items))
   )
-  expect_lt(old_recovery_rmse, 0.40)
 
   unique_linked_est <- item_ad_values(linked_values, new_item_names[unique_idx])
   unique_linked_rmse <- rmse(
     unique_linked_est,
     item_ad_truth(new_a, new_d, unique_idx)
   )
-  expect_lt(unique_linked_rmse, 0.50)
 
-  # Keep the numbers in the failure message so CI logs are buyer-readable.
-  expect_true(
-    is.finite(old_recovery_rmse) && is.finite(unique_linked_rmse),
-    info = sprintf(
-      "anchor_copy_rmse=%.6f old_recovery_rmse=%.4f unique_linked_rmse=%.4f",
-      anchor_copy_rmse,
-      old_recovery_rmse,
-      unique_linked_rmse
-    )
+  # testthat 3 expect_lt() has no info=; keep every gate on expect_true()
+  # so CI logs always print the three RMSE numbers.
+  metrics <- sprintf(
+    "anchor_copy_rmse=%.6f old_recovery_rmse=%.4f unique_linked_rmse=%.4f",
+    anchor_copy_rmse,
+    old_recovery_rmse,
+    unique_linked_rmse
   )
+  expect_true(
+    is.finite(anchor_copy_rmse) &&
+      is.finite(old_recovery_rmse) &&
+      is.finite(unique_linked_rmse),
+    info = metrics
+  )
+  expect_true(anchor_copy_rmse < 1e-6, info = metrics)
+  expect_true(old_recovery_rmse < 0.40, info = metrics)
+  expect_true(unique_linked_rmse < 0.50, info = metrics)
 })
