@@ -19,6 +19,9 @@ parameter calibration and test linking.
 - Keep `.github/dependabot.yml` active for GitHub Actions updates.
 - Keep `ARCHITECTURE.md` up to date when structure changes.
 - Keep README accurate for local verification commands.
+- Keep `.cursor/install.sh` revision-agnostic: provision R + CRAN deps only.
+  Do not `R CMD INSTALL` the current tree in `install` (environment builds
+  freeze that copy). Use `testthat::test_local()` / `rcmdcheck` on the checkout.
 
 ## Editing priorities
 
