@@ -20,6 +20,13 @@ R_PROFILE_USER=/dev/null Rscript -e 'testthat::test_local()'
 R_PROFILE_USER=/dev/null Rscript -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"))'
 ```
 
+Run a single test file with the `filter` argument (matches
+`tests/testthat/test-<filter>.R`):
+
+```bash
+R_PROFILE_USER=/dev/null Rscript -e 'testthat::test_local(filter = "surveyFA")'
+```
+
 See `ARCHITECTURE.md` (sections 1 and 8) for how this fits the repository.
 
 ## Security
