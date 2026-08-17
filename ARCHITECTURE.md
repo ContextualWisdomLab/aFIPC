@@ -19,6 +19,7 @@ metadata and CI are wired, and which parts are safe to evolve.
 - `.github/ISSUE_TEMPLATE/` - structured issue intake templates
 - `.github/CODEOWNERS` - code ownership map for reviews
 - `.github/dependabot.yml` - Automated Actions dependency updates
+- `.cursor/` - Cloud Agent environment (`environment.json` + `install.sh`)
 - `docs/coderabbit/review-commands.md` - CodeRabbit command quick reference
 - `docs/operations/maintenance-runbook.md` - recurring maintainer operations checklist
 - `README.md` - User/developer entrypoint
@@ -91,6 +92,10 @@ package metadata, and CI workflow definitions in Git.
 - Primary check: `R CMD check` via GitHub Actions
 - Local check command:
   - `Rscript -e 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"))'`
+- Cloud Agent: `.cursor/environment.json` runs `.cursor/install.sh` to provision
+  CRAN-release R and r2u binaries (`mirt`, `testthat`, `roxygen2`, `rcmdcheck`).
+  `install` is snapshot-scoped and must not `R CMD INSTALL` the current tree;
+  use `testthat::test_local()` / `rcmdcheck` against the checkout.
 
 ## 9. Future Considerations / Roadmap
 
@@ -103,9 +108,9 @@ package metadata, and CI workflow definitions in Git.
 ## 10. Project Identification
 
 - Project Name: aFIPC
-- Repository URL: `https://github.com/seonghobae/aFIPC`
+- Repository URL: `https://github.com/ContextualWisdomLab/aFIPC`
 - Primary Contact: Seongho Bae
-- Date of Last Update: 2026-02-15
+- Date of Last Update: 2026-08-17
 
 ## 11. Glossary / Acronyms
 
