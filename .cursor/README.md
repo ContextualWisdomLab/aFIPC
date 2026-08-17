@@ -21,3 +21,9 @@ R_PROFILE_USER=/dev/null Rscript -e 'rcmdcheck::rcmdcheck(args = c("--no-manual"
 ```
 
 See `ARCHITECTURE.md` (sections 1 and 8) for how this fits the repository.
+
+## Security
+
+`install.sh` stores each repository key in its own keyring under
+`/etc/apt/keyrings` and binds it to that repository with `signed-by`, so a key
+can only vouch for its own source (no global `trusted.gpg.d` trust).
