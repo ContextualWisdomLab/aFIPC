@@ -106,4 +106,16 @@ Applies to every agent (Claude, Codex, Cursor, opencode, ...) working in this re
 - For substantive calibration/linking changes, cite the relevant IRT and
   psychometrics literature. Commit paper PDFs only when redistribution is
   permitted; otherwise cite, link, and summarize.
+- Method decisions are recorded in `docs/adr/`. Verified APA 7th records
+  and DOIs are in `docs/papers/README.md`. Do not invent bibliographic
+  records or leave empty `DOI:` placeholders.
+- The implemented linking contract is FIPC (Kim, 2006): anchors keep
+  old-form values. `autoFIPC()` does not estimate a Stocking–Lord (1983)
+  or Haebara (1980) transformation (ADR-0001). Estimation is `mirt`
+  MML-EM (ADR-0002). IPD/DIF screening is delegated to `mirt` and is
+  not a published invariance claim (ADR-0003).
+- Do not restore Kim and Kolen (2010), "Linking item parameters to a
+  base scale," *Journal of Educational Measurement*. That record is not
+  a real JEM article. The title is Kang and Petersen (2012). A real
+  Kim and Kolen FIPC paper is Kim and Kolen (2019).
 <!-- END cwl-agent-guidance -->

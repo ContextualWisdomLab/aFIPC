@@ -86,8 +86,9 @@ score/theta outputs, returned as an R list.
 
 The linking contract (Kim, 2006): anchor items keep their old-form parameter
 values fixed during new-form calibration so the new form is calibrated
-directly onto the established scale. It is documented in
-`docs/fixed-parameter-item-calibration.md` and enforced by
+directly onto the established scale. That is FIPC, not a Stocking–Lord or
+Haebara transformation. It is documented in
+`docs/fixed-parameter-item-calibration.md` and `docs/adr/`, and enforced by
 `tests/testthat/test-fixed-parameter-calibration.R`.
 
 ## Key conventions
@@ -123,3 +124,5 @@ Summarized from `AGENTS.md` and `CONTRIBUTING.md`; read those for detail.
 - `CONTRIBUTING.md` — contribution process and verification baseline
 - `docs/operations/maintenance-runbook.md` — recurring maintainer operations
 - `docs/fixed-parameter-item-calibration.md` — calibration/linking basis
+- `docs/adr/` — FIPC, mirt MML-EM, and IPD/DIF decision records
+- `docs/papers/README.md` — verified source papers and DOIs
