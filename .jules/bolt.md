@@ -16,3 +16,6 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2026-08-24 - R 언어에서 데이터프레임의 열 업데이트 시 부분집합 할당(subsetting) 방식 최적화
+**Learning:** 데이터 프레임에서 조건에 맞는 특정 행의 값을 변경할 때, 2차원 인덱싱을 사용하는 `df[df$idx == 'val', 'col'] <- new_val` 방식은 R의 내부 메서드 디스패치(`[<-.data.frame`)를 거치면서 차원 검사와 팩터 레벨 검증 등을 수행하여 성능 오버헤드가 큽니다.
+**Action:** 이를 단일 벡터에 대한 직접 인덱싱인 `df$col[df$idx == 'val'] <- new_val` 방식으로 변경하면 리스트 접근과 C 수준의 벡터 할당을 통해 O(1)에 가까운 훨씬 빠른 성능을 얻을 수 있으므로 이 패턴을 일관되게 적용해야 합니다.
