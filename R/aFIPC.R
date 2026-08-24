@@ -598,15 +598,17 @@ autoFIPC <-
     # Preserve mirt's structural estimability flags. Forcing every row TRUE
     # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
 
-    NewScaleParms[NewScaleParms$item == 'GROUP', "est"] <- FALSE
-    OldScaleParms[OldScaleParms$item == 'GROUP', "est"] <- FALSE
+    # ⚡ Bolt: Use direct vector subsetting (e.g. df$col[idx] <- val) instead of 2D data frame assignment (e.g. df[idx, 'col'] <- val)
+    # to bypass method dispatch overhead and significantly improve memory copy performance.
+    NewScaleParms$est[NewScaleParms$item == 'GROUP'] <- FALSE
+    OldScaleParms$est[OldScaleParms$item == 'GROUP'] <- FALSE
 
-    NewScaleParms[NewScaleParms$name == "COV_11", "est"] <- TRUE
-    OldScaleParms[OldScaleParms$name == "COV_11", "est"] <- TRUE
+    NewScaleParms$est[NewScaleParms$name == "COV_11"] <- TRUE
+    OldScaleParms$est[OldScaleParms$name == "COV_11"] <- TRUE
 
     if (itemtype == 'Rasch') {
-      NewScaleParms[NewScaleParms$name == "a1", "est"] <- FALSE
-      OldScaleParms[OldScaleParms$name == "a1", "est"] <- FALSE
+      NewScaleParms$est[NewScaleParms$name == "a1"] <- FALSE
+      OldScaleParms$est[OldScaleParms$name == "a1"] <- FALSE
     }
 
     #IPD
@@ -875,8 +877,9 @@ autoFIPC <-
           'MEAN = F1'
         ))
 
-      NewScaleParms[NewScaleParms$name == "MEAN_1", "est"] <- TRUE
-      OldScaleParms[OldScaleParms$name == "MEAN_1", "est"] <- TRUE
+      # ⚡ Bolt: Direct vector subsetting to avoid slow [<-.data.frame dispatch overhead
+      NewScaleParms$est[NewScaleParms$name == "MEAN_1"] <- TRUE
+      OldScaleParms$est[OldScaleParms$name == "MEAN_1"] <- TRUE
     } else {
       LinkedModelSyntax <-
         mirt::mirt.model(paste0(
