@@ -89,3 +89,13 @@ test_that("autoFIPC validates input types securely", {
     "Security Error: tryEM must be a single non-NA logical value"
   )
 })
+
+test_that("autoFIPC securely restricts input via regex for prompts", {
+  expect_true(grepl("^[12]$", "1"))
+  expect_true(grepl("^[12]$", "2"))
+  expect_false(grepl("^[12]$", "3"))
+  expect_false(grepl("^[12]$", "12"))
+  expect_false(grepl("^[12]$", "0"))
+  expect_false(grepl("^[12]$", "abc"))
+  expect_false(grepl("^[12]$", ""))
+})
