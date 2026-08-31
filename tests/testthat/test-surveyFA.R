@@ -120,6 +120,7 @@ test_that("surveyFA correctly identifies the item with the minimum p-value", {
 
 test_that("surveyFA correctly identifies the item with the minimum variance when p-values aren't enough", {
   skip_if_not_installed("mirt")
+  skip_if_not_installed("mockery")
   set.seed(42)
 
   # Create synthetic data with one constant column so its variance is 0
