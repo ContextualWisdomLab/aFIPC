@@ -8,7 +8,7 @@ over feature velocity.
 ## Ground Rules
 
 1. Avoid behavior changes in `R/aFIPC.R` unless backed by explicit regression
-  evidence and maintainer approval.
+   evidence and maintainer approval.
 2. Prefer small, auditable pull requests.
 3. Keep CI/security/docs healthy (`.github/workflows/`, `README.md`,
    `ARCHITECTURE.md`, `AGENTS.md`).
