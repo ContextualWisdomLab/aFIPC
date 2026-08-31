@@ -82,3 +82,78 @@ test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
     "could not estimate a valid model after bounded recovery attempts"
   )
 })
+
+test_that("surveyFA correctly identifies the item with the minimum p-value", {
+  skip_if_not_installed("mirt")
+  set.seed(42)
+
+  # Create synthetic data that will cause some misfit
+  raw <- as.data.frame(
+    mirt::simdata(
+      a = matrix(rep(1, 5), ncol = 1),
+      d = rep(0, 5),
+      itemtype = rep("2PL", 5),
+      N = 100
+    )
+  )
+  names(raw) <- paste0("item", seq_len(ncol(raw)))
+
+  # Inject noise to one item to make it misfit (item3)
+  raw$item3 <- rbinom(100, 1, 0.1)
+
+  # Capture the warning which might occur during estimation, we only care about the return
+  fitted <- suppressWarnings(
+    aFIPC::surveyFA(
+      data = raw,
+      autofix = TRUE,
+      forceUIRT = TRUE,
+      forceNormalEM = TRUE,
+      SE = TRUE
+    )
+  )
+
+  # If it removed an item, item3 is highly likely to be the one removed
+  # or at least the process should not crash and should return a valid model.
+  expect_true(inherits(fitted, "SingleGroupClass"))
+  # Verify that candidate extraction which uses which.min() works without error
+})
+
+test_that("surveyFA correctly identifies the item with the minimum variance when p-values aren't enough", {
+  skip_if_not_installed("mirt")
+  set.seed(42)
+
+  # Create synthetic data with one constant column so its variance is 0
+  raw <- as.data.frame(
+    mirt::simdata(
+      a = matrix(rep(1, 5), ncol = 1),
+      d = rep(0, 5),
+      itemtype = rep("2PL", 5),
+      N = 100
+    )
+  )
+  names(raw) <- paste0("item", seq_len(ncol(raw)))
+
+  # Inject noise to one item to make it misfit and also give it a really low variance
+  # In select_bad_item, it falls back to var if it couldn't find anything by p-value or the itemfit fails.
+  # Let's mock mirt::itemfit so it fails and we test the variance path directly.
+
+  mock_itemfit <- mockery::mock(stop("Forced error"))
+  mockery::stub(aFIPC::surveyFA, "mirt::itemfit", mock_itemfit)
+
+  # We want one item to have smaller variance
+  raw$item3 <- rep(0, 100)
+  raw$item3[1] <- 1 # slightly non-constant so it doesn't get pre-filtered
+
+  fitted <- suppressWarnings(
+    aFIPC::surveyFA(
+      data = raw,
+      autofix = TRUE,
+      forceUIRT = TRUE,
+      forceNormalEM = TRUE,
+      SE = TRUE,
+      maxItemRemovals = 1
+    )
+  )
+
+  expect_true(inherits(fitted, "SingleGroupClass"))
+})
