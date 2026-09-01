@@ -2,6 +2,8 @@
 
 Automated Fixed Item Parameter Calibration (FIPC) for IRT test linking.
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ContextualWisdomLab/aFIPC)
+
 This package contains the original graduate-school implementation used to
 produce accurate fixed-item linking results. The current maintenance goal is to
 preserve numerical behavior while modernizing repository operations
