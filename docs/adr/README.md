@@ -17,7 +17,7 @@ behavior.
 | ID | Title | Status |
 | --- | --- | --- |
 | [ADR-0001](0001-fipc-linking-contract.md) | FIPC as the linking contract | Accepted |
-| [ADR-0002](0002-mirt-mml-em-engine.md) | mirt MML-EM as the estimation engine | Accepted |
+| [ADR-0002](0002-mirt-mml-em-engine.md) | mirt as the estimation engine | Accepted |
 | [ADR-0003](0003-ipd-dif-screening-delegation.md) | IPD/DIF screening is delegated to mirt | Accepted |
 
 ## Related documents
