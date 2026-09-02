@@ -43,13 +43,17 @@ R objects (data frame/matrix/model), and outputs are returned as an R list.
 
 - Path: `R/aFIPC.R`
 - Responsibility:
-  - Calibrate old/new forms using `mirt`
+  - Calibrate old/new forms using `mirt`, with bounded QMCEM/MHRM/`surveyFA`
+    recovery when an initial raw-data fit is unacceptable
   - Optionally detect item parameter drift (IPD)
   - Apply fixed common-item constraints for test linking
+  - Fit the linked model with EM for nominal items or `tryEM = TRUE`, and MHRM
+    otherwise
   - Produce linked model and score/theta artifacts
 - Key dependency: `mirt`
-- Method decision: FIPC (Kim, 2006), not Stocking–Lord (1983) or
-  Haebara (1980) transformation estimation; see `docs/adr/0001-fipc-linking-contract.md`
+- Method decision: FIPC (Kim, 2006), not Stocking-Lord (1983) or
+  Haebara (1980) transformation estimation; see
+  `docs/adr/0001-fipc-linking-contract.md`
 
 ### 3.2 Package Metadata and API Surface
 
@@ -119,31 +123,36 @@ is an alternative to separate calibration plus Stocking and Lord
 concurrent calibration (Kolen & Brennan, 2014). This repository does
 not implement those transformation estimators.
 
-Estimation lives in `mirt` MML-EM (Chalmers, 2012; Bock & Aitkin,
-1981). Optional IPD screening calls `mirt::multipleGroup` and
-`mirt::DIF`; it is not a published invariance claim (see
-`docs/adr/0003-ipd-dif-screening-delegation.md`). Score-scale
-interpretation is bounded by AERA, APA, and NCME (2014).
+Numerical estimation lives in `mirt` (Chalmers, 2012). The linked FIPC
+fit uses MML-EM (Bock & Aitkin, 1981) for nominal items or when
+`tryEM = TRUE`, and MHRM otherwise. Separately fitted old/new raw-data
+models can recover through QMCEM, MHRM, and `surveyFA` variants after
+an unacceptable initial fit, so a returned aFIPC result must not be
+summarized as if every model artifact used MML-EM. Optional IPD
+screening calls `mirt::multipleGroup` and `mirt::DIF` with the same
+EM-versus-MHRM selection rule as the linked fit; it is not a published
+invariance claim (see `docs/adr/0003-ipd-dif-screening-delegation.md`).
+Score-scale interpretation is bounded by AERA, APA, and NCME (2014).
 
-A withdrawn cite attributed "Linking item parameters to a base scale"
-to Kim and Kolen (2010) in JEM. That record is not kept. The title is
-Kang and Petersen (2012). Kim and Kolen (2019) is a real later FIPC
-application paper.
+An earlier draft incorrectly attributed "Linking item parameters to a
+base scale" to Kim and Kolen (2010) in JEM; that attribution was removed.
+The title belongs to Kang and Petersen (2012). Kim and Kolen (2019) is
+a separate, real later FIPC application paper.
 
 Full APA 7th records and DOIs: `docs/papers/README.md`. Accepted
 method ADRs: `docs/adr/`.
 
 Kim, S. (2006). A comparative study of IRT fixed parameter calibration
-methods. *Journal of Educational Measurement, 43*(4), 355–381.
+methods. *Journal of Educational Measurement, 43*(4), 355-381.
 <https://doi.org/10.1111/j.1745-3984.2006.00021.x>
 
 Stocking, M. L., & Lord, F. M. (1983). Developing a common metric in
 item response theory. *Applied Psychological Measurement, 7*(2),
-201–210. <https://doi.org/10.1177/014662168300700208>
+201-210. <https://doi.org/10.1177/014662168300700208>
 
 Haebara, T. (1980). Equating logistic ability scales by a weighted
 least squares method. *Japanese Psychological Research, 22*(3),
-144–149. <https://doi.org/10.4992/psycholres1954.22.144>
+144-149. <https://doi.org/10.4992/psycholres1954.22.144>
 
 Kolen, M. J., & Brennan, R. L. (2014). *Test equating, scaling, and
 linking: Methods and practices* (3rd ed.). Springer.
@@ -151,20 +160,20 @@ linking: Methods and practices* (3rd ed.). Springer.
 
 Kim, S., & Kolen, M. J. (2019). Application of IRT fixed parameter
 calibration to multiple-group test data. *Applied Measurement in
-Education, 32*(4), 310–324.
+Education, 32*(4), 310-324.
 <https://doi.org/10.1080/08957347.2019.1660344>
 
 Kang, T., & Petersen, N. S. (2012). Linking item parameters to a base
-scale. *Asia Pacific Education Review, 13*(2), 311–321.
+scale. *Asia Pacific Education Review, 13*(2), 311-321.
 <https://doi.org/10.1007/s12564-011-9197-2>
 
 Chalmers, R. P. (2012). mirt: A multidimensional item response theory
 package for the R environment. *Journal of Statistical Software,
-48*(6), 1–29. <https://doi.org/10.18637/jss.v048.i06>
+48*(6), 1-29. <https://doi.org/10.18637/jss.v048.i06>
 
 Bock, R. D., & Aitkin, M. (1981). Marginal maximum likelihood
 estimation of item parameters: Application of an EM algorithm.
-*Psychometrika, 46*(4), 443–459.
+*Psychometrika, 46*(4), 443-459.
 <https://doi.org/10.1007/BF02293801>
 
 American Educational Research Association, American Psychological
