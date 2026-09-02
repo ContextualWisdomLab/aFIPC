@@ -38,7 +38,7 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
 
 test_that("autoFIPC handles large invalid inputs correctly in interactive sessions without crashing", {
   # Using mockery to stub base functions properly in the context of autoFIPC
-  mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
+  mockery::stub(aFIPC::autoFIPC, 'interactive', function() TRUE)
   mockery::stub(aFIPC::autoFIPC, 'readline', mockery::mock("99999999999999999999", "99999999999999999999", "99999999999999999999"))
 
   # Should stop after 3 attempts due to the new regex validation correctly ignoring large numbers
