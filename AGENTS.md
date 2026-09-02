@@ -1,98 +1,127 @@
 # AGENTS.md
 
-## Scope
+## Mission
 
-This repository contains the aFIPC R package and its supporting documentation,
-CI, security, and historical dependency material. Preserve scientific behavior
-unless a change is backed by explicit regression evidence.
+Maintain this repository as a stable, reproducible R package for fixed-item
+parameter calibration and test linking.
 
-## Repository priorities
+## Non-negotiable guardrails
 
-1. Preserve fixed-item calibration semantics and historical numerical behavior.
-2. Keep security, package checks, and documentation truthful and reproducible.
-3. Prefer small, auditable changes over broad refactors.
-4. Keep generated/package metadata consistent with source and documentation.
+1. Preserve historical numerical behavior in `R/aFIPC.R` unless there is
+   explicit regression evidence and maintainer intent to change behavior.
+2. Treat CI/security/docs hygiene as first-class maintenance work.
+3. Keep changes minimal and auditable; prefer additive guardrails over broad
+   refactoring.
 
-## Source boundaries
+## Required maintenance checks
 
-- `R/aFIPC.R` owns the main `autoFIPC()` orchestration flow.
-- `R/surveyFA.R` contains supporting analytical recovery routines.
-- `DESCRIPTION`, `NAMESPACE`, and `man/` are R package surfaces.
-- `docs/adr/` records accepted method/architecture decisions.
-- `docs/papers/README.md` records verified methodological sources.
-- `packrat/` is historical compatibility material, not the preferred dependency
-  workflow.
+- Keep `.github/workflows/` green and action SHAs pinned.
+- Keep `.github/dependabot.yml` active for GitHub Actions updates.
+- Keep `ARCHITECTURE.md` up to date when structure changes.
+- Keep README accurate for local verification commands.
+- Keep `.cursor/install.sh` revision-agnostic: provision R + CRAN deps only.
+  Do not `R CMD INSTALL` the current tree in `install` (environment builds
+  freeze that copy). Use `testthat::test_local()` / `rcmdcheck` on the checkout.
 
-Do not silently alter common-item matching, fixed/free parameter semantics,
-latent-distribution handling, IPD/DIF screening, estimation method selection,
-scoring, or expected-score output.
+## Editing priorities
 
-## Change discipline
+1. Safety and reproducibility
+2. CI reliability
+3. Documentation clarity
+4. Feature changes
 
-- Treat `R/aFIPC.R` numerical behavior as compatibility-sensitive.
-- Add focused regression evidence before intentional scientific behavior changes.
-- Keep input validation and fail-closed behavior intact unless a stronger
-  evidence-backed contract replaces it.
-- Do not replace a failing check with a weaker threshold or exclusion.
-- Do not invent release, benchmark, customer, certification, or commercial
-  readiness claims from local or predecessor evidence.
+## High-risk areas
 
-## Validation
+- `R/aFIPC.R` contains long legacy logic with interactive prompts.
+- Any changes around calibration/linking constraints can alter scientific output.
 
-Run the repository's actual package/documentation checks. The canonical local R
-package check is:
+## Preferred change strategy
 
-```bash
-R_PROFILE_USER=/dev/null Rscript -e \
-'install.packages("rcmdcheck", repos="https://cloud.r-project.org")'
-R_PROFILE_USER=/dev/null Rscript -e \
-'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning")'
-```
+- Add tests/fixtures first when behavior changes are required.
+- Isolate operational fixes (workflow/docs/dependency policy) from algorithmic
+  edits.
+- Document assumptions and risk in commit/PR summaries.
 
-Hosted exact-head checks remain authoritative for merge decisions. A push
-invalidates predecessor-head check and review evidence.
+## Product design and Figma
 
-## Commercial license boundary
-
-The repository currently declares GPL-family package/runtime licensing and
-imports `mirt`. Do not present the source as Apache-2.0/MIT-cleared or
-commercially intake-compliant until the provenance/relicensing and dependency
-replacement work tracked by issue #320 is integrated and verified. Repository
-source licensing and third-party dependency licensing are separate obligations.
+- This repo has no frontend, route tree, Figma file, or implemented visual
+  surface. Do not create UI code or visual artifacts unless a real product
+  surface is introduced.
+- Do not call future Figma work a "design system" unless it includes reusable
+  foundations, tokens, components, states, accessibility guidance, and code
+  mapping. Otherwise call it a UI kit, wireframe, or draft.
 
 <!-- BEGIN cwl-agent-guidance -->
-## ContextualWisdomLab operating context
+## Agent guidance (CWL governance)
 
-- Keep this component independently usable and composable. A sibling repository
-  may consume it through a released/versioned boundary, but do not create hidden
-  cross-repository implementation coupling.
-- Sibling components include `fast-mlsirm`, which may consume aFIPC-style
-  fixed-item calibration concepts in broader psychometric workflows. aFIPC does
-  not become the owner of those sibling products' orchestration, data, or
-  deployment authority.
-- Cross-product LLM/provider routing, if ever required, belongs to
-  `contextual-orchestrator`, not this numerical R package.
+Applies to every agent (Claude, Codex, Cursor, opencode, ...) working in this repo.
+
+### Security & review gate
+
+- Every PR runs a central **Security Scan** required check: `osv-scan` +
+  `dependency-review` (diff-scoped) and `trivy-fs` (repo-wide, CRITICAL/HIGH,
+  fixable only). It runs against each PR base, **including stacked PRs**.
+- A failing `trivy-fs` is a **REAL finding, not a flake.** Read the job log (it
+  prints each finding's rule id, severity, and file) or the run's SARIF results,
+  then **remediate**: bump the offending R dependency (this package vendors its
+  library tree under `packrat/`), or, only for a genuine false positive, add a
+  narrow, path-scoped, commented entry to `.trivyignore.yaml`. Never weaken or
+  disable the gate. This repo has no Dockerfile or k8s manifests, so misconfig
+  findings are not expected; a hit here is a dependency or secret finding.
+- The vendored packrat openssl docs include a verified false-positive example
+  key at `packrat/lib/x86_64-pc-linux-gnu/3.4.1/openssl/doc/keys.html`; keep
+  its `private-key` suppression path-scoped in `.trivyignore.yaml` and do not
+  blanket-ignore the rule.
+- A local `trivy` scan with a stale DB misses findings: run
+  `trivy --download-db-only` first, and scan the **merge ref**, not just the PR head.
+- The org `code_scanning` ruleset is intentionally **CodeQL-only** (multiple
+  code-scanning tools cannot converge on one PR ref). Gating is by the Security
+  Scan **job result**, not the `code_scanning` rule; do not add tools to that rule.
+
+### Code exploration
+
+- There is no `.codegraph/` index in this repo, so use normal search
+  (grep/find) to locate and understand code. If a `.codegraph/` index is added
+  later, prefer CodeGraph (`codegraph explore "<query>"` or the
+  code-review-graph MCP tools) before grep/find; it surfaces callers, callees,
+  and impact that text search misses.
+
+### This repo's role in the ecosystem
+
+- **aFIPC**: R IRT package for Fixed-Item Parameter Calibration; feeds
+  fast-mlsirm's psychometrics.
+- The org is an ecosystem around **naruon** (the hub: an email/PIM app that
+  DOM-decomposes emails and files into a persisted knowledge graph). Every
+  component is a **standalone program that must ALSO work as a git submodule**,
+  grown separately and together.
+- Sibling components: **waf-ids-ai-soc** (WAF/IDS/AI SOC/LB/APIM),
+  **clearfolio** (document viewer), **pg-erd-cloud** (ERD tool),
+  **contextual-orchestrator** (LLM cost/perf/upstream-LB gateway, beyond
+  LiteLLM), **codec-carver** (STT/omni-modal speech-video codec),
+  **fast-mlsirm** (LLM-as-a-Judge calibration + evaluation-item quality; uses
+  aFIPC FIPC + kaefa item-fit), **feelanet-adfs** (passwordless SSO:
+  OIDC/SCIM/ADFS/LDAP/FIDO2/OAuth2.1, eliminate passwords), **newsdom-api**
+  (PDF to DOM sidecar), **semantic-data-portal** (upper ontology/catalog/governance
+  plane with its own graph engine).
 
 ### Research grounding
 
 - For substantive calibration/linking changes, cite the relevant IRT and
   psychometrics literature. Commit paper PDFs only when redistribution is
   permitted; otherwise cite, link, and summarize.
-- Method decisions are recorded in `docs/adr/`. Verified APA 7th records and
-  DOIs are in `docs/papers/README.md`. Do not invent bibliographic records or
-  leave empty `DOI:` placeholders.
-- The implemented linking contract is FIPC (Kim, 2006): anchors keep old-form
-  values. `autoFIPC()` does not estimate a Stocking-Lord (1983) or Haebara
-  (1980) transformation (ADR-0001).
-- `mirt` owns numerical estimation (ADR-0002), but do not flatten all returned
-  models into one method label. Raw old/new data fits can recover through QMCEM,
-  MHRM, and `surveyFA` paths when an initial fit is unacceptable. The linked
-  FIPC fit and IPD/DIF path use EM for nominal items or `tryEM = TRUE`, and MHRM
-  otherwise. Record the actual method path when evidence depends on it.
-- IPD/DIF screening is delegated to `mirt` and is not a published invariance
-  claim (ADR-0003).
-- Do not restore the earlier incorrect attribution of "Linking item parameters
-  to a base scale" to Kim and Kolen (2010) in the *Journal of Educational
-  Measurement*. The title belongs to Kang and Petersen (2012). Kim and Kolen
-  (2019) is a separate, real FIPC application paper.
+- Method decisions are recorded in `docs/adr/`. Verified APA 7th records
+  and DOIs are in `docs/papers/README.md`. Do not invent bibliographic
+  records or leave empty `DOI:` placeholders.
+- The implemented linking contract is FIPC (Kim, 2006): anchors keep
+  old-form values. `autoFIPC()` does not estimate a Stocking–Lord (1983)
+  or Haebara (1980) transformation (ADR-0001). Numerical estimation is
+  delegated to `mirt` (ADR-0002), but the returned models are not all one
+  MML-EM path: raw old/new fits may recover through QMCEM, MHRM, and
+  `surveyFA` variants, while the linked fit and IPD/DIF path use EM for
+  nominal items or `tryEM = TRUE` and MHRM otherwise. IPD/DIF screening is
+  not a published invariance claim (ADR-0003).
+- Do not restore Kim and Kolen (2010), "Linking item parameters to a
+  base scale," *Journal of Educational Measurement*. That attribution was
+  incorrect and was removed. The title is Kang and Petersen (2012). A real
+  Kim and Kolen FIPC paper is Kim and Kolen (2019).
 <!-- END cwl-agent-guidance -->
