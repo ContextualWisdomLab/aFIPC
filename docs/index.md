@@ -23,7 +23,8 @@ downstream decision authority remain outside this package.
    objects.
 2. Define the reviewed common-item correspondence between forms.
 3. Run `autoFIPC()` with the intended item model and explicit common-item
-   confirmation.
+   confirmation. For non-interactive raw-data use of the default 3PL path,
+   explicitly set both BILOG-prior choices instead of leaving them `NULL`.
 4. Review convergence, item-parameter-drift evidence, and linked outputs before
    downstream score reporting or operational use.
 
@@ -44,8 +45,13 @@ calibration. See the FIPC contract and ADR index for the precise boundary.
 
 ## Onboarding and verification
 
-Clone the repository, use a current R toolchain, and run the package checks
-before changing calibration behavior:
+The current source graph is not commercially intake-cleared because it directly
+imports GPL-family `mirt`. `rcmdcheck` does not install the package-under-check's
+runtime dependencies, so there is no honest commercially compatible clean-R
+bootstrap to advertise while issue #320 remains open.
+
+For maintainers working in an already provisioned legacy compatibility or
+license-diligence environment, the repository check itself is:
 
 ```bash
 R_PROFILE_USER=/dev/null Rscript -e \
@@ -53,6 +59,12 @@ R_PROFILE_USER=/dev/null Rscript -e \
 R_PROFILE_USER=/dev/null Rscript -e \
 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning")'
 ```
+
+That command assumes the package's existing declared dependencies are already
+available; it is not a recommendation to add `mirt` to a new commercial stack.
+A clean commercial setup becomes publishable only after #320 replaces/removes
+the GPL-family runtime path and the resulting graph passes package, numerical,
+security, and provenance verification.
 
 For contributor expectations and architectural context, read `CONTRIBUTING.md`
 and `ARCHITECTURE.md` before modifying estimation or linking logic.
