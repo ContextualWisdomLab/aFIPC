@@ -110,3 +110,5 @@ Applies to every agent (Claude, Codex, Cursor, opencode, ...) working in this re
   psychometrics literature. Commit paper PDFs only when redistribution is
   permitted; otherwise cite, link, and summarize.
 <!-- END cwl-agent-guidance -->
+
+Strix uses the zero-cost `orchestrator/free` route.
