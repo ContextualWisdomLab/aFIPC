@@ -24,3 +24,8 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
+^tests/testthat/test-sentinel-integer-coercion\.R$
+^\.semgrepignore$
+^test_dummy\.R$
+^test_validation\.R$
+^\.markdownlint\.json$
