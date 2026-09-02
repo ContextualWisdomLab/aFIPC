@@ -2,40 +2,92 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ContextualWisdomLab/aFIPC)
 
-**aFIPC** provides automated Fixed Item Parameter Calibration (FIPC) for item-response-theory test linking. It preserves common-item parameters from an old form while calibrating new-form items onto the established scale, with estimation delegated to `mirt`.
+Automated Fixed Item Parameter Calibration for item-response-theory linking and
+equating.
 
-## Product scope
+## Product responsibility
 
-- `autoFIPC()` implements the package's FIPC linking workflow.
-- Common items retain old-form parameter values during linked calibration.
-- The package uses `mirt` marginal maximum-likelihood / EM estimation rather than implementing a separate numerical IRT engine.
-- FIPC is intentionally distinct from separate calibration followed by Stocking–Lord or Haebara characteristic-curve transformations and from concurrent calibration.
-- Item-parameter-drift / DIF screening is delegated to the supported `mirt` machinery documented by the repository.
+aFIPC preserves a common measurement scale across test forms by combining
+anchor-item information from a reference form with calibration of newly
+administered items. It is intended for psychometric workflows where score
+comparability across administrations matters and fixed-item linking is the
+chosen design.
 
-## Start here
+The repository owns the in-process R calibration/linking workflow. Test
+delivery, source-system data collection, operational score policy, and
+downstream decision authority remain outside this package.
 
-Install or inspect the package from the organization-owned repository:
+## Core workflow
 
-```r
-# install.packages("remotes")
-remotes::install_github("ContextualWisdomLab/aFIPC")
+1. Prepare reference-form and new-form response data or compatible fitted model
+   objects.
+2. Define the reviewed common-item correspondence between forms.
+3. Run `autoFIPC()` with the intended item model and explicit common-item
+   confirmation.
+4. Review convergence, item-parameter-drift evidence, and linked outputs before
+   downstream score reporting or operational use.
+
+## Method and architecture
+
+- `R/aFIPC.R` contains the main fixed-item linking workflow.
+- `R/surveyFA.R` contains supporting analytical routines used by the package.
+- `DESCRIPTION`, `NAMESPACE`, and `man/` define package metadata and generated
+  reference documentation.
+- `docs/adr/` records reviewed method/architecture decisions.
+- `docs/papers/` retains verified methodological references and DOIs.
+- `.github/workflows/` provides continuous-integration and security checks.
+
+The current calibration engine directly uses the external `mirt` runtime for
+IRT estimation and parameter/model operations. FIPC is distinct from separate
+calibration plus Stocking-Lord/Haebara transformations and from concurrent
+calibration. See the FIPC contract and ADR index for the precise boundary.
+
+## Onboarding and verification
+
+Clone the repository, use a current R toolchain, and run the package checks
+before changing calibration behavior:
+
+```bash
+R_PROFILE_USER=/dev/null Rscript -e \
+'install.packages("rcmdcheck", repos="https://cloud.r-project.org")'
+R_PROFILE_USER=/dev/null Rscript -e \
+'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning")'
 ```
 
-For local development and verification, follow the repository README and contribution guidance rather than relying on the historical vendored Packrat installation tree.
+For contributor expectations and architectural context, read `CONTRIBUTING.md`
+and `ARCHITECTURE.md` before modifying estimation or linking logic.
 
-## Documentation
+## Release and commercial-license status
 
-- [Repository README](https://github.com/ContextualWisdomLab/aFIPC/blob/master/README.md) — package purpose, development status, and local package checks.
-- [Architecture](https://github.com/ContextualWisdomLab/aFIPC/blob/master/ARCHITECTURE.md) — runtime and maintenance boundaries.
-- [FIPC linking contract](fixed-parameter-item-calibration.md) — what is fixed, what is estimated, and how the linked scale is defined.
-- [Architecture decisions](adr/) — reviewed decisions for FIPC-only linking, `mirt` MML-EM estimation, and IPD/DIF delegation.
-- [Research sources](papers/) — verified methodological references and DOIs.
-- [Contributing](https://github.com/ContextualWisdomLab/aFIPC/blob/master/CONTRIBUTING.md) — development and verification expectations.
-- [GitHub Releases](https://github.com/ContextualWisdomLab/aFIPC/releases) — release history when available.
-- [Ask DeepWiki](https://deepwiki.com/ContextualWisdomLab/aFIPC) — repository-aware questions about the code and documentation.
+The repository currently has no published GitHub Release. Source metadata
+`0.1.0` and development checks are not immutable release evidence.
 
-## Evidence boundary
+The current source/dependency graph is also **not cleared for
+ContextualWisdomLab commercial intake/distribution**: package metadata declares
+`GPL-3 | file LICENSE`, and the runtime directly imports the GPL-family `mirt`
+package. Issue #320 owns the source-provenance/relicensing review plus
+replacement of that runtime dependency while preserving the actual fixed-item
+calibration/linking contract. Until that work is complete, do not describe
+aFIPC as Apache-2.0/MIT-cleared or commercially policy-compliant.
 
-aFIPC is psychometric research software. Linking quality depends on anchor quality, model fit, calibration assumptions, and the comparability of the forms being linked. Repository tests and cited methodology provide implementation evidence; they do not make every pair of operational test forms automatically comparable.
+## Documentation and support
 
-This page is suitable as the source for a minimal GitHub Pages site once the organization-owned metadata/Pages reconciler can publish the repository safely. A source commit alone is not evidence that Pages is live.
+- [Repository README](https://github.com/ContextualWisdomLab/aFIPC/blob/master/README.md)
+  - product, usage, status, and contributor entry point.
+- [Architecture](https://github.com/ContextualWisdomLab/aFIPC/blob/master/ARCHITECTURE.md)
+  - runtime and maintenance boundaries.
+- [FIPC linking contract](fixed-parameter-item-calibration.md) - linking design.
+- [Architecture decisions](adr/README.md) - method and ownership decisions.
+- [Research sources](papers/README.md) - verified references and DOIs.
+- [Contributing](https://github.com/ContextualWisdomLab/aFIPC/blob/master/CONTRIBUTING.md)
+  - development and verification expectations.
+- [Ask DeepWiki](https://deepwiki.com/ContextualWisdomLab/aFIPC) - repository-aware
+  documentation and code navigation.
+
+Linking quality depends on anchor quality, model fit, calibration assumptions,
+and the comparability of the forms being linked. Repository tests and cited
+methodology are implementation evidence; they do not make arbitrary test forms
+automatically comparable.
+
+This file is a Pages-ready source only. It is not evidence that GitHub Pages is
+published; publication requires repository settings and live HTTPS verification.
