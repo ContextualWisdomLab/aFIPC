@@ -1,11 +1,8 @@
 # aFIPC
 
-Automated Fixed Item Parameter Calibration (FIPC) for IRT test linking.
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ContextualWisdomLab/aFIPC)
 
-This package contains the original graduate-school implementation used to
-produce accurate fixed-item linking results. The current maintenance goal is to
-preserve numerical behavior while modernizing repository operations
-(documentation, CI, and dependency hygiene).
+Automated Fixed Item Parameter Calibration (FIPC) for IRT test linking and equating. aFIPC helps psychometric teams preserve score-scale continuity across test forms by fixing anchor-item parameters while estimating parameters for newly administered items.
 
 ## What this repository contains
 
@@ -13,11 +10,12 @@ preserve numerical behavior while modernizing repository operations
 - `DESCRIPTION`, `NAMESPACE`, `man/`: package metadata and generated docs
 - `packrat/`: historical dependency lock/vendor directory
 - `.github/workflows/`: CI/security automation
+- `docs/index.md`: product, architecture, onboarding, and release-facing documentation
 
 ## Development status
 
-- Algorithmic core is legacy but trusted for historical outputs.
-- Operational guardrails are now maintained via GitHub Actions and Dependabot.
+- Algorithmic behavior is preserved for compatibility with established linking outputs.
+- Operational guardrails are maintained via GitHub Actions and Dependabot.
 - Legacy `packrat` bootstrap is opt-in via `AFIPC_ENABLE_PACKRAT=true`.
 - Broken host-specific `packrat/lib-R` symlinks were removed for portable builds.
 - Architectural and agent operation docs are available in:
@@ -50,6 +48,5 @@ R_PROFILE_USER=/dev/null Rscript -e \
 ## Maintenance policy
 
 - Prefer preserving equation/calibration behavior over refactoring.
-- Avoid silent behavioral changes in `autoFIPC()` without explicit regression
-  evidence.
+- Avoid silent behavioral changes in `autoFIPC()` without explicit regression evidence.
 - Keep CI green on supported runners and keep Actions pinned/updated.
