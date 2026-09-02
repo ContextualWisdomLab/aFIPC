@@ -19,27 +19,36 @@ The implementation does not use one estimation method for every model
 artifact. The method policy has three distinct stages:
 
 1. When raw old/new form data must first be fitted, `autoFIPC()` starts with
-   the ordinary `mirt` path. If fit diagnostics remain unacceptable and
-   whole-form retry is enabled, it may retry QMCEM, then MHRM, and finally
-   `surveyFA()` recovery variants. These fallbacks are independent of the
-   later linked-fit `tryEM` choice.
+   the ordinary `mirt` path. If the current fit is still unacceptable and the
+   corresponding `tryFitwholeOldItems` or `tryFitwholeNewItems` flag is true,
+   that flag gates only the direct QMCEM retry followed by the direct MHRM
+   retry. If the model remains unacceptable after that stage—or if the direct
+   whole-form retry flag is false—the later `surveyFA()` recovery sequence is
+   still evaluated independently: `forceUIRT`, then `forceNormalEM`, then the
+   `unstable` path, then `forceMHRM`, with each later step attempted only while
+   the current model remains unacceptable. These raw-form recovery gates are
+   independent of the later linked-fit `tryEM` choice.
 2. The linked FIPC fit uses EM when `itemtype == "nominal"` or `tryEM` is
    true. Otherwise it uses MHRM.
 3. IPD/DIF screening follows the same EM-versus-MHRM selection rule as the
    linked fit: EM for nominal items or `tryEM = TRUE`, MHRM otherwise.
 
 Accordingly, an `autoFIPC()` result can legitimately contain old/new form
-models fitted by QMCEM or MHRM even when the linked model uses EM. Documentation
-must not label every returned model as MML-EM.
+models fitted by QMCEM, MHRM, or a `surveyFA()` recovery path even when the
+linked model uses EM. Setting `tryFitwholeOldItems = FALSE` or
+`tryFitwholeNewItems = FALSE` suppresses only the corresponding direct
+QMCEM/MHRM whole-form retries; it does not suppress later `surveyFA()` recovery.
+Documentation must not label every returned model as MML-EM.
 
 ## Decision
 
 Use `mirt` as the estimation engine while keeping the method of each model
 artifact explicit:
 
-- Separate old-form and new-form raw-data fits call `mirt::mirt` and may use
-  the bounded recovery sequence described above when their initial fit is not
-  acceptable.
+- Separate old-form and new-form raw-data fits call `mirt::mirt`. Their
+  `tryFitwhole*` flags gate the direct QMCEM-then-MHRM retries only; if the
+  current model is still unacceptable, `surveyFA()` recovery remains a
+  separate subsequent gate sequence.
 - The linked fit calls `mirt::mirt` with `pars` after the FIPC copy-and-fix
   step.
 - Default linked estimation uses `method = "EM"` because `tryEM` defaults to
@@ -59,6 +68,9 @@ MHRM algorithms.
   estimator and risk silent numerical drift. Rejected.
 - **A different IRT package.** Historical outputs were produced with `mirt`.
   Changing engines would be a scientific behavior change, not a docs fix.
+- **Treating `tryFitwhole* = FALSE` as disabling every later recovery.**
+  Rejected because current source places the `surveyFA()` recovery sequence
+  outside those direct retry gates.
 - **Calling every result “MML-EM.”** Rejected because source permits QMCEM and
   MHRM for raw-form recovery and MHRM for the linked/IPD branch when the
   explicit method policy selects it.
@@ -70,6 +82,9 @@ MHRM algorithms.
 - Evidence about a returned model should record its actual estimation path;
   `tryEM = TRUE` alone does not prove the separately fitted old/new models used
   EM after all recovery attempts.
+- Disabling `tryFitwholeOldItems` or `tryFitwholeNewItems` must not be described
+  as disabling all raw-form recovery unless runtime behavior is changed in a
+  dedicated behavior PR with regression evidence.
 - Formula-integrity reviews in
   `docs/fixed-parameter-item-calibration.md` apply to orchestration only.
   Estimation mathematics stay in `mirt`.
