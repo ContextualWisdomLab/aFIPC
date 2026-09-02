@@ -32,7 +32,7 @@ refactoring.
 4. Review convergence, item-parameter-drift evidence, and linked outputs before
    downstream use.
 
-A minimal API shape is:
+A non-interactive raw-data API shape is:
 
 ```r
 result <- autoFIPC(
@@ -40,9 +40,16 @@ result <- autoFIPC(
   oldformYData = reference_form,
   newformCommonItemNames = common_new,
   oldformCommonItemNames = common_old,
+  newformBILOGprior = FALSE,
+  oldformBILOGprior = FALSE,
   confirmCommonItems = TRUE
 )
 ```
+
+The explicit BILOG-prior choices matter for the default 3PL path: leaving either
+choice as `NULL` can require interactive input when raw response data are fitted.
+If callers use already fitted compatible model objects, review the complete
+argument contract before omitting those raw-data choices.
 
 `autoFIPC()` returns the base-form, new-form, and linked-model artifacts as an R
 list. See `man/autoFIPC.Rd` for the complete argument contract.
@@ -77,11 +84,17 @@ assumptions, and the comparability of the forms being linked. Repository tests
 and cited methodology are implementation evidence; they do not make arbitrary
 forms automatically comparable.
 
-## Evaluate from source
+## Evaluate the current source
 
-This repository currently provides a source package rather than a published
-GitHub release. For contributor/evaluation checks, use a clean R profile and the
-same `rcmdcheck` path exercised by repository automation:
+This repository currently provides source rather than an immutable GitHub
+release. It also has a known GPL-family runtime blocker: `DESCRIPTION` imports
+`mirt`, and `rcmdcheck` does **not** install that dependency for the package under
+check. Therefore this README does not present a fresh `install.packages("mirt")`
+bootstrap as a commercially acceptable onboarding path.
+
+If you are maintaining the existing legacy development environment and its
+current dependency graph has already been provisioned for license-diligence or
+compatibility work, the repository check itself is:
 
 ```bash
 R_PROFILE_USER=/dev/null Rscript -e \
@@ -90,6 +103,12 @@ R_PROFILE_USER=/dev/null Rscript -e \
 R_PROFILE_USER=/dev/null Rscript -e \
 'rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning")'
 ```
+
+This is **not** a clean commercial-install recipe: `rcmdcheck` expects the
+package's declared runtime dependencies, including the currently disallowed
+`mirt`, to already exist. A commercially compatible clean setup is blocked until
+issue #320 replaces/removes that runtime path and the final package graph is
+revalidated.
 
 The historical `packrat/` tree is retained for compatibility archaeology. Its
 bootstrap is opt-in via `AFIPC_ENABLE_PACKRAT=true` and should not be treated as
