@@ -56,17 +56,26 @@ algorithms at distinct stages rather than applying one method label to every
 returned model:
 
 - If old/new inputs are raw response data, `autoFIPC()` first builds separate
-  form models. When an initial fit is unacceptable and whole-form retry is
-  enabled, source can retry QMCEM, then MHRM, followed by `surveyFA()` recovery
-  variants. Those recovery choices can occur even when `tryEM = TRUE`.
+  form models. If a current form fit is unacceptable and the corresponding
+  `tryFitwholeOldItems` or `tryFitwholeNewItems` flag is true, that flag gates
+  only the direct QMCEM retry followed by the direct MHRM retry.
+- If the current raw-form model remains unacceptable after that stage—or if the
+  corresponding direct whole-form retry flag is false—the later `surveyFA()`
+  recovery sequence is evaluated independently. Source proceeds through
+  `forceUIRT`, `forceNormalEM`, `unstable`, and `forceMHRM` variants as needed,
+  stopping when the current model becomes acceptable. These raw-form recovery
+  choices are independent of the later linked-fit `tryEM` choice.
 - The linked FIPC model uses `method = "EM"` when the item type is nominal or
   `tryEM = TRUE`; for non-nominal items with `tryEM = FALSE`, it uses MHRM.
 - IPD/DIF screening follows the same EM-versus-MHRM selection rule as the
   linked fit.
 
 Therefore, `tryEM = TRUE` is not evidence that the separately returned old/new
-form models were ultimately fitted by MML-EM. Reproducibility evidence should
-record the actual fitted-model path when method identity matters.
+form models were ultimately fitted by MML-EM. Likewise,
+`tryFitwholeOldItems = FALSE` or `tryFitwholeNewItems = FALSE` suppresses the
+direct QMCEM/MHRM retry for that form, not every later `surveyFA()` recovery.
+Reproducibility evidence should record the actual fitted-model path when method
+identity matters.
 
 ## Formula-integrity audit of performance refactors
 
@@ -128,9 +137,10 @@ behavior. See `docs/adr/` for the accepted method decisions.
 
 `DESCRIPTION` imports `mirt` without pinning an exact package version, so this
 document must not imply one historical version is permanently authoritative.
-At the 2026-09-02 documentation review, the current CRAN package was `mirt`
-1.47. Reproducibility evidence should record the installed version actually
-used for a calibration run.
+At the 2026-09-02 documentation review, current CRAN package/check metadata was
+reverified as `mirt` 1.47. Reproducibility evidence should record the installed
+version actually used for a calibration run rather than treating that review
+snapshot as a permanent pin.
 
 - CRAN package record: <https://cran.r-project.org/package=mirt>
 - CRAN reference manual: <https://cran.r-project.org/web/packages/mirt/mirt.pdf>
