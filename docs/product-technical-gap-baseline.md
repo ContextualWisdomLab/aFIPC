@@ -1,6 +1,6 @@
 # aFIPC Product–Technical Gap Baseline
 
-Last reviewed against PR #273 after repair commits `3f02b35`, `76ae714`, `a94531d`, and `438e692`. The protected base for this repair started at `master@f87c2324f1686135e57d8730c1b0b9420874f300`. GitHub live state remains authoritative when these identifiers become historical.
+Last reviewed against PR #273 after repair commits `3f02b35`, `76ae714`, `a94531d`, `438e692`, and `7fc01d6`. The protected base for this repair started at `master@f87c2324f1686135e57d8730c1b0b9420874f300`. GitHub live state remains authoritative when these identifiers become historical.
 
 ## Product boundary
 
@@ -26,13 +26,21 @@ Acceptance for this repair is:
 
 ### Scientific validation
 
-Unit and deterministic regression tests exist, but commercial scientific acceptance is not yet established across realistic ability-distribution shifts, anchor proportions, sample sizes and item-parameter regimes. The next evidence-bearing work should record true generating parameters and deterministic seeds, then report recovery RMSE, bias and interval coverage without excluding failed replications from the denominator. Non-normal and shifted latent distributions must be represented rather than assuming that a nominally normal reference condition is sufficient.
+Deterministic regression evidence exists, and open PR #264 adds a true-parameter recovery gate for one generated 2PL condition. Its current exact head `af61177e0039a689c64d09c7f63275641ce7d537` has successful R CMD check, Code Quality, Security Audit, SAST, Security Scan, OpenCode, Noema, Strix and merge-scheduler workflow evidence; its previously actionable CodeRabbit findings are implemented and their review threads have been resolved. It is still not a substitute for product-level Monte Carlo acceptance because the experiment covers one fixed seed, one sample size, one anchor design and one latent-distribution condition.
+
+Commercial scientific acceptance therefore remains open across realistic ability-distribution shifts, anchor proportions, sample sizes and item-parameter regimes. The next evidence-bearing work should record true generating parameters and deterministic seed manifests, then report recovery RMSE, bias and interval coverage without excluding failed replications from the denominator. Non-normal and shifted latent distributions must be represented rather than assuming that a nominally normal reference condition is sufficient.
 
 The research trace for this requirement is maintained in `docs/fixed-parameter-item-calibration.md`. Kim (2006) showed that fixed-parameter calibration performance depends on the prior-ability update/EM strategy and population distribution; Kim, Kim, and Lee (2026) provide newer evidence that latent-density misspecification can materially affect IRT equating. The latter is a stress-test rationale, not a claim that aFIPC has already been shown biased.
 
+### Commercial dependency and licensing boundary
+
+Open issue #320 is the canonical commercial-intake blocker for the current runtime graph. Repository metadata declares `GPL-3 | file LICENSE`, while the root `LICENSE` is not a complete standalone permissive grant, and core calibration imports/calls `mirt`. The issue records current CRAN `mirt` metadata as `GPL (>= 3)` and states that ContextualWisdomLab's normal commercial intake policy does not accept GPL/LGPL/AGPL-family dependencies.
+
+This cannot be repaired by README wording, suppressing license evidence, or relabeling `mirt` optional while the core path still invokes it. The owner-path acceptance in #320 is a commercially compatible estimator/runtime boundary that preserves the actual fixed-item calibration estimand and numerically validates compatibility, followed by source/contributor provenance sufficient for any repository relicensing decision. Until that evidence exists, the repository must not be represented as satisfying the organization's intended commercial dependency policy.
+
 ### Release evidence
 
-A commercial release path needs version/CHANGELOG discipline, reproducible package build/check evidence, an immutable tag/GitHub Release, dependency/SBOM evidence where applicable, provenance, and a documented rollback path. The repository currently has no GitHub Release and no `CHANGELOG.md`, so this gap remains open even if PR #273 becomes code-green.
+A commercial release path needs version/CHANGELOG discipline, reproducible package build/check evidence, an immutable tag/GitHub Release, dependency/SBOM evidence where applicable, provenance, and a documented rollback path. The repository currently has no GitHub Release and no `CHANGELOG.md`, so this gap remains open even if PR #273 becomes code-green. The licensing/runtime boundary above is an upstream prerequisite to claiming a policy-compliant commercial release.
 
 ### Performance evidence
 
@@ -48,8 +56,8 @@ The codebase contains historical comments and `.jules/bolt.md` entries that use 
 
 **Risk.** The helper intentionally preserves the legacy error text rather than introducing a new public error class. If a typed condition becomes part of the package API later, that should be a separate behavior change with its own RED/GREEN tests.
 
-**Effect.** The optimization can proceed without hiding fitted-model/response-data drift. The PR remains non-release-ready until exact-head CI and the broader scientific/release gaps above are resolved.
+**Effect.** The optimization can proceed without hiding fitted-model/response-data drift. The PR remains non-release-ready until exact-head CI and the broader scientific, licensing and release gaps above are resolved.
 
 ## References
 
-See `docs/fixed-parameter-item-calibration.md` for the APA 7th research trace, including Kim (2006), Kang and Petersen (2012), Chalmers' `mirt` documentation, and Kim, Kim, and Lee (2026).
+See `docs/fixed-parameter-item-calibration.md` for the APA 7th research trace, including Kim (2006), Kang and Petersen (2012), Chalmers' `mirt` documentation, and Kim, Kim, and Lee (2026). Commercial dependency-policy acceptance is tracked by issue #320; that repository issue is the authoritative owner-path statement for the no-GPL-family intake requirement used here.
