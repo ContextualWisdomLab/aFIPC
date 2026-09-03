@@ -78,18 +78,3 @@ test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)",
   expect_identical(actual_old, legacy_old)
   expect_identical(actual_new, legacy_new)
 })
-
-test_that("model-column optimization preserves legacy selection failures (#273)", {
-  available <- c("item_a", "item_b", "item_c")
-
-  expect_identical(
-    aFIPC:::.validated_model_columns(c("item_c", "item_a"), available),
-    c("item_c", "item_a")
-  )
-
-  expect_error(
-    aFIPC:::.validated_model_columns(c("item_a", "missing_item"), available),
-    "undefined columns selected",
-    fixed = TRUE
-  )
-})

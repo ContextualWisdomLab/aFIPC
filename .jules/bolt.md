@@ -16,7 +16,3 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
-
-## 2026-09-03 - 모델 열 검증을 보존한 열 이름 조회
-**Learning:** `colnames(df[cols])`를 `intersect(cols, colnames(df))`로 바로 바꾸면 메모리 할당은 줄일 수 있지만 의미가 같지 않습니다. 기존 코드는 요청한 열이 하나라도 없으면 `undefined columns selected`로 중단하는 반면 `intersect()`는 없는 열을 조용히 제거합니다. FIPC/IPD에서는 fitted model과 response data의 문항 schema 불일치를 숨기면 잘못된 linking 대상이 만들어질 수 있으므로 이 실패 동작은 성능 최적화보다 우선합니다.
-**Action:** 요청 순서를 그대로 반환하되 `match()` 결과에 `NA`가 있으면 기존과 같은 오류로 중단하는 `.validated_model_columns()`를 사용합니다. 최적화 PR에는 정상 순서와 missing-column 오류를 함께 고정하는 회귀 테스트를 먼저 두고, 속도 향상 수치는 재현 가능한 benchmark가 있을 때만 주장합니다.

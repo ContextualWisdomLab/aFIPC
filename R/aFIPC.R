@@ -1,21 +1,3 @@
-#' Validate fitted-model columns without materializing a data subset
-#'
-#' Preserve the historical `data[requested_columns]` contract while avoiding
-#' allocation of the intermediate data frame. Fitted-model item order is kept,
-#' and a response-data/model schema mismatch remains a hard failure rather than
-#' being silently dropped from linking or IPD analysis.
-#'
-#' @param requested Character vector of fitted-model column names.
-#' @param available Character vector of response-data column names.
-#' @return `requested`, unchanged, after validating that every name is present.
-#' @keywords internal
-.validated_model_columns <- function(requested, available) {
-  if (anyNA(match(requested, available))) {
-    stop("undefined columns selected", call. = FALSE)
-  }
-  requested
-}
-
 #' automated fixed item parameter linking
 #'
 #' @import mirt
@@ -638,14 +620,8 @@ autoFIPC <-
       IPDItemCount <- 0
 
       # IPD target item checking
-      newFormColNames <- .validated_model_columns(
-        colnames(newFormModel@Data$data),
-        colnames(newformXDataK)
-      )
-      oldFormColNames <- .validated_model_columns(
-        colnames(oldFormModel@Data$data),
-        colnames(oldformYDataK)
-      )
+      newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
+      oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
       # ⚡ Bolt: Vectorized match() to avoid dynamic array growth overhead inside a for loop
       idxNew <- match(newformCommonItemNames, newFormColNames)
@@ -773,14 +749,8 @@ autoFIPC <-
       }
     }
 
-    newFormColNames <- .validated_model_columns(
-      colnames(newFormModel@Data$data),
-      colnames(newformXDataK)
-    )
-    oldFormColNames <- .validated_model_columns(
-      colnames(oldFormModel@Data$data),
-      colnames(oldformYDataK)
-    )
+    newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
+    oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
     # ⚡ Bolt: Cache parameter indices to avoid O(N) linear search inside loop
     newScaleParmsItemIdxCache <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)

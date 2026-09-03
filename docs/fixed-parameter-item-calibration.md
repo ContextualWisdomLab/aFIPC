@@ -41,14 +41,6 @@ eligible when both items share the same number of scored response categories,
 i.e. `n_cat(x_j) == n_cat(y_j)` where `n_cat` counts distinct non-missing
 responses.
 
-A fitted model and the response data used for linking must also agree on item
-identity. The current `mirt::fixedCalib()` documentation explicitly requires
-observed responses or `NA` placeholders for item names used by the fitted model.
-Accordingly, `autoFIPC()` treats a fitted-model item that is absent from its
-response data as a schema error. Performance work may avoid constructing an
-intermediate data-frame subset, but it must not turn that error into silent
-intersection or item dropping.
-
 ## Formula-integrity audit of performance refactors
 
 The estimation mathematics (item-response probabilities, the MML-EM cycles,
@@ -71,49 +63,19 @@ performance refactors were reviewed against that contract and confirmed
 - **#99** (`d73adbd`): vectorize IPD anchor extraction from a per-column loop
   to `as.character(unlist(IPDItemList[row, cols]))`. Row 1 (old form), row 2
   (new form), and the screened column order are all preserved exactly.
-- **#273**: replace `colnames(df[model_columns])` only after preserving its
-  fail-closed schema validation. `.validated_model_columns()` avoids the
-  intermediate subset, keeps fitted-model column order, and rejects missing
-  response-data columns. `tests/testthat/test-optimization-equivalence.R`
-  covers both the ordered success case and the missing-column error.
 
-Regression guards for the formula-bearing expressions are pinned to independent
-reference values in `tests/testthat/test-optimization-equivalence.R`. The
-end-to-end linking contract (anchors fixed to old-form values, non-anchors left
-free) is pinned in `tests/testthat/test-fixed-parameter-calibration.R`.
-
-## Scientific acceptance gap
-
-The package does not yet have product-level Monte Carlo acceptance across
-realistic latent-distribution shifts, anchor proportions, sample sizes and item
-parameter regimes. Kim (2006) found that FPC performance depends on the prior
-ability updating and EM-cycle strategy and on differences between reference and
-new-form ability distributions. More recently, Kim, Kim, and Lee (2026) showed
-that latent-density misspecification can materially affect IRT equating accuracy;
-their study concerns IRT equating rather than this implementation directly, so
-it is evidence for a stress-test requirement, not evidence that `autoFIPC()` is
-currently biased.
-
-Before claiming scientific release readiness, acceptance should therefore
-report true-parameter recovery, RMSE, bias and interval coverage over explicitly
-recorded seeds and conditions, including non-normal or shifted latent
-distributions and realistic common-item designs. Small deterministic synthetic
-tests remain unit/regression evidence, not a substitute for that validation.
+Regression guards for the two formula-bearing expressions (#56 and #99) are
+pinned to hand-computed reference values in
+`tests/testthat/test-optimization-equivalence.R`. The end-to-end linking
+contract (anchors fixed to old-form values, non-anchors left free) is pinned in
+`tests/testthat/test-fixed-parameter-calibration.R`.
 
 ## References
 
-- Chalmers, R. P. (2012). mirt: A multidimensional item response theory package
-  for the R environment. *Journal of Statistical Software, 48*(6), 1–29.
-  https://doi.org/10.18637/jss.v048.i06
-- Chalmers, R. P. (n.d.). *Fixed-item calibration method (`mirt::fixedCalib`)*.
-  mirt documentation. https://philchalmers.github.io/mirt/docs/reference/fixedCalib.html
-- Kang, T., & Petersen, N. S. (2012). Linking item parameters to a base scale.
-  *Asia Pacific Education Review, 13*(2), 311–321.
-  https://doi.org/10.1007/s12564-011-9197-2
-- Kim, K. Y., Kim, S., & Lee, H. (2026). The impact of latent density
-  misspecification on item response theory equating methods. *Applied
-  Psychological Measurement, 50*(7), 359–375.
-  https://doi.org/10.1177/01466216261425440
 - Kim, S. (2006). A comparative study of IRT fixed parameter calibration
-  methods. *Journal of Educational Measurement, 43*(4), 355–381.
-  https://doi.org/10.1111/j.1745-3984.2006.00021.x
+  methods. Journal of Educational Measurement, 43(4), 355-381.
+- Chalmers, R. P. `mirt::fixedCalib` documentation. The implementation note
+  describes fixed-item calibration methods based on Kim (2006) and points to
+  `multipleGroup` for more flexible anchor-item calibration.
+- Kim, S., & Kolen, M. J. (2010). Linking item parameters to a base scale.
+  Journal of Educational Measurement, 47(2), 164-181.
