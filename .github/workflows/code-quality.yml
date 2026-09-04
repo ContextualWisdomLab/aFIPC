@@ -31,6 +31,11 @@ jobs:
           python3 -m pip install --user yamllint
           python3 -m yamllint .yamllint.yml .github/dependabot.yml .github/workflows/*.yml
 
+      - name: Validate workflow concurrency contract
+        run: |
+          python3 scripts/ci/test_workflow_concurrency_contract_unit.py
+          python3 scripts/ci/test_workflow_concurrency_contract.py
+
       - name: Lint markdown docs
         run: |
           npm install -g markdownlint-cli2@0.18.1
