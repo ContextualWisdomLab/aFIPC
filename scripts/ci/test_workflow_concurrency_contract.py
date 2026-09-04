@@ -2,7 +2,10 @@ from pathlib import Path
 
 
 WORKFLOWS = Path(".github/workflows")
-EXPECTED_GROUP = "${{ github.workflow }}-${{ github.repository }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.run_id }}"
+EXPECTED_GROUP = (
+    "${{ github.workflow }}-${{ github.repository }}-"
+    "${{ github.event.pull_request.number || github.run_id }}"
+)
 EXPECTED_CANCEL = "cancel-in-progress: ${{ github.event_name == 'pull_request' }}"
 
 
