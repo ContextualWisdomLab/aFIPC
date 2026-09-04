@@ -620,9 +620,8 @@ autoFIPC <-
       IPDItemCount <- 0
 
       # IPD target item checking
-      # ⚡ Bolt: Use intersect to avoid O(N) memory copy caused by dataframe subsetting
-      newFormColNames <- intersect(colnames(newFormModel@Data$data), colnames(newformXDataK))
-      oldFormColNames <- intersect(colnames(oldFormModel@Data$data), colnames(oldformYDataK))
+      newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
+      oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
       # ⚡ Bolt: Vectorized match() to avoid dynamic array growth overhead inside a for loop
       idxNew <- match(newformCommonItemNames, newFormColNames)
@@ -750,9 +749,8 @@ autoFIPC <-
       }
     }
 
-    # ⚡ Bolt: Use intersect to avoid O(N) memory copy caused by dataframe subsetting
-    newFormColNames <- intersect(colnames(newFormModel@Data$data), colnames(newformXDataK))
-    oldFormColNames <- intersect(colnames(oldFormModel@Data$data), colnames(oldformYDataK))
+    newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
+    oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
 
     # ⚡ Bolt: Cache parameter indices to avoid O(N) linear search inside loop
     newScaleParmsItemIdxCache <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)
@@ -772,7 +770,6 @@ autoFIPC <-
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-          # ⚡ Bolt: Use sum(!is.na()) instead of length(stats::na.omit()) to avoid method dispatch and memory allocation overhead
           (sum(!is.na(unique(newFormModel@Data$data[, newFormItemName]))) ==
             sum(!is.na(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
