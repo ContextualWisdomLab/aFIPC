@@ -83,7 +83,6 @@ surveyFA <- function(
   response_data <- as.data.frame(data)
   response_data <-
     response_data[, vapply(response_data, function(column) {
-      # ⚡ Bolt: Use logical index summing instead of stats::na.omit to avoid method dispatch and attribute allocation overhead
       nunique <- sum(!is.na(unique(column)))
       nunique >= 2L
     }, logical(1L))]
