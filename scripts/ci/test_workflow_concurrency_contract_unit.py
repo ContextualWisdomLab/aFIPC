@@ -6,12 +6,15 @@ from test_workflow_concurrency_contract import discover_workflows, validate_work
 
 
 VALID = """name: Example
-on: pull_request
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]
 concurrency:
   group: ${{ github.workflow }}-${{ github.repository }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   check:
+    if: ${{ github.event_name != 'pull_request' || (github.event.action != 'closed' && github.event.pull_request.draft == false) }}
     runs-on: ubuntu-latest
 """
 
@@ -59,6 +62,14 @@ jobs:
         )
         with self.assertRaisesRegex(AssertionError, "unsafe cancellation policy"):
             validate_workflow_text(Path("wrong-cancel.yml"), malformed)
+
+    def test_rejects_draft_runner_admission(self) -> None:
+        malformed = VALID.replace(
+            "github.event.pull_request.draft == false",
+            "github.event.pull_request.draft == true",
+        )
+        with self.assertRaisesRegex(AssertionError, "draft pull requests"):
+            validate_workflow_text(Path("draft.yml"), malformed)
 
 
 if __name__ == "__main__":

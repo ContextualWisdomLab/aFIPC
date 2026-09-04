@@ -4,6 +4,7 @@ on:
   push:
     branches: ["master", "main"]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]
     branches: ["master", "main"]
 
 permissions:
@@ -15,6 +16,7 @@ concurrency:
 
 jobs:
   secret-and-workflow-audit:
+    if: ${{ github.event_name != 'pull_request' || (github.event.action != 'closed' && github.event.pull_request.draft == false) }}
     runs-on: ubuntu-latest
 
     steps:

@@ -9,6 +9,9 @@ EXPECTED_GROUP = (
     "${{ github.event.pull_request.number || github.run_id }}"
 )
 EXPECTED_CANCEL = "${{ github.event_name == 'pull_request' }}"
+EXPECTED_PR_TYPES = (
+    "types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]"
+)
 
 
 def discover_workflows(root: Path = WORKFLOWS) -> list[Path]:
@@ -53,6 +56,11 @@ def validate_workflow_text(path: Path, text: str) -> None:
     assert cancellations == [
         f"cancel-in-progress: {EXPECTED_CANCEL}"
     ], f"{path}: unsafe cancellation policy"
+    if "\n  pull_request:\n" in text:
+        assert EXPECTED_PR_TYPES in text, f"{path}: incomplete pull-request lifecycle"
+        assert (
+            "github.event.pull_request.draft == false" in text
+        ), f"{path}: draft pull requests occupy a runner"
 
 
 def main() -> None:
