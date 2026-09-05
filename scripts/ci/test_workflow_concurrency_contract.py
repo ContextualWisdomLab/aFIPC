@@ -6,15 +6,13 @@ from pathlib import Path
 WORKFLOWS = Path(".github/workflows")
 EXPECTED_GROUP = (
     "${{ github.workflow }}-${{ github.repository }}-"
-    "${{ github.event.pull_request.number || github.run_id }}"
+    "${{ github.event_name == 'pull_request' && github.run_attempt == 1 && "
+    "github.event.pull_request.number || github.run_id }}"
 )
 EXPECTED_CANCEL = "${{ github.event_name == 'pull_request' }}"
-EXPECTED_PR_TYPES = (
-    "types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]"
-)
+EXPECTED_PR_TYPES = "types: [opened, synchronize, reopened, ready_for_review]"
 EXPECTED_PR_ADMISSION = (
-    "${{ github.event_name != 'pull_request' || "
-    "(github.event.action != 'closed' && github.event.pull_request.draft == false) }}"
+    "${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}"
 )
 
 
@@ -127,7 +125,7 @@ def validate_workflow_text(path: Path, text: str) -> None:
     ), f"{path}: incomplete pull-request lifecycle"
     assert _job_admissions(text) and all(
         admission == EXPECTED_PR_ADMISSION for admission in _job_admissions(text)
-    ), f"{path}: draft or closed pull requests occupy a runner"
+    ), f"{path}: draft pull requests occupy a runner"
 
 
 def main() -> None:

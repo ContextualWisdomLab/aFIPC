@@ -8,13 +8,13 @@ from test_workflow_concurrency_contract import discover_workflows, validate_work
 VALID = """name: Example
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]
+    types: [opened, synchronize, reopened, ready_for_review]
 concurrency:
-  group: ${{ github.workflow }}-${{ github.repository }}-${{ github.event.pull_request.number || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.repository }}-${{ github.event_name == 'pull_request' && github.run_attempt == 1 && github.event.pull_request.number || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   check:
-    if: ${{ github.event_name != 'pull_request' || (github.event.action != 'closed' && github.event.pull_request.draft == false) }}
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
 """
 
@@ -32,6 +32,14 @@ class WorkflowConcurrencyContractTest(unittest.TestCase):
 
     def test_accepts_exact_top_level_contract(self) -> None:
         validate_workflow_text(Path("valid.yml"), VALID)
+
+    def test_rejects_noop_pull_request_lifecycle_events(self) -> None:
+        malformed = VALID.replace(
+            "types: [opened, synchronize, reopened, ready_for_review]",
+            "types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]",
+        )
+        with self.assertRaisesRegex(AssertionError, "pull-request lifecycle"):
+            validate_workflow_text(Path("noop-events.yml"), malformed)
 
     def test_rejects_nested_lookalike(self) -> None:
         malformed = """name: Example
@@ -75,17 +83,17 @@ jobs:
             "github.event.pull_request.draft == false",
             "github.event.pull_request.draft == true",
         )
-        with self.assertRaisesRegex(AssertionError, "draft or closed pull requests"):
+        with self.assertRaisesRegex(AssertionError, "draft pull requests"):
             validate_workflow_text(Path("draft.yml"), malformed)
 
-    def test_rejects_missing_closed_runner_admission(self) -> None:
-        malformed = VALID.replace("github.event.action != 'closed' && ", "")
-        with self.assertRaisesRegex(AssertionError, "draft or closed pull requests"):
-            validate_workflow_text(Path("closed.yml"), malformed)
+    def test_rejects_rerun_that_shares_the_pull_request_group(self) -> None:
+        malformed = VALID.replace(" && github.run_attempt == 1", "")
+        with self.assertRaisesRegex(AssertionError, "unsafe concurrency group"):
+            validate_workflow_text(Path("rerun.yml"), malformed)
 
     def test_rejects_flow_style_pull_request_trigger(self) -> None:
         malformed = VALID.replace(
-            "on:\n  pull_request:\n    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]",
+            "on:\n  pull_request:\n    types: [opened, synchronize, reopened, ready_for_review]",
             "on: [pull_request]",
         )
         with self.assertRaisesRegex(AssertionError, "pull-request trigger"):
