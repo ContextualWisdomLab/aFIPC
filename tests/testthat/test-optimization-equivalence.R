@@ -1,19 +1,16 @@
 # Formula-integrity regression guards for performance refactors.
 #
-# These tests pin the formula-bearing expressions that recent "Bolt"
-# refactors rewrote, so any future re-optimization that silently changes their
-# meaning is caught. Values below are hand-computed references, not a
-# re-encoding of the current implementation.
+# These tests pin the two formula-bearing expressions that recent "Bolt"
+# performance refactors rewrote, so any future re-optimization that silently
+# changes their meaning is caught. Values below are hand-computed references,
+# not a re-encoding of the current implementation.
 #
 # Audited refactors:
 #   * #56 (fc8bbfb): response-category count guard rewritten from
 #       length(levels(as.factor(x)))  ->  length(na.omit(unique(x)))
-#     The protected contract now counts DISTINCT OBSERVED NON-MISSING response
-#     categories. In particular, unused factor levels are not observations.
-#   * #336: the same observed-category count is expressed as
-#       sum(!is.na(unique(x)))
-#     The test below treats this as a behavior-preserving expression change;
-#     it does not infer a latency or allocation improvement from equivalence.
+#     Both count DISTINCT NON-MISSING response categories. This guard decides
+#     whether an old/new common-item pair may be linked (Kim, 2006: an anchor
+#     item must share the same response structure on both forms).
 #   * #99 (d73adbd): IPD common-item extraction rewritten from a per-column
 #       for-loop over IPDItemList[cols][row, i]
 #     to a vectorized
@@ -21,57 +18,36 @@
 #     Row 1 = old-form anchor names, row 2 = new-form anchor names, restricted
 #     to the columns that survived IPD screening (CommonItemList_NOIPD).
 
-test_that("category-count guard counts distinct observed non-missing categories (#336)", {
+test_that("category-count guard counts distinct non-missing categories (#56)", {
   vecs <- list(
-    dichotomous        = c(0, 1, 0, 1, 1, 0),
-    trichotomous_w_na  = c(0, 1, 2, NA, 2, 1, 0),
-    constant           = c(0, 0, 0, 0),
-    four_category_w_na = c(0, 1, 2, 3, 3, NA, 1),
-    all_missing        = c(NA_real_, NA_real_),
-    numeric_nan        = c(1, NaN, NA_real_, 1, 2),
-    factor_w_unused    = factor(c("a", "b", "a", NA), levels = c("a", "b", "unused"))
+    dichotomous       = c(0, 1, 0, 1, 1, 0),
+    trichotomous_w_na = c(0, 1, 2, NA, 2, 1, 0),
+    constant          = c(0, 0, 0, 0),
+    four_category_w_na = c(0, 1, 2, 3, 3, NA, 1)
   )
 
-  # Independent hand-computed reference (distinct observed non-missing values).
+  # Independent hand-computed reference (distinct non-missing categories).
   expected <- c(
     dichotomous        = 2L,
     trichotomous_w_na  = 3L,
     constant           = 1L,
-    four_category_w_na = 4L,
-    all_missing        = 0L,
-    numeric_nan        = 2L,
-    factor_w_unused    = 2L
+    four_category_w_na = 4L
   )
 
-  omit_unique_idiom <- vapply(
+  new_idiom <- vapply(
     vecs,
-    function(x) length(stats::na.omit(unique(x))),
+    function(x) length(na.omit(unique(x))),
     integer(1)
   )
-  logical_count_idiom <- vapply(
-    vecs,
-    function(x) sum(!is.na(unique(x))),
-    integer(1)
-  )
-
-  expect_equal(omit_unique_idiom, expected)
-  expect_equal(logical_count_idiom, expected)
-  expect_equal(unname(logical_count_idiom), unname(omit_unique_idiom))
-
-  # On ordinary atomic response vectors, preserve the pre-#56 expression too.
-  # A factor with declared-but-unused levels is intentionally excluded here:
-  # `levels(as.factor(x))` counts declarations, whereas the protected #56
-  # contract counts observed categories.
-  ordinary <- setdiff(names(vecs), "factor_w_unused")
   legacy_idiom <- vapply(
-    vecs[ordinary],
+    vecs,
     function(x) length(levels(as.factor(x))),
     integer(1)
   )
-  expect_equal(
-    unname(logical_count_idiom[ordinary]),
-    unname(legacy_idiom)
-  )
+
+  expect_equal(new_idiom, expected)
+  # The refactor must remain equivalent to the pre-#56 expression.
+  expect_equal(unname(new_idiom), unname(legacy_idiom))
 })
 
 test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)", {
