@@ -24,3 +24,5 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
+^\.semgrepignore$
+^test_validation\.R$
