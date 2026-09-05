@@ -12,6 +12,10 @@ EXPECTED_CANCEL = "${{ github.event_name == 'pull_request' }}"
 EXPECTED_PR_TYPES = (
     "types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]"
 )
+EXPECTED_PR_ADMISSION = (
+    "${{ github.event_name != 'pull_request' || "
+    "(github.event.action != 'closed' && github.event.pull_request.draft == false) }}"
+)
 
 
 def discover_workflows(root: Path = WORKFLOWS) -> list[Path]:
@@ -40,10 +44,69 @@ def _top_level_concurrency_lines(path: Path, text: str) -> list[str]:
             break
 
     return [
-        line.strip()
+        line[2:]
         for line in lines[start:end]
-        if line.strip() and not line.lstrip().startswith("#")
+        if line.startswith("  ") and not line.startswith("    ")
     ]
+
+
+def _has_pull_request_trigger(text: str) -> bool:
+    """Return whether the workflow has a top-level pull-request trigger block."""
+    lines = text.splitlines()
+    try:
+        start = lines.index("on:") + 1
+    except ValueError:
+        return False
+    for line in lines[start:]:
+        if line and not line[0].isspace():
+            break
+        if line == "  pull_request:":
+            return True
+    return False
+
+
+def _pull_request_types(text: str) -> list[str]:
+    """Return direct entries from the top-level pull-request trigger."""
+    lines = text.splitlines()
+    start = lines.index("  pull_request:") + 1
+    entries: list[str] = []
+    for line in lines[start:]:
+        if line and (
+            not line[0].isspace()
+            or (line.startswith("  ") and not line.startswith("    "))
+        ):
+            break
+        if line.startswith("    ") and not line.startswith("      "):
+            entries.append(line[4:])
+    return entries
+
+
+def _job_admissions(text: str) -> list[str]:
+    """Return direct ``if`` values for every top-level job."""
+    lines = text.splitlines()
+    start = lines.index("jobs:") + 1
+    admissions: list[str] = []
+    for index in range(start, len(lines)):
+        line = lines[index]
+        if line and not line[0].isspace():
+            break
+        if line.startswith("  ") and not line.startswith("    ") and line.endswith(":"):
+            job_end = next(
+                (
+                    candidate
+                    for candidate in range(index + 1, len(lines))
+                    if lines[candidate].startswith("  ")
+                    and not lines[candidate].startswith("    ")
+                ),
+                len(lines),
+            )
+            direct_if = [
+                entry[8:]
+                for entry in lines[index + 1 : job_end]
+                if entry.startswith("    if: ")
+            ]
+            admissions.extend(direct_if or [""])
+    return admissions
 
 
 def validate_workflow_text(path: Path, text: str) -> None:
@@ -56,11 +119,15 @@ def validate_workflow_text(path: Path, text: str) -> None:
     assert cancellations == [
         f"cancel-in-progress: {EXPECTED_CANCEL}"
     ], f"{path}: unsafe cancellation policy"
-    if "\n  pull_request:\n" in text:
-        assert EXPECTED_PR_TYPES in text, f"{path}: incomplete pull-request lifecycle"
-        assert (
-            "github.event.pull_request.draft == false" in text
-        ), f"{path}: draft pull requests occupy a runner"
+    assert _has_pull_request_trigger(
+        text
+    ), f"{path}: missing structured pull-request trigger"
+    assert EXPECTED_PR_TYPES in _pull_request_types(
+        text
+    ), f"{path}: incomplete pull-request lifecycle"
+    assert _job_admissions(text) and all(
+        admission == EXPECTED_PR_ADMISSION for admission in _job_admissions(text)
+    ), f"{path}: draft or closed pull requests occupy a runner"
 
 
 def main() -> None:
