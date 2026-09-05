@@ -70,7 +70,7 @@ test_that("new-form BILOG prompt accepts only 1 or 2", {
       newformXData = test_data,
       oldformYData = test_data,
       newformCommonItemNames = c("item1"),
-      oldformCommonItemNames = c("old_item_1"),
+      oldformCommonItemNames = c("item1"),
       confirmCommonItems = TRUE,
       itemtype = "3PL",
       oldformBILOGprior = NULL,
