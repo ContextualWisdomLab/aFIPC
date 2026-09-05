@@ -4,6 +4,7 @@ on:
   push:
     branches: ["master", "main"]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: ["master", "main"]
   workflow_dispatch:
 
@@ -11,11 +12,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: r-cmd-check-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.repository }}-${{ github.event_name == 'pull_request' && github.run_attempt == 1 && github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     env:
       R_PROFILE_USER: /dev/null

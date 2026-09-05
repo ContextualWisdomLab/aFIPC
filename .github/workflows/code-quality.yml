@@ -4,13 +4,19 @@ on:
   push:
     branches: ["master", "main"]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: ["master", "main"]
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.repository }}-${{ github.event_name == 'pull_request' && github.run_attempt == 1 && github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   quality:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +32,11 @@ jobs:
         run: |
           python3 -m pip install --user yamllint
           python3 -m yamllint .yamllint.yml .github/dependabot.yml .github/workflows/*.yml
+
+      - name: Validate workflow concurrency contract
+        run: |
+          python3 scripts/ci/test_workflow_concurrency_contract_unit.py
+          python3 scripts/ci/test_workflow_concurrency_contract.py
 
       - name: Lint markdown docs
         run: |
