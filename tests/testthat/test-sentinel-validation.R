@@ -39,7 +39,7 @@ test_that("common-item confirmation admits only exact menu choices", {
 
   mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
 
-  for (answers in list(c('0', '3', '12'), c(' 1', 'a', '9999999999'))) {
+  for (answers in list(c('0', '3', '12'), c(' 1', 'a', '2147483648'))) {
     mockery::stub(aFIPC::autoFIPC, 'readline', do.call(mockery::mock, as.list(answers)))
     expect_error(
       aFIPC::autoFIPC(
@@ -88,7 +88,7 @@ test_that("oldform BILOG prompt admits only exact menu choices", {
 
   mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
 
-  for (answers in list(c('0', '3', '12'), c(' 1', 'a', '9999999999'))) {
+  for (answers in list(c('0', '3', '12'), c(' 1', 'a', '2147483648'))) {
     mockery::stub(aFIPC::autoFIPC, 'readline', do.call(mockery::mock, as.list(answers)))
     expect_error(
       aFIPC::autoFIPC(
@@ -104,23 +104,26 @@ test_that("oldform BILOG prompt admits only exact menu choices", {
     )
   }
 
+  mockery::stub(aFIPC::autoFIPC, 'mirt::mirt.model', function(...) 1)
   mockery::stub(aFIPC::autoFIPC, 'mirt::mirt', function(...) stop('forced post-prior failure'))
-  mockery::stub(aFIPC::autoFIPC, 'readline', mockery::mock('2'))
-  expect_error(
-    aFIPC::autoFIPC(
-      newformXData = new_df,
-      oldformYData = old_df,
-      newformCommonItemNames = 'A',
-      oldformCommonItemNames = 'A',
-      confirmCommonItems = TRUE,
-      itemtype = '3PL',
-      oldformBILOGprior = NULL
-    ),
-    "Security Error: Initial estimation of oldFormModel completely failed"
-  )
+  for (answer in c('1', '2')) {
+    mockery::stub(aFIPC::autoFIPC, 'readline', mockery::mock(answer))
+    expect_error(
+      aFIPC::autoFIPC(
+        newformXData = new_df,
+        oldformYData = old_df,
+        newformCommonItemNames = 'A',
+        oldformCommonItemNames = 'A',
+        confirmCommonItems = TRUE,
+        itemtype = '3PL',
+        oldformBILOGprior = NULL
+      ),
+      "Security Error: Initial estimation of oldFormModel completely failed"
+    )
+  }
 })
 
-test_that("newform BILOG prompt rejects every non-menu input class", {
+test_that("newform BILOG prompt admits only exact menu choices", {
   mod <- new("SingleGroupClass")
   mod@OptimInfo$converged <- TRUE
   mod@OptimInfo$secondordertest <- TRUE
@@ -130,9 +133,10 @@ test_that("newform BILOG prompt rejects every non-menu input class", {
 
   mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
   mockery::stub(aFIPC::autoFIPC, 'surveyFA', function(...) stop('forced failure'))
-  mockery::stub(aFIPC::autoFIPC, 'mirt::mirt', function(...) mod)
+  mockery::stub(aFIPC::autoFIPC, 'mirt::mirt.model', function(...) 1)
 
-  for (answers in list(c('0', '3', '12'), c(' 1', 'a', '9999999999'))) {
+  for (answers in list(c('0', '3', '12'), c(' 1', 'a', '2147483648'))) {
+    mockery::stub(aFIPC::autoFIPC, 'mirt::mirt', function(...) mod)
     mockery::stub(aFIPC::autoFIPC, 'readline', do.call(mockery::mock, as.list(answers)))
     expect_error(
       aFIPC::autoFIPC(
@@ -146,6 +150,29 @@ test_that("newform BILOG prompt rejects every non-menu input class", {
         oldformBILOGprior = TRUE
       ),
       "Too many invalid newform BILOG prior attempts"
+    )
+  }
+
+  for (answer in c('1', '2')) {
+    mirt_calls <- 0L
+    mockery::stub(aFIPC::autoFIPC, 'mirt::mirt', function(...) {
+      mirt_calls <<- mirt_calls + 1L
+      if (mirt_calls == 1L) return(mod)
+      stop('forced post-prior failure')
+    })
+    mockery::stub(aFIPC::autoFIPC, 'readline', mockery::mock(answer))
+    expect_error(
+      aFIPC::autoFIPC(
+        newformXData = new_df,
+        oldformYData = old_df,
+        newformCommonItemNames = 'A',
+        oldformCommonItemNames = 'A',
+        confirmCommonItems = TRUE,
+        itemtype = '3PL',
+        newformBILOGprior = NULL,
+        oldformBILOGprior = TRUE
+      ),
+      "Security Error: Initial estimation of newFormModel completely failed"
     )
   }
 })
