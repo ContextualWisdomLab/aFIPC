@@ -5,8 +5,6 @@
 ^\.Rprofile$
 ^\.github$
 ^\.github/.*
-^\.cursor$
-^\.cursor/.*
 ^\.codegraph$
 ^\.codegraph/.*
 ^.*\.Rcheck$
@@ -24,3 +22,4 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
+^\.semgrepignore$
