@@ -35,3 +35,21 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
     "Security Error: confirmCommonItems must be a single non-NA logical value or NULL"
   )
 })
+
+test_that("autoFIPC strict integer conversion correctly stops on invalid or out-of-bounds inputs", {
+  # We mock `interactive()` to simulate an interactive session.
+  mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
+  # We simulate invalid inputs that exceed the bounds.
+  mockery::stub(aFIPC::autoFIPC, 'readline', mockery::mock("3", "99999999999999", "3"))
+
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = data.frame(A=1),
+      oldformYData = data.frame(A=2),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      confirmCommonItems = NULL
+    ),
+    "Too many invalid common item confirmation attempts"
+  )
+})
