@@ -45,13 +45,15 @@ test_that("readline validates 1 or 2 with exact regex strictly - newformBILOGpri
   mock_readline_fail <- mockery::mock("1", "3", "999", "abc", cycle = TRUE)
   mockery::stub(aFIPC::autoFIPC, 'readline', mock_readline_fail)
 
-  setClass("mockMirtClass", representation(OptimInfo = "list", Data = "list"))
-  mockObj <- new("mockMirtClass", OptimInfo = list(secondordertest = TRUE), Data = list(K = c(2,2)))
+  # We actually need to build an S4 object with the `@` slots that mirt returns
+  # because autoFIPC accesses `@OptimInfo` directly instead of via extract.mirt!
+  fake_model <- new("SingleGroupClass")
+  fake_model@OptimInfo <- list(secondordertest = TRUE)
+  fake_model@Data <- list(K = c(2,2))
 
-  mockery::stub(aFIPC::autoFIPC, 'mirt::mirt', function(...) mockObj)
-  mockery::stub(aFIPC::autoFIPC, 'mirt::extract.mirt', function(...) list())
-  mockery::stub(aFIPC::autoFIPC, 'mirt::multipleGroup', function(...) list())
-  mockery::stub(aFIPC::autoFIPC, 'aFIPC::make_aFIPC_model', function(...) list())
+  mockery::stub(aFIPC::autoFIPC, 'mirt::mirt', fake_model)
+  mockery::stub(aFIPC::autoFIPC, 'mirt::multipleGroup', fake_model)
+  mockery::stub(aFIPC::autoFIPC, 'aFIPC:::make_aFIPC_model', fake_model)
 
   test_data <- data.frame(
     item1 = c(1,0,1,0,1),
