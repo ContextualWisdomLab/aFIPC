@@ -63,7 +63,7 @@ jobs:
           if (length(bad)) install.packages(bad, type = "source", repos = r)'
 
       - name: Run R CMD check
-        uses: r-lib/actions/check-r-package@6f6e5bc62fba3a704f74e7ad7ef7676c5c6a2590
+        uses: r-lib/actions/check-r-package@465b7d8e732ca3921382b1674c59bada9cbf3399
         with:
           args: 'c("--no-manual", "--as-cran")'
           error-on: '"error"'
