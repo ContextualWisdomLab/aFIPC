@@ -1,3 +1,20 @@
+#' Select the first named minimum without sorting the full vector
+#'
+#' @description Returns the name attached to the first minimum value in a named
+#'   numeric vector. The helper intentionally uses a single linear scan so the
+#'   bounded recovery loop does not pay the cost of sorting every candidate.
+#' @param values A named numeric vector whose missing-value policy has already
+#'   been applied by the caller.
+#' @return The first minimum value's name, or `NA_character_` for an empty input.
+#' @keywords internal
+.minimum_named_value <- function(values) {
+  minimum_index <- which.min(values)
+  if (length(minimum_index) == 0L) {
+    return(NA_character_)
+  }
+  names(values)[minimum_index]
+}
+
 #' @title surveyFA
 #' @description Fallback calibration helper used when direct model estimation in
 #'   `autoFIPC()` fails.
@@ -232,7 +249,7 @@ surveyFA <- function(
       names(p_values) <- rownames(fit_df)
       if (any(!is.na(p_values))) {
         p_values[is.na(p_values)] <- 1
-        candidate <- names(sort(p_values, decreasing = FALSE))[1L]
+        candidate <- .minimum_named_value(p_values)
         if (!is.na(candidate) && p_values[[candidate]] < pThreshold) {
           return(candidate)
         }
