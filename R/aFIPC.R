@@ -613,10 +613,10 @@ autoFIPC <-
     if (checkIPD == T) {
       # config
       IPDgroup <-
-        as.factor(c(
+        factor(c(
           rep('oldForm', nrow(oldformYDataK)),
           rep('newForm', nrow(newformXDataK))
-        ))
+        ), levels = c('newForm', 'oldForm'))
       IPDItemCount <- 0
 
       # IPD target item checking
