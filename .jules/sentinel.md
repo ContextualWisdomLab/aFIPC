@@ -1,4 +1,9 @@
-## 2024-07-12 - Fix missing parameter validations
-**Vulnerability:** Unvalidated inputs passed to `if()` statements can cause process crashes (`condition has length > 1`) or unexpected coercion vulnerabilities.
-**Learning:** In R, optional boolean parameters that default to `NULL` should be validated using explicit runtime type validation (e.g., `if (!is.null(flag) && (!is.logical(flag) || length(flag) != 1 || is.na(flag)))`).
-**Prevention:** Always implement explicit runtime type validation for optional boolean parameters.
+## 2024-05-24 - [대화형 입력 정수 오버플로우 검증 취약점 수정]
+**Vulnerability:** 사용자로부터 대화형 입력을 받을 때 `grepl("^[0-9]+$", n)`을 사용하여 숫자만 입력되었는지를 확인한 후 `as.integer(n)`으로 형변환을 수행했습니다. 이 경우 사용자가 R의 최대 정수(Integer) 한도를 초과하는 매우 큰 숫자를 입력하면 정규식 검사는 통과하지만 `as.integer()`가 강제로 `NA`를 반환하게 되고, 이후 로직에서 `NA` 값이 활용되면서 치명적인 오류나 크래시(DoS)가 발생할 수 있습니다.
+**Learning:** 숫자 형태를 강제하는 정규식만으로는 타입 변환 후의 값의 유효성까지 보장할 수 없음을 확인했습니다. 특히, 한정된 선택지를 받는 프롬프트(예: 1: Yes, 2: No)에서는 입력값을 직접 리스트와 대조하는 명시적 확인이 필요합니다.
+**Prevention:** 정규식 패턴 확인 대신, 미리 지정된 유효한 선택지 집합 내에 입력된 문자열이 존재하는지 직접 확인(예: `n %in% c("1", "2")`)하여 오버플로우나 유효하지 않은 값 할당을 원천 차단해야 합니다.
+
+## 2024-05-24 - [대화형 입력 정수 오버플로우 검증 취약점 수정]
+**Vulnerability:** 사용자로부터 대화형 입력을 받을 때 `grepl("^[0-9]+$", n)`을 사용하여 숫자만 입력되었는지를 확인한 후 `as.integer(n)`으로 형변환을 수행했습니다. 이 경우 사용자가 R의 최대 정수(Integer) 한도를 초과하는 매우 큰 숫자를 입력하면 정규식 검사는 통과하지만 `as.integer()`가 강제로 `NA`를 반환하게 되고, 이후 로직에서 `NA` 값이 활용되면서 치명적인 오류나 크래시(DoS)가 발생할 수 있습니다.
+**Learning:** 숫자 형태를 강제하는 정규식만으로는 타입 변환 후의 값의 유효성까지 보장할 수 없음을 확인했습니다. 특히, 한정된 선택지를 받는 프롬프트(예: 1: Yes, 2: No)에서는 입력값을 직접 리스트와 대조하는 명시적 확인이 필요합니다.
+**Prevention:** 정규식 패턴 확인 대신, 미리 지정된 유효한 선택지 집합 내에 입력된 문자열이 존재하는지 직접 확인(예: `n %in% c("1", "2")`)하여 오버플로우나 유효하지 않은 값 할당을 원천 차단해야 합니다.
