@@ -35,3 +35,41 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
     "Security Error: confirmCommonItems must be a single non-NA logical value or NULL"
   )
 })
+
+
+test_that("binary menu choice accepts only exact documented values", {
+  make_reader <- function(values) {
+    force(values)
+    function(prompt) {
+      value <- values[[1]]
+      values <<- values[-1]
+      value
+    }
+  }
+
+  expect_identical(
+    aFIPC:::.read_binary_choice("prompt", "invalid", make_reader("1")),
+    1L
+  )
+  expect_identical(
+    aFIPC:::.read_binary_choice("prompt", "invalid", make_reader("2")),
+    2L
+  )
+  expect_identical(
+    aFIPC:::.read_binary_choice(
+      "prompt",
+      "invalid",
+      make_reader(c("0", "3", "1"))
+    ),
+    1L
+  )
+  expect_error(
+    aFIPC:::.read_binary_choice(
+      "prompt",
+      "invalid",
+      make_reader(c("12", "2147483648", " 1"))
+    ),
+    "invalid",
+    fixed = TRUE
+  )
+})
