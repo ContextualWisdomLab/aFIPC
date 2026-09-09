@@ -620,8 +620,8 @@ autoFIPC <-
       IPDItemCount <- 0
 
       # IPD target item checking
-      newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
-      oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+    newFormColNames <- intersect(colnames(newFormModel@Data$data), colnames(newformXDataK))
+    oldFormColNames <- intersect(colnames(oldFormModel@Data$data), colnames(oldformYDataK))
 
       # ⚡ Bolt: Vectorized match() to avoid dynamic array growth overhead inside a for loop
       idxNew <- match(newformCommonItemNames, newFormColNames)
@@ -749,8 +749,8 @@ autoFIPC <-
       }
     }
 
-    newFormColNames <- colnames(newformXDataK[colnames(newFormModel@Data$data)])
-    oldFormColNames <- colnames(oldformYDataK[colnames(oldFormModel@Data$data)])
+    newFormColNames <- intersect(colnames(newFormModel@Data$data), colnames(newformXDataK))
+    oldFormColNames <- intersect(colnames(oldFormModel@Data$data), colnames(oldformYDataK))
 
     # ⚡ Bolt: Cache parameter indices to avoid O(N) linear search inside loop
     newScaleParmsItemIdxCache <- split(seq_len(nrow(NewScaleParms)), NewScaleParms$item)
@@ -770,8 +770,8 @@ autoFIPC <-
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-          (length(stats::na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
-            length(stats::na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
+          (sum(!is.na(unique(newFormModel@Data$data[, newFormItemName]))) ==
+            sum(!is.na(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
         message(
           'applying ',
