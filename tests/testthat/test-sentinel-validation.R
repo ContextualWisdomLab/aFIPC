@@ -72,4 +72,17 @@ test_that("binary menu choice accepts only exact documented values", {
     "invalid",
     fixed = TRUE
   )
+
+  for (value in c("3", "10", "2147483648", "invalid", "")) {
+    expect_error(
+      aFIPC:::.read_binary_choice(
+        "prompt",
+        "invalid",
+        make_reader(rep(value, 3))
+      ),
+      "invalid",
+      fixed = TRUE,
+      info = paste("unexpectedly accepted binary menu value", dQuote(value))
+    )
+  }
 })
