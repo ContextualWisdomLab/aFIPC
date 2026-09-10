@@ -36,23 +36,18 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
   )
 })
 
-test_that("autoFIPC strictly validates interactive readline confirmation inputs", {
-  # We should expect an error since our data won't actually be fitted mirt models with the dummy SingleGroupClass mock
-  mockery::stub(aFIPC::autoFIPC, 'readline', mockery::mock('1', '1', '1', '1', '1'))
-  mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
 
-  # The test should proceed past the checkCorrect interactive prompt and fail downstream,
-  # indicating that the valid exact-match response '1' was accepted.
-  err <- tryCatch({
-    aFIPC::autoFIPC(
-      newformXData = data.frame(A=1),
-      oldformYData = data.frame(A=2),
-      newformCommonItemNames = c('A'),
-      oldformCommonItemNames = c('A')
-    )
-    "No error"
-  }, error = function(e) e$message)
+test_that("getInteractiveConfirmation correctly validates valid inputs", {
+  mockery::stub(getInteractiveConfirmation, 'readline', mockery::mock('1', '2'))
+  mockery::stub(getInteractiveConfirmation, 'interactive', TRUE)
 
-  expect_false(grepl("Please write down pairs correctly", err))
-  expect_false(grepl("Too many invalid common item confirmation attempts", err))
+  expect_equal(getInteractiveConfirmation("prompt", "error"), 1L)
+  expect_equal(getInteractiveConfirmation("prompt", "error"), 2L)
+})
+
+test_that("getInteractiveConfirmation correctly rejects invalid numeric inputs and hits the retry limit", {
+  mockery::stub(getInteractiveConfirmation, 'readline', mockery::mock('0', '3', '9999999999'))
+  mockery::stub(getInteractiveConfirmation, 'interactive', TRUE)
+
+  expect_error(getInteractiveConfirmation("prompt", "error"), "error")
 })

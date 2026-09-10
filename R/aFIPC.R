@@ -33,6 +33,18 @@
 #'   confirmCommonItems = TRUE
 #' )
 #' }
+
+getInteractiveConfirmation <- function(prompt_str, error_str) {
+  if (!interactive()) stop(error_str)
+  for (attempt in seq_len(3)) {
+    n <- readline(prompt = prompt_str)
+    if (grepl("^[12]$", n)) {
+      return(as.integer(n))
+    }
+  }
+  stop(error_str)
+}
+
 autoFIPC <-
   function(
     newformXData,
@@ -60,6 +72,9 @@ autoFIPC <-
     # garbage cleaning
 
     # Input validation - Security Enhancement
+
+
+
     isRealMirtModel <- function(x) {
       if (!isS4(x) || !methods::is(x, "SingleGroupClass")) return(FALSE)
       ok <- tryCatch({
@@ -126,28 +141,7 @@ autoFIPC <-
     correspondItems <-
       data.frame(cbind(newformCommonItemNames, oldformCommonItemNames))
 
-    checkCorrect <- function() {
-      if (isTRUE(confirmCommonItems)) {
-        return(1L)
-      }
-      if (identical(confirmCommonItems, FALSE)) {
-        return(2L)
-      }
-      if (!interactive()) {
-        stop(
-          'Common item confirmation requires an interactive session; ',
-          'set confirmCommonItems = TRUE to accept the supplied pairs.'
-        )
-      }
-      for (attempt in seq_len(3)) {
-        n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-        if (grepl("^[12]$", n)) {
-          return(as.integer(n))
-        }
-      }
-      stop("Too many invalid common item confirmation attempts")
-    }
-    confirm <- checkCorrect()
+    confirm <- if (isTRUE(confirmCommonItems)) 1L else if (identical(confirmCommonItems, FALSE)) 2L else getInteractiveConfirmation("Is it correct? (1: Yes 2: No) : ", "Too many invalid common item confirmation attempts")
     if (confirm != 1) {
       stop('Please write down pairs correctly')
     }
@@ -164,20 +158,7 @@ autoFIPC <-
       # if Data is data.frame
       oldformYDataK <- oldformYData
       if (itemtype == '3PL' && length(oldformBILOGprior) == 0) {
-        checkoldformBILOGprior <- function() {
-          if (!interactive()) stop("Interactive session required for oldform BILOG prior")
-          for (attempt in seq_len(3)) {
-            n <-
-              readline(
-                prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
-              )
-            if (grepl("^[12]$", n)) {
-              return(as.integer(n))
-            }
-          }
-          stop("Too many invalid oldform BILOG prior attempts")
-        }
-        oldformBILOGprior <- checkoldformBILOGprior()
+        oldformBILOGprior <- getInteractiveConfirmation("Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : ", "Too many invalid oldform BILOG prior attempts")
         if (oldformBILOGprior == 1) {
           oldformBILOGprior <- TRUE
         } else {
@@ -383,20 +364,7 @@ autoFIPC <-
     } else {
       newformXDataK <- newformXData
       if (itemtype == '3PL' && length(newformBILOGprior) == 0) {
-        checknewformBILOGprior <- function() {
-          if (!interactive()) stop("Interactive session required for newform BILOG prior")
-          for (attempt in seq_len(3)) {
-            n <-
-              readline(
-                prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
-              )
-            if (grepl("^[12]$", n)) {
-              return(as.integer(n))
-            }
-          }
-          stop("Too many invalid newform BILOG prior attempts")
-        }
-        newformBILOGprior <- checknewformBILOGprior()
+        newformBILOGprior <- getInteractiveConfirmation("Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : ", "Too many invalid newform BILOG prior attempts")
         if (newformBILOGprior == 1) {
           newformBILOGprior <- TRUE
         } else {
