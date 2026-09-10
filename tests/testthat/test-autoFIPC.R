@@ -7,7 +7,7 @@ test_that("autoFIPC raises error in non-interactive session for inputs", {
       newformCommonItemNames = c('A'),
       oldformCommonItemNames = c('A')
     ),
-    "Too many invalid common item confirmation attempts"
+    "Common item confirmation requires an interactive session"
   )
 })
 
@@ -62,7 +62,7 @@ test_that("autoFIPC validates input types securely", {
       oldformYData = structure(list(), class = "SingleGroupClass"),
       newformCommonItemNames = c('A'),
       oldformCommonItemNames = c('A'),
-      confirmCommonItems = NULL
+      confirmCommonItems = TRUE
     ),
     "Security Error: oldformYData must be a data.frame, matrix, or a valid fitted mirt model"
   )
