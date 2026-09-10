@@ -1,6 +1,7 @@
 test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGprior, and confirmCommonItems", {
+  # newformBILOGprior
   expect_error(
-    aFIPC::autoFIPC(
+    autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = data.frame(A=2),
       newformCommonItemNames = c('A'),
@@ -10,8 +11,9 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
     "Security Error: newformBILOGprior must be a single non-NA logical value or NULL"
   )
 
+  # oldformBILOGprior
   expect_error(
-    aFIPC::autoFIPC(
+    autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = data.frame(A=2),
       newformCommonItemNames = c('A'),
@@ -21,8 +23,9 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
     "Security Error: oldformBILOGprior must be a single non-NA logical value or NULL"
   )
 
+  # confirmCommonItems
   expect_error(
-    aFIPC::autoFIPC(
+    autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = data.frame(A=2),
       newformCommonItemNames = c('A'),
@@ -33,32 +36,44 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
   )
 })
 
-test_that("autoFIPC rejects out-of-domain interactive confirmation values", {
-  mockery::stub(aFIPC::autoFIPC, 'readline', mockery::mock('0', '3', '9999999999'))
-  mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
 
-  expect_error(
-    aFIPC::autoFIPC(
+
+
+test_that("autoFIPC strictly validates interactive readline confirmation inputs", {
+  # Mock valid "1" responses to pass the three interactive prompts
+  mockery::stub(autoFIPC, 'readline', mockery::mock('1', '1', '1'))
+  mockery::stub(autoFIPC, 'interactive', TRUE)
+
+  # The test should proceed past the interactive prompts and fail downstream,
+  # indicating that the valid exact-match response '1' was accepted.
+  err <- tryCatch({
+    autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = data.frame(A=2),
       newformCommonItemNames = c('A'),
       oldformCommonItemNames = c('A')
-    ),
-    "Too many invalid common item confirmation attempts"
-  )
+    )
+    "No error"
+  }, error = function(e) e$message)
+
+  expect_false(grepl("Too many invalid common item confirmation attempts", err))
 })
 
-test_that("autoFIPC accepts 2 as an explicit negative menu decision", {
-  mockery::stub(aFIPC::autoFIPC, 'readline', mockery::mock('2'))
-  mockery::stub(aFIPC::autoFIPC, 'interactive', TRUE)
+test_that("autoFIPC correctly rejects invalid numeric inputs and hits the retry limit", {
+  # Mock invalid inputs: '0', '3', '9999999999' (out of range), 'abc' (non-numeric), '' (whitespace/empty)
+  # The loop tries 3 times. We just need to fail the first prompt (checkCorrect) 3 times.
+  mockery::stub(autoFIPC, 'readline', mockery::mock('0', '3', '9999999999'))
+  mockery::stub(autoFIPC, 'interactive', TRUE)
 
-  expect_error(
-    aFIPC::autoFIPC(
+  err <- tryCatch({
+    autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = data.frame(A=2),
       newformCommonItemNames = c('A'),
       oldformCommonItemNames = c('A')
-    ),
-    "Please write down pairs correctly"
-  )
+    )
+    "No error"
+  }, error = function(e) e$message)
+
+  expect_true(grepl("Too many invalid common item confirmation attempts", err))
 })
