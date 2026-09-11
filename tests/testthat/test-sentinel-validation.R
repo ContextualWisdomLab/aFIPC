@@ -35,3 +35,65 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
     "Security Error: confirmCommonItems must be a single non-NA logical value or NULL"
   )
 })
+
+
+test_that("binary menu choice accepts only exact documented values", {
+  make_reader <- function(values) {
+    force(values)
+    function(prompt) {
+      value <- values[[1]]
+      values <<- values[-1]
+      value
+    }
+  }
+
+  expect_identical(
+    aFIPC:::.read_binary_choice("prompt", "invalid", make_reader("1")),
+    1L
+  )
+  expect_identical(
+    aFIPC:::.read_binary_choice("prompt", "invalid", make_reader("2")),
+    2L
+  )
+  expect_identical(
+    aFIPC:::.read_binary_choice(
+      "prompt",
+      "invalid",
+      make_reader(c("0", "3", "1"))
+    ),
+    1L
+  )
+  expect_error(
+    aFIPC:::.read_binary_choice(
+      "prompt",
+      "invalid",
+      make_reader(c("12", "2147483648", " 1"))
+    ),
+    "invalid",
+    fixed = TRUE
+  )
+
+  for (value in c("3", "10", "2147483648", "invalid", "")) {
+    expect_error(
+      aFIPC:::.read_binary_choice(
+        "prompt",
+        "invalid",
+        make_reader(rep(value, 3))
+      ),
+      "invalid",
+      fixed = TRUE,
+      info = paste("unexpectedly accepted binary menu value", dQuote(value))
+    )
+  }
+})
+
+test_that("autoFIPC routes every interactive binary menu through the bounded reader", {
+  source_text <- paste(deparse(body(aFIPC::autoFIPC)), collapse = "\n")
+  calls <- gregexpr(".read_binary_choice(", source_text, fixed = TRUE)[[1]]
+
+  expect_equal(sum(calls > 0), 3L)
+  expect_false(grepl('grepl("^[0-9]+$"', source_text, fixed = TRUE))
+  expect_match(source_text, "Too many invalid common item confirmation attempts", fixed = TRUE)
+  expect_match(source_text, "Too many invalid oldform BILOG prior attempts", fixed = TRUE)
+  expect_match(source_text, "Too many invalid newform BILOG prior attempts", fixed = TRUE)
+})
