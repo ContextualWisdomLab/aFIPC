@@ -54,7 +54,12 @@ autoFIPC <-
     ...
   ) {
     # print credits
-    message('automated Fixed Item Parameter Calibration: aFIPC 0.2')
+    message(
+      paste0(
+        'automated Fixed Item Parameter Calibration: aFIPC ',
+        as.character(utils::packageVersion('aFIPC'))
+      )
+    )
     message('Seongho Bae (seongho@kw.ac.kr)\n')
     try(invisible(gc()), silent = T)
     # garbage cleaning
