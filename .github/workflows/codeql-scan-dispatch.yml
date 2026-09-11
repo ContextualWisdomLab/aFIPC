@@ -1,0 +1,18 @@
+name: CodeQL Scan Dispatch
+on:
+  repository_dispatch:
+    types: [codeql-scan]
+permissions:
+  contents: read
+jobs:
+  codeql-dispatch-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: actions
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

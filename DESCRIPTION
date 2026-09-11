@@ -10,7 +10,7 @@ Description: Automates fixed item parameter linking for test linking under
     the item response theory paradigm using mirt package estimates.
 License: GPL-3 | file LICENSE
 Imports: mirt, methods
-Suggests: testthat (>= 3.0.0)
+Suggests: testthat (>= 3.0.0), mockery
 Encoding: UTF-8
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
