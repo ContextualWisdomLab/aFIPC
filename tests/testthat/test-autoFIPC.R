@@ -89,3 +89,24 @@ test_that("autoFIPC validates input types securely", {
     "Security Error: tryEM must be a single non-NA logical value"
   )
 })
+
+test_that("autoFIPC common-item category count preserves NA semantics without na.omit", {
+  source_text <- paste(deparse(body(aFIPC::autoFIPC)), collapse = "\n")
+
+  expect_match(source_text, "sum(!is.na(unique(newFormModel@Data$data[, newFormItemName])))", fixed = TRUE)
+  expect_match(source_text, "sum(!is.na(unique(oldFormModel@Data$data[, oldFormItemName])))", fixed = TRUE)
+  expect_false(grepl("stats::na.omit(unique(newFormModel@Data$data", source_text, fixed = TRUE))
+  expect_false(grepl("stats::na.omit(unique(oldFormModel@Data$data", source_text, fixed = TRUE))
+
+  representative <- list(
+    c(1, 1, NA),
+    c(1, 2, NA, 2),
+    c(NA, NA),
+    c("A", "B", NA, "A")
+  )
+  for (values in representative) {
+    legacy_count <- length(stats::na.omit(unique(values)))
+    direct_count <- sum(!is.na(unique(values)))
+    expect_identical(direct_count, legacy_count)
+  }
+})
