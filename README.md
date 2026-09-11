@@ -46,10 +46,19 @@ result <- autoFIPC(
 )
 ```
 
-The explicit BILOG-prior choices matter for the default 3PL path: leaving either
-choice as `NULL` can require interactive input when raw response data are fitted.
-If callers use already fitted compatible model objects, review the complete
-argument contract before omitting those raw-data choices.
+For raw 3PL response data, the BILOG-prior flags select the initial form-fit
+path. `TRUE` uses the traditional BILOG-MG prior model and normal MMLE/EM call;
+`FALSE` starts with the empirical-histogram path. `NULL` leaves that choice
+interactive and therefore fails in a non-interactive session rather than
+silently choosing a prior strategy.
+
+These flags govern the initial raw-form fit, not every recovery step. If a form
+fit remains unacceptable, its `tryFitwhole*` flag gates the direct QMCEM then
+MHRM retries. The later `surveyFA()` recovery sequence remains independently
+eligible while the fit is unacceptable. ADR-0002 records the exact recovery
+ordering and the separate linked-fit EM/MHRM policy. If callers use already
+fitted compatible model objects, review the complete argument contract before
+omitting raw-data choices.
 
 `autoFIPC()` returns the base-form, new-form, and linked-model artifacts as an R
 list. See `man/autoFIPC.Rd` for the complete argument contract.
