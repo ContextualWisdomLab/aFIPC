@@ -96,6 +96,25 @@ MMLE/EM initial fit, `FALSE` starts with the empirical-histogram initial fit,
 and `NULL` leaves the choice interactive. Those choices do not disable the
 later recovery gates documented in ADR-0002.
 
+## Package version authority gap
+
+Protected `DESCRIPTION` declares package version `0.1.0`, while the protected
+`autoFIPC()` startup banner still hard-codes `aFIPC 0.2`. There is no accepted
+ADR or API contract that establishes `0.2` as a separate method-version
+namespace, so public documentation must not invent that distinction.
+
+Draft PR #363 is the focused causal lane. Its test-only RED captures the banner
+before the existing input-validation failure and requires the emitted version to
+match `utils::packageVersion("aFIPC")`; the repair removes the hard-coded
+runtime literal and derives the banner from installed package metadata. The
+current effective diff is limited to `R/aFIPC.R` and the focused regression.
+Keep it Draft until one unchanged exact head has terminal package, quality,
+security/SAST/CodeQL gates and qualifying independent current-head review.
+
+Release work must use the package metadata/version, CHANGELOG and immutable
+artifact/tag as one consistent release identity. A source banner or historical
+comment must not create a second version authority.
+
 ## Current performance lanes
 
 Several open branches propose R-level micro-optimizations in the
@@ -108,8 +127,11 @@ predecessor is closed.
 Their admissible evidence is narrower than generated performance language:
 
 - direct model-column lookup must preserve the source/model column-membership
-  validation that the protected data-frame projection provided; #335 is closed
-  only because its valid delta and finding were transferred to #169;
+  validation that the protected data-frame projection provided; #169 has been
+  ordinary-forward repaired back to its bounded two-file experiment after an
+  intervening descendant reintroduced unrelated workflow/environment/docs
+  changes; closed #335 is only a verified predecessor whose valid finding was
+  transferred there;
 - distinct non-missing category refactors must preserve observed-category
   semantics, including NA/NaN/factor edge cases;
 - minimum-selection refactors must preserve first-minimum/tie behavior and the
@@ -149,6 +171,7 @@ or a replacement runtime as behaviorally equivalent.
 
 - Commercial/runtime licensing owner: issue #320.
 - Product/method documentation owner lane: PR #261.
+- Package/runtime version-authority repair: PR #363.
 - Interactive choice-domain centralized successor candidate: PR #349.
 - Interactive product-path predecessor evidence retained: PR #337.
 - Model-column performance/validation owner lane: PR #169; closed #335 is a
