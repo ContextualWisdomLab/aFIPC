@@ -5,7 +5,7 @@
 #' @param newformXData new form data X
 #' @param oldformYData old form (base form) data Y
 #' @param newformCommonItemNames Common item variable names in new form data
-#' @param oldformCommonItemNames Common item variable names in old (base form) data
+#' @param oldformCommonItemNames Common item variable names in old (base) form data
 #' @param itemtype itemtype of calibration
 #' @param newformBILOGprior using BILOG-MG prior when try to calibrate 3PL model? if you want, set the this to TRUE
 #' @param oldformBILOGprior using BILOG-MG prior when try to calibrate 3PL model? if you want, set the this to TRUE
@@ -602,6 +602,7 @@ autoFIPC <-
 
     # Preserve mirt's structural estimability flags. Forcing every row TRUE
     # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
+
     NewScaleParms[NewScaleParms$item == 'GROUP', "est"] <- FALSE
     OldScaleParms[OldScaleParms$item == 'GROUP', "est"] <- FALSE
 
