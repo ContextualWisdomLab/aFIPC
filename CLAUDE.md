@@ -78,6 +78,8 @@ See `ARCHITECTURE.md` for the full map. Essentials:
 - `.github/workflows/` — `r.yml` (R CMD check), `code-quality.yml`
   (yamllint + markdownlint + actionlint), `security-audit.yml` (gitleaks +
   actionlint). All action refs are pinned to full commit SHAs.
+- `.cursor/` — Cloud Agent environment. `install.sh` provisions R + CRAN
+  deps only; do not `R CMD INSTALL` the current tree there.
 
 Runtime is single-process and fileless: in-memory old/new form data ->
 `autoFIPC()` -> `mirt` calibration -> optional item parameter drift (IPD)

@@ -1,0 +1,4 @@
+{
+  "name": "aFIPC",
+  "install": "bash .cursor/install.sh"
+}
