@@ -89,3 +89,12 @@ test_that("autoFIPC validates input types securely", {
     "Security Error: tryEM must be a single non-NA logical value"
   )
 })
+
+test_that("autoFIPC item-count validation avoids data-frame materialization", {
+  source_text <- paste(deparse(body(aFIPC::autoFIPC)), collapse = "\n")
+
+  expect_match(source_text, "nItems <- ncol\\(newformXData\\)")
+  expect_match(source_text, "nItems <- ncol\\(oldformYData\\)")
+  expect_false(grepl("ncol\\(as.data.frame\\(newformXData\\)\\)", source_text))
+  expect_false(grepl("ncol\\(as.data.frame\\(oldformYData\\)\\)", source_text))
+})
