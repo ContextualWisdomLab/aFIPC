@@ -5,7 +5,7 @@
 #' @param newformXData new form data X
 #' @param oldformYData old form (base form) data Y
 #' @param newformCommonItemNames Common item variable names in new form data
-#' @param oldformCommonItemNames Common item variable names in old (base) form data
+#' @param oldformCommonItemNames Common item variable names in old (base form) data
 #' @param itemtype itemtype of calibration
 #' @param newformBILOGprior using BILOG-MG prior when try to calibrate 3PL model? if you want, set the this to TRUE
 #' @param oldformBILOGprior using BILOG-MG prior when try to calibrate 3PL model? if you want, set the this to TRUE
@@ -54,7 +54,12 @@ autoFIPC <-
     ...
   ) {
     # print credits
-    message('automated Fixed Item Parameter Calibration: aFIPC 0.2')
+    message(
+      paste0(
+        'automated Fixed Item Parameter Calibration: aFIPC ',
+        as.character(utils::packageVersion('aFIPC'))
+      )
+    )
     message('Seongho Bae (seongho@kw.ac.kr)\n')
     try(invisible(gc()), silent = T)
     # garbage cleaning
@@ -597,7 +602,6 @@ autoFIPC <-
 
     # Preserve mirt's structural estimability flags. Forcing every row TRUE
     # frees boundary parameters such as 2PL g/u and makes the Hessian unstable.
-
     NewScaleParms[NewScaleParms$item == 'GROUP', "est"] <- FALSE
     OldScaleParms[OldScaleParms$item == 'GROUP', "est"] <- FALSE
 
