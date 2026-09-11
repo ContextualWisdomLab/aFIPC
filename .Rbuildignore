@@ -24,4 +24,3 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
-^\.markdownlint\.json$
