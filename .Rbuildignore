@@ -27,3 +27,4 @@
 ^test_dummy\.R$
 ^test_validation\.R$
 ^\.semgrepignore$
+^\.markdownlint\.json$
