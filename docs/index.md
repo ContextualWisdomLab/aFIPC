@@ -28,6 +28,14 @@ downstream decision authority remain outside this package.
 4. Review convergence, item-parameter-drift evidence, and linked outputs before
    downstream score reporting or operational use.
 
+For raw 3PL response data, `*_BILOGprior = TRUE` selects the traditional
+BILOG-MG prior MMLE/EM initial fit, while `FALSE` starts with the
+empirical-histogram path. `NULL` leaves the choice interactive and therefore
+fails in a non-interactive session. These flags select the initial form-fit
+path; they do not disable later recovery. Form-specific `tryFitwhole*` flags
+gate direct QMCEM then MHRM retries, while the later `surveyFA()` recovery
+sequence remains independently eligible. See ADR-0002 for the exact ordering.
+
 ## Method and architecture
 
 - `R/aFIPC.R` contains the main fixed-item linking workflow.
