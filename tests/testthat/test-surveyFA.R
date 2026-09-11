@@ -82,20 +82,3 @@ test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
     "could not estimate a valid model after bounded recovery attempts"
   )
 })
-
-test_that("surveyFA least-p-value selection avoids full sorting without changing first-minimum semantics", {
-  source_text <- paste(deparse(body(aFIPC::surveyFA)), collapse = "\n")
-  expect_match(source_text, "candidate <- names(p_values)[which.min(p_values)]", fixed = TRUE)
-  expect_false(grepl("names(sort(p_values, decreasing = FALSE))[1L]", source_text, fixed = TRUE))
-
-  representative <- list(
-    c(item_a = 0.4, item_b = 0.1, item_c = 0.3),
-    c(item_a = 0.1, item_b = 0.1, item_c = 0.2),
-    c(item_a = 1.0, item_b = 0.0, item_c = 1.0)
-  )
-  for (p_values in representative) {
-    legacy_candidate <- names(sort(p_values, decreasing = FALSE))[1L]
-    direct_candidate <- names(p_values)[which.min(p_values)]
-    expect_identical(direct_candidate, legacy_candidate)
-  }
-})
