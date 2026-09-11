@@ -86,3 +86,14 @@ test_that("binary menu choice accepts only exact documented values", {
     )
   }
 })
+
+test_that("autoFIPC routes every interactive binary menu through the bounded reader", {
+  source_text <- paste(deparse(body(aFIPC::autoFIPC)), collapse = "\n")
+  calls <- gregexpr(".read_binary_choice(", source_text, fixed = TRUE)[[1]]
+
+  expect_equal(sum(calls > 0), 3L)
+  expect_false(grepl('grepl("^[0-9]+$"', source_text, fixed = TRUE))
+  expect_match(source_text, "Too many invalid common item confirmation attempts", fixed = TRUE)
+  expect_match(source_text, "Too many invalid oldform BILOG prior attempts", fixed = TRUE)
+  expect_match(source_text, "Too many invalid newform BILOG prior attempts", fixed = TRUE)
+})
