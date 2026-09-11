@@ -767,11 +767,12 @@ autoFIPC <-
       newFormItemName <- newFormColNames[idxNew_all[i]]
       oldFormItemName <- oldFormColNames[idxOld_all[i]]
 
+      # ⚡ Bolt: Use sum(!is.na()) instead of stats::na.omit() to avoid method dispatch and attribute overhead
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-          (length(stats::na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
-            length(stats::na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
+          (sum(!is.na(unique(newFormModel@Data$data[, newFormItemName]))) ==
+            sum(!is.na(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
         message(
           'applying ',
