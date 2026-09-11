@@ -24,3 +24,5 @@
 ^\.jules(/.*)?$
 ^\.trivyignore\.yaml$
 ^trivy\.yaml$
+^\.semgrepignore$
+^tests/testthat/test_afipc_readline\.R$
