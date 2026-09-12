@@ -58,6 +58,17 @@ test_that("autoFIPC validates input types securely", {
 
   expect_error(
     aFIPC::autoFIPC(
+      newformXData = matrix(c(1, 2), nrow = 1, dimnames = list(NULL, c("A", "B"))),
+      oldformYData = data.frame(A=2, B=3),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      itemtype = c("2PL", "2PL", "2PL")
+    ),
+    "Security Error: itemtype must be length 1 or length 2 \\(number of items\\)."
+  )
+
+  expect_error(
+    aFIPC::autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = structure(list(), class = "SingleGroupClass"),
       newformCommonItemNames = c('A'),
