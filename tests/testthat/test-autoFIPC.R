@@ -58,6 +58,17 @@ test_that("autoFIPC validates input types securely", {
 
   expect_error(
     aFIPC::autoFIPC(
+      newformXData = matrix(c(1, 2), nrow = 1, dimnames = list(NULL, c("A", "B"))),
+      oldformYData = data.frame(A=2, B=3),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      itemtype = c("2PL", "2PL", "2PL")
+    ),
+    "Security Error: itemtype must be length 1 or length 2 \\(number of items\\)."
+  )
+
+  expect_error(
+    aFIPC::autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = structure(list(), class = "SingleGroupClass"),
       newformCommonItemNames = c('A'),
@@ -87,5 +98,40 @@ test_that("autoFIPC validates input types securely", {
       tryEM = NA
     ),
     "Security Error: tryEM must be a single non-NA logical value"
+  )
+})
+
+test_that("autoFIPC validates itemtype length from the old-form matrix branch", {
+  skip_if_not_installed("mirt")
+
+  set.seed(366)
+  model_data <- mirt::simdata(
+    a = matrix(c(0.8, 1.0, 1.2, 0.9), ncol = 1),
+    d = c(-0.8, -0.2, 0.4, 1.0),
+    itemtype = rep("2PL", 4),
+    N = 400
+  )
+  new_model <- mirt::mirt(
+    model_data,
+    1,
+    itemtype = "2PL",
+    SE = FALSE,
+    verbose = FALSE
+  )
+  old_matrix <- matrix(
+    c(0, 1, 1, 0),
+    nrow = 2,
+    dimnames = list(NULL, c("A", "B"))
+  )
+
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = new_model,
+      oldformYData = old_matrix,
+      newformCommonItemNames = "A",
+      oldformCommonItemNames = "A",
+      itemtype = c("2PL", "2PL", "2PL")
+    ),
+    "Security Error: itemtype must be length 1 or length 2 \\(number of items\\)."
   )
 })
