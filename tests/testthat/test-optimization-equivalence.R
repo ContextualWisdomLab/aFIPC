@@ -1,6 +1,6 @@
 # Formula-integrity regression guards for performance refactors.
 #
-# These tests pin the two formula-bearing expressions that recent "Bolt"
+# These tests pin the formula-bearing expressions that recent "Bolt"
 # performance refactors rewrote, so any future re-optimization that silently
 # changes their meaning is caught. Values below are hand-computed references,
 # not a re-encoding of the current implementation.
@@ -18,36 +18,52 @@
 #     Row 1 = old-form anchor names, row 2 = new-form anchor names, restricted
 #     to the columns that survived IPD screening (CommonItemList_NOIPD).
 
-test_that("category-count guard counts distinct non-missing categories (#56)", {
+test_that("category-count guard counts distinct non-missing categories (#56, #367)", {
   vecs <- list(
-    dichotomous       = c(0, 1, 0, 1, 1, 0),
+    dichotomous = c(0, 1, 0, 1, 1, 0),
     trichotomous_w_na = c(0, 1, 2, NA, 2, 1, 0),
-    constant          = c(0, 0, 0, 0),
+    constant = c(0, 0, 0, 0),
+    all_missing = c(NA_real_, NA_real_),
+    nan_and_na = c(1, NaN, NA, 1),
+    factor_w_na = factor(c("a", "b", NA, "a")),
     four_category_w_na = c(0, 1, 2, 3, 3, NA, 1)
   )
 
   # Independent hand-computed reference (distinct non-missing categories).
   expected <- c(
-    dichotomous        = 2L,
-    trichotomous_w_na  = 3L,
-    constant           = 1L,
-    four_category_w_na = 4L
+    dichotomous = 2,
+    trichotomous_w_na = 3,
+    constant = 1,
+    all_missing = 0,
+    nan_and_na = 1,
+    factor_w_na = 2,
+    four_category_w_na = 4
   )
 
-  new_idiom <- vapply(
+  previous_idiom <- vapply(
     vecs,
     function(x) length(na.omit(unique(x))),
-    integer(1)
+    numeric(1)
+  )
+  current_idiom <- vapply(
+    vecs,
+    function(x) sum(!is.na(unique(x))),
+    numeric(1)
   )
   legacy_idiom <- vapply(
     vecs,
     function(x) length(levels(as.factor(x))),
-    integer(1)
+    numeric(1)
   )
 
-  expect_equal(new_idiom, expected)
-  # The refactor must remain equivalent to the pre-#56 expression.
-  expect_equal(unname(new_idiom), unname(legacy_idiom))
+  expect_equal(previous_idiom, expected)
+  expect_equal(current_idiom, expected)
+  expect_equal(current_idiom, previous_idiom)
+
+  # The historical factor-level expression is equivalent for the ordinary
+  # observed-category fixtures where conversion to factor is well-defined.
+  ordinary <- c("dichotomous", "trichotomous_w_na", "constant", "four_category_w_na")
+  expect_equal(unname(previous_idiom[ordinary]), unname(legacy_idiom[ordinary]))
 })
 
 test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)", {
