@@ -82,7 +82,7 @@ test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)",
   legacy_old <- character(length(CommonItemList_NOIPD))
   legacy_new <- character(length(CommonItemList_NOIPD))
   for (i in seq_along(CommonItemList_NOIPD)) {
-    legacy_old[i] <- as.character(IPDItemList[CommonItemItemList_NOIPD][1, i])
+    legacy_old[i] <- as.character(IPDItemList[CommonItemList_NOIPD][1, i])
     legacy_new[i] <- as.character(IPDItemList[CommonItemList_NOIPD][2, i])
   }
   expect_identical(actual_old, legacy_old)
