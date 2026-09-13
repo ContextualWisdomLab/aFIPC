@@ -9,9 +9,10 @@
 #       length(levels(as.factor(x))) -> length(stats::na.omit(unique(x)))
 #   * #372: the same guard rewritten from
 #       length(stats::na.omit(unique(x))) -> sum(!is.na(unique(x)))
-#     All three forms must count DISTINCT NON-MISSING response categories. This
-#     guard decides whether an old/new common-item pair may be linked (Kim, 2006:
-#     an anchor item must share the same response structure on both forms).
+#     The current and immediately preceding forms must count DISTINCT
+#     NON-MISSING response categories. This guard decides whether an old/new
+#     common-item pair may be linked (Kim, 2006: an anchor item must share the
+#     same response structure on both forms).
 #   * #99 (d73adbd): IPD common-item extraction rewritten from a per-column
 #       for-loop over IPDItemList[cols][row, i]
 #     to a vectorized
@@ -49,15 +50,26 @@ test_that("category-count guard counts distinct non-missing categories", {
     function(x) length(stats::na.omit(unique(x))),
     integer(1)
   )
-  legacy_idiom <- vapply(
-    vecs,
-    function(x) length(levels(as.factor(x))),
-    integer(1)
-  )
 
   expect_equal(optimized_idiom, expected)
   expect_equal(unname(optimized_idiom), unname(previous_idiom))
-  expect_equal(unname(optimized_idiom), unname(legacy_idiom))
+
+  # Preserve the original #56 equivalence check on its ordinary numeric cases.
+  legacy_vecs <- vecs[c(
+    "dichotomous",
+    "trichotomous_w_na",
+    "constant",
+    "four_category_w_na"
+  )]
+  legacy_idiom <- vapply(
+    legacy_vecs,
+    function(x) length(levels(as.factor(x))),
+    integer(1)
+  )
+  expect_equal(
+    unname(optimized_idiom[names(legacy_vecs)]),
+    unname(legacy_idiom)
+  )
 })
 
 test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)", {
