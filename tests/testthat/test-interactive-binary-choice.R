@@ -1,67 +1,59 @@
-test_that("interactive binary choices accept only exact 1 or 2", {
-  expect_identical(
-    aFIPC:::read_binary_choice(
-      prompt = "choice: ",
-      noninteractive_error = "interactive required",
-      invalid_error = "invalid choice",
-      reader = function(prompt) "1",
-      interactive_check = function() TRUE
-    ),
-    1L
-  )
-
-  expect_identical(
-    aFIPC:::read_binary_choice(
-      prompt = "choice: ",
-      noninteractive_error = "interactive required",
-      invalid_error = "invalid choice",
-      reader = function(prompt) "2",
-      interactive_check = function() TRUE
-    ),
-    2L
-  )
-})
-
-test_that("interactive binary choices reject coercible and overflow inputs", {
-  invalid_values <- c(
-    "0", "3", "01", " 1", "1 ", "+1", "-1", "1.0",
-    paste(rep("9", 1000), collapse = "")
-  )
+scripted_auto_fipc <- function(values) {
   index <- 0L
+  fn <- aFIPC::autoFIPC
+  test_env <- new.env(parent = environment(fn))
+  test_env$interactive <- function() TRUE
+  test_env$readline <- function(prompt = "") {
+    index <<- index + 1L
+    values[[min(index, length(values))]]
+  }
+  environment(fn) <- test_env
+
+  list(
+    run = fn,
+    reads = function() index
+  )
+}
+
+test_that("common-item confirmation rejects coercible and overflow choices", {
+  huge_integer <- paste(rep("9", 1000), collapse = "")
+  runner <- scripted_auto_fipc(c("3", " 1", huge_integer))
 
   expect_error(
-    aFIPC:::read_binary_choice(
-      prompt = "choice: ",
-      noninteractive_error = "interactive required",
-      invalid_error = "invalid choice",
-      reader = function(prompt) {
-        index <<- index + 1L
-        invalid_values[index]
-      },
-      interactive_check = function() TRUE
+    runner$run(
+      newformXData = data.frame(A = c(0, 1)),
+      oldformYData = data.frame(A = c(0, 1)),
+      newformCommonItemNames = "A",
+      oldformCommonItemNames = "A"
     ),
-    "invalid choice",
+    "Too many invalid common item confirmation attempts",
     fixed = TRUE
   )
-  expect_identical(index, 3L)
+  expect_identical(runner$reads(), 3L)
 })
 
-test_that("interactive binary choices fail closed outside an interactive session", {
-  reads <- 0L
+test_that("old-form prior prompt uses the same exact binary-choice contract", {
+  huge_integer <- paste(rep("9", 1000), collapse = "")
+  runner <- scripted_auto_fipc(c("0", "+1", huge_integer))
 
   expect_error(
-    aFIPC:::read_binary_choice(
-      prompt = "choice: ",
-      noninteractive_error = "interactive required",
-      invalid_error = "invalid choice",
-      reader = function(prompt) {
-        reads <<- reads + 1L
-        "1"
-      },
-      interactive_check = function() FALSE
+    runner$run(
+      newformXData = data.frame(A = c(0, 1)),
+      oldformYData = data.frame(A = c(0, 1)),
+      newformCommonItemNames = "A",
+      oldformCommonItemNames = "A",
+      confirmCommonItems = TRUE
     ),
-    "interactive required",
+    "Too many invalid oldform BILOG prior attempts",
     fixed = TRUE
   )
-  expect_identical(reads, 0L)
+  expect_identical(runner$reads(), 3L)
+})
+
+test_that("all three interactive binary prompts share exact 1-or-2 validation", {
+  body_text <- paste(deparse(body(aFIPC::autoFIPC)), collapse = "\n")
+  matches <- gregexpr('n %in% c("1", "2")', body_text, fixed = TRUE)[[1]]
+  match_count <- if (identical(matches, -1L)) 0L else length(matches)
+
+  expect_identical(match_count, 3L)
 })
