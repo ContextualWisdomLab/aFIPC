@@ -58,6 +58,9 @@ def _top_level_concurrency_entries(path: Path, text: str) -> dict[str, list[str]
             continuation: list[str] = []
             cursor = index + 1
             while cursor < end and lines[cursor].startswith("    "):
+                assert not lines[cursor].startswith(
+                    "      "
+                ), f"{path}: folded concurrency scalar uses indentation that preserves newlines"
                 stripped = lines[cursor].strip()
                 if stripped and not stripped.startswith("#"):
                     continuation.append(stripped)
