@@ -56,13 +56,6 @@ find_prior_assignment_block <- function(expression, function_name, target_name) 
                     new_block <- substitute({
                         check_fn <- function() {}
                         target <- check_fn()
-                        if (!is.null(target)) {
-                            if (target == 1) {
-                                target <- TRUE
-                            } else {
-                                target <- FALSE
-                            }
-                        }
                     }, list(target = as.name(target_name), check_fn = as.name(function_name)))
 
                     for (j in seq_len(length(body_expr))) {
@@ -71,6 +64,10 @@ find_prior_assignment_block <- function(expression, function_name, target_name) 
                         }
                         if (is.call(body_expr[[j]]) && identical(body_expr[[j]][[1L]], as.name("<-")) && identical(body_expr[[j]][[2L]], as.name(target_name))) {
                             new_block[[3L]] <- body_expr[[j]]
+                        }
+                        if (is.call(body_expr[[j]]) && identical(body_expr[[j]][[1L]], as.name("if")) && is.call(body_expr[[j]][[2L]]) && identical(body_expr[[j]][[2L]][[2L]], as.name(target_name))) {
+                            if_block <- body_expr[[j]]
+                            new_block[[4L]] <- substitute(if (!is.null(target)) if_block, list(target=as.name(target_name), if_block=if_block))
                         }
                     }
 
