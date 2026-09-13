@@ -12,9 +12,8 @@ on:
 concurrency:
   group: >-
     ${{ github.workflow }}-${{ github.repository }}-${{
-      github.event_name == 'pull_request' && github.run_attempt == 1 &&
-      github.event.pull_request.number || github.run_id
-    }}
+    github.event_name == 'pull_request' && github.run_attempt == 1 &&
+    github.event.pull_request.number || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   check:
@@ -44,6 +43,14 @@ class WorkflowConcurrencyContractTest(unittest.TestCase):
         )
         with self.assertRaisesRegex(AssertionError, "pull-request lifecycle"):
             validate_workflow_text(Path("missing-cleanup-events.yml"), malformed)
+
+    def test_rejects_folded_group_that_preserves_newlines(self) -> None:
+        malformed = VALID.replace(
+            "\n    github.event_name == 'pull_request'",
+            "\n      github.event_name == 'pull_request'",
+        )
+        with self.assertRaisesRegex(AssertionError, "folded concurrency scalar"):
+            validate_workflow_text(Path("newline-group.yml"), malformed)
 
     def test_rejects_nested_lookalike(self) -> None:
         malformed = """name: Example
