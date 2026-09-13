@@ -40,6 +40,32 @@ find_nested_function_expression <- function(expression, function_name) {
   NULL
 }
 
+find_prior_assignment_block <- function(expression, function_name, target_name) {
+  if (!is.call(expression)) {
+    return(NULL)
+  }
+
+  if (identical(expression[[1L]], as.name("if"))) {
+    expression_text <- paste(deparse(expression), collapse = "\n")
+    assignment_text <- sprintf("%s <- %s()", target_name, function_name)
+    if (
+      grepl(function_name, expression_text, fixed = TRUE) &&
+        grepl(assignment_text, expression_text, fixed = TRUE)
+    ) {
+      return(expression)
+    }
+  }
+
+  for (part in as.list(expression)[-1L]) {
+    nested <- find_prior_assignment_block(part, function_name, target_name)
+    if (!is.null(nested)) {
+      return(nested)
+    }
+  }
+
+  NULL
+}
+
 scripted_nested_prompt <- function(function_name, values, confirm_common_items = NULL) {
   function_expression <- find_nested_function_expression(
     body(aFIPC::autoFIPC),
@@ -64,6 +90,34 @@ scripted_nested_prompt <- function(function_name, values, confirm_common_items =
   )
 }
 
+scripted_prior_assignment <- function(function_name, target_name, value) {
+  assignment_block <- find_prior_assignment_block(
+    body(aFIPC::autoFIPC),
+    function_name,
+    target_name
+  )
+  if (is.null(assignment_block)) {
+    stop(sprintf("Could not find assignment block for %s", function_name))
+  }
+
+  index <- 0L
+  test_env <- new.env(parent = environment(aFIPC::autoFIPC))
+  test_env$itemtype <- "3PL"
+  test_env[[target_name]] <- NULL
+  test_env$interactive <- function() TRUE
+  test_env$readline <- function(prompt = "") {
+    index <<- index + 1L
+    value
+  }
+
+  eval(assignment_block, envir = test_env)
+
+  list(
+    value = test_env[[target_name]],
+    reads = index
+  )
+}
+
 test_that("common-item confirmation rejects coercible and overflow choices", {
   huge_integer <- paste(rep("9", 1000), collapse = "")
   runner <- scripted_auto_fipc(c("3", " 1", huge_integer))
@@ -79,6 +133,35 @@ test_that("common-item confirmation rejects coercible and overflow choices", {
     fixed = TRUE
   )
   expect_identical(runner$reads(), 3L)
+})
+
+test_that("common-item exact choices drive reject or proceed behavior", {
+  reject_runner <- scripted_auto_fipc("2")
+  expect_error(
+    reject_runner$run(
+      newformXData = data.frame(A = c(0, 1)),
+      oldformYData = data.frame(A = c(0, 1)),
+      newformCommonItemNames = "A",
+      oldformCommonItemNames = "A"
+    ),
+    "Please write down pairs correctly",
+    fixed = TRUE
+  )
+  expect_identical(reject_runner$reads(), 1L)
+
+  huge_integer <- paste(rep("9", 1000), collapse = "")
+  proceed_runner <- scripted_auto_fipc(c("1", "0", "+1", huge_integer))
+  expect_error(
+    proceed_runner$run(
+      newformXData = data.frame(A = c(0, 1)),
+      oldformYData = data.frame(A = c(0, 1)),
+      newformCommonItemNames = "A",
+      oldformCommonItemNames = "A"
+    ),
+    "Too many invalid oldform BILOG prior attempts",
+    fixed = TRUE
+  )
+  expect_identical(proceed_runner$reads(), 4L)
 })
 
 test_that("old-form prior prompt uses the same exact binary-choice contract", {
@@ -125,12 +208,36 @@ test_that("all three prompt helpers accept only the exact binary choices", {
   }
 })
 
-test_that("common-item helper maps accepted choices to proceed or reject", {
-  yes_runner <- scripted_nested_prompt("checkCorrect", "1")
-  no_runner <- scripted_nested_prompt("checkCorrect", "2")
+test_that("old-form and new-form choices set their logical prior flags", {
+  old_yes <- scripted_prior_assignment(
+    "checkoldformBILOGprior",
+    "oldformBILOGprior",
+    "1"
+  )
+  old_no <- scripted_prior_assignment(
+    "checkoldformBILOGprior",
+    "oldformBILOGprior",
+    "2"
+  )
+  new_yes <- scripted_prior_assignment(
+    "checknewformBILOGprior",
+    "newformBILOGprior",
+    "1"
+  )
+  new_no <- scripted_prior_assignment(
+    "checknewformBILOGprior",
+    "newformBILOGprior",
+    "2"
+  )
 
-  expect_identical(yes_runner$run(), 1L)
-  expect_identical(no_runner$run(), 2L)
+  expect_identical(old_yes$value, TRUE)
+  expect_identical(old_no$value, FALSE)
+  expect_identical(new_yes$value, TRUE)
+  expect_identical(new_no$value, FALSE)
+  expect_identical(old_yes$reads, 1L)
+  expect_identical(old_no$reads, 1L)
+  expect_identical(new_yes$reads, 1L)
+  expect_identical(new_no$reads, 1L)
 })
 
 test_that("new-form prior prompt rejects representative invalid choices", {
