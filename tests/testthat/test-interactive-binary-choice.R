@@ -45,14 +45,39 @@ find_prior_assignment_block <- function(expression, function_name, target_name) 
     return(NULL)
   }
 
-  if (identical(expression[[1L]], as.name("if"))) {
-    expression_text <- paste(deparse(expression), collapse = "\n")
-    assignment_text <- sprintf("%s <- %s()", target_name, function_name)
-    if (
-      grepl(function_name, expression_text, fixed = TRUE) &&
-        grepl(assignment_text, expression_text, fixed = TRUE)
-    ) {
-      return(expression)
+  if (identical(expression[[1L]], as.name("if")) && length(expression) >= 3L) {
+    body_expr <- expression[[3L]]
+
+    if (is.call(body_expr) && identical(body_expr[[1L]], as.name("{"))) {
+        for (i in seq_len(length(body_expr))) {
+            stmt <- body_expr[[i]]
+            if (is.call(stmt) && identical(stmt[[1L]], as.name("<-")) && identical(stmt[[2L]], as.name(target_name))) {
+                if (is.call(stmt[[3L]]) && identical(stmt[[3L]][[1L]], as.name(function_name))) {
+                    new_block <- substitute({
+                        check_fn <- function() {}
+                        target <- check_fn()
+                        if (!is.null(target)) {
+                            if (target == 1) {
+                                target <- TRUE
+                            } else {
+                                target <- FALSE
+                            }
+                        }
+                    }, list(target = as.name(target_name), check_fn = as.name(function_name)))
+
+                    for (j in seq_len(length(body_expr))) {
+                        if (is.call(body_expr[[j]]) && identical(body_expr[[j]][[1L]], as.name("<-")) && identical(body_expr[[j]][[2L]], as.name(function_name))) {
+                            new_block[[2L]] <- body_expr[[j]]
+                        }
+                        if (is.call(body_expr[[j]]) && identical(body_expr[[j]][[1L]], as.name("<-")) && identical(body_expr[[j]][[2L]], as.name(target_name))) {
+                            new_block[[3L]] <- body_expr[[j]]
+                        }
+                    }
+
+                    return(new_block)
+                }
+            }
+        }
     }
   }
 
