@@ -1,16 +1,18 @@
 # Formula-integrity regression guards for performance refactors.
 #
-# These tests pin the two formula-bearing expressions that recent "Bolt"
-# performance refactors rewrote, so any future re-optimization that silently
-# changes their meaning is caught. Values below are hand-computed references,
-# not a re-encoding of the current implementation.
+# These tests pin formula-bearing expressions that performance refactors rewrite,
+# so a future optimization cannot silently change their statistical meaning.
+# Values below are hand-computed references, not copies of the implementation.
 #
 # Audited refactors:
 #   * #56 (fc8bbfb): response-category count guard rewritten from
-#       length(levels(as.factor(x)))  ->  length(na.omit(unique(x)))
-#     Both count DISTINCT NON-MISSING response categories. This guard decides
-#     whether an old/new common-item pair may be linked (Kim, 2006: an anchor
-#     item must share the same response structure on both forms).
+#       length(levels(as.factor(x))) -> length(stats::na.omit(unique(x)))
+#   * #372: the same guard rewritten from
+#       length(stats::na.omit(unique(x))) -> sum(!is.na(unique(x)))
+#     The current and immediately preceding forms must count DISTINCT
+#     NON-MISSING response categories. This guard decides whether an old/new
+#     common-item pair may be linked (Kim, 2006: an anchor item must share the
+#     same response structure on both forms).
 #   * #99 (d73adbd): IPD common-item extraction rewritten from a per-column
 #       for-loop over IPDItemList[cols][row, i]
 #     to a vectorized
@@ -18,36 +20,56 @@
 #     Row 1 = old-form anchor names, row 2 = new-form anchor names, restricted
 #     to the columns that survived IPD screening (CommonItemList_NOIPD).
 
-test_that("category-count guard counts distinct non-missing categories (#56)", {
+test_that("category-count guard counts distinct non-missing categories", {
   vecs <- list(
-    dichotomous       = c(0, 1, 0, 1, 1, 0),
+    dichotomous = c(0, 1, 0, 1, 1, 0),
     trichotomous_w_na = c(0, 1, 2, NA, 2, 1, 0),
-    constant          = c(0, 0, 0, 0),
-    four_category_w_na = c(0, 1, 2, 3, 3, NA, 1)
+    constant = c(0, 0, 0, 0),
+    four_category_w_na = c(0, 1, 2, 3, 3, NA, 1),
+    factor_w_na = factor(c("0", "1", NA, "1", "0")),
+    nan_and_na = c(0, 1, NaN, NA, 1)
   )
 
   # Independent hand-computed reference (distinct non-missing categories).
   expected <- c(
-    dichotomous        = 2L,
-    trichotomous_w_na  = 3L,
-    constant           = 1L,
-    four_category_w_na = 4L
+    dichotomous = 2L,
+    trichotomous_w_na = 3L,
+    constant = 1L,
+    four_category_w_na = 4L,
+    factor_w_na = 2L,
+    nan_and_na = 2L
   )
 
-  new_idiom <- vapply(
+  optimized_idiom <- vapply(
     vecs,
-    function(x) length(na.omit(unique(x))),
+    function(x) sum(!is.na(unique(x))),
     integer(1)
   )
-  legacy_idiom <- vapply(
+  previous_idiom <- vapply(
     vecs,
+    function(x) length(stats::na.omit(unique(x))),
+    integer(1)
+  )
+
+  expect_equal(optimized_idiom, expected)
+  expect_equal(unname(optimized_idiom), unname(previous_idiom))
+
+  # Preserve the original #56 equivalence check on its ordinary numeric cases.
+  legacy_vecs <- vecs[c(
+    "dichotomous",
+    "trichotomous_w_na",
+    "constant",
+    "four_category_w_na"
+  )]
+  legacy_idiom <- vapply(
+    legacy_vecs,
     function(x) length(levels(as.factor(x))),
     integer(1)
   )
-
-  expect_equal(new_idiom, expected)
-  # The refactor must remain equivalent to the pre-#56 expression.
-  expect_equal(unname(new_idiom), unname(legacy_idiom))
+  expect_equal(
+    unname(optimized_idiom[names(legacy_vecs)]),
+    unname(legacy_idiom)
+  )
 })
 
 test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)", {
