@@ -10,9 +10,12 @@ EXPECTED_GROUP = (
     "github.event.pull_request.number || github.run_id }}"
 )
 EXPECTED_CANCEL = "${{ github.event_name == 'pull_request' }}"
-EXPECTED_PR_TYPES = "types: [opened, synchronize, reopened, ready_for_review]"
+EXPECTED_PR_TYPES = (
+    "types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]"
+)
 EXPECTED_PR_ADMISSION = (
-    "${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}"
+    "${{ github.event_name != 'pull_request' || "
+    "(github.event.action != 'closed' && github.event.pull_request.draft == false) }}"
 )
 
 
@@ -21,14 +24,10 @@ def discover_workflows(root: Path = WORKFLOWS) -> list[Path]:
     return sorted({*root.glob("*.yml"), *root.glob("*.yaml")})
 
 
-def _top_level_concurrency_lines(path: Path, text: str) -> list[str]:
-    """Return non-comment entries from the sole top-level concurrency block."""
+def _top_level_concurrency_entries(path: Path, text: str) -> dict[str, list[str]]:
+    """Return direct key/value entries from the sole top-level concurrency block."""
     lines = text.splitlines()
-    starts = [
-        index
-        for index, line in enumerate(lines)
-        if line == "concurrency:"
-    ]
+    starts = [index for index, line in enumerate(lines) if line == "concurrency:"]
     assert len(starts) == 1, f"{path}: expected exactly one top-level concurrency block"
 
     start = starts[0] + 1
@@ -41,11 +40,36 @@ def _top_level_concurrency_lines(path: Path, text: str) -> list[str]:
             end = index
             break
 
-    return [
-        line[2:]
-        for line in lines[start:end]
-        if line.startswith("  ") and not line.startswith("    ")
-    ]
+    entries: dict[str, list[str]] = {}
+    index = start
+    while index < end:
+        line = lines[index]
+        if not line.startswith("  ") or line.startswith("    "):
+            index += 1
+            continue
+
+        key, separator, raw_value = line[2:].partition(":")
+        if not separator:
+            index += 1
+            continue
+
+        value = raw_value.strip()
+        if value in {">", ">-"}:
+            continuation: list[str] = []
+            cursor = index + 1
+            while cursor < end and lines[cursor].startswith("    "):
+                stripped = lines[cursor].strip()
+                if stripped and not stripped.startswith("#"):
+                    continuation.append(stripped)
+                cursor += 1
+            value = " ".join(continuation)
+            index = cursor
+        else:
+            index += 1
+
+        entries.setdefault(key, []).append(value)
+
+    return entries
 
 
 def _has_pull_request_trigger(text: str) -> bool:
@@ -108,14 +132,12 @@ def _job_admissions(text: str) -> list[str]:
 
 
 def validate_workflow_text(path: Path, text: str) -> None:
-    """Require exact group and PR-only cancellation values in top-level concurrency."""
-    entries = _top_level_concurrency_lines(path, text)
-    groups = [entry for entry in entries if entry.startswith("group:")]
-    cancellations = [entry for entry in entries if entry.startswith("cancel-in-progress:")]
+    """Require exact PR lifecycle, admission, grouping, and cancellation semantics."""
+    entries = _top_level_concurrency_entries(path, text)
 
-    assert groups == [f"group: {EXPECTED_GROUP}"], f"{path}: unsafe concurrency group"
-    assert cancellations == [
-        f"cancel-in-progress: {EXPECTED_CANCEL}"
+    assert entries.get("group") == [EXPECTED_GROUP], f"{path}: unsafe concurrency group"
+    assert entries.get("cancel-in-progress") == [
+        EXPECTED_CANCEL
     ], f"{path}: unsafe cancellation policy"
     assert _has_pull_request_trigger(
         text
@@ -125,7 +147,7 @@ def validate_workflow_text(path: Path, text: str) -> None:
     ), f"{path}: incomplete pull-request lifecycle"
     assert _job_admissions(text) and all(
         admission == EXPECTED_PR_ADMISSION for admission in _job_admissions(text)
-    ), f"{path}: draft pull requests occupy a runner"
+    ), f"{path}: draft or closed pull requests occupy a runner"
 
 
 def main() -> None:
