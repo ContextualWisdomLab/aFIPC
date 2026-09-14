@@ -128,6 +128,13 @@ find_prior_assignment_block <- function(expression, function_name, target_name) 
     return(NULL)
   }
 
+  for (part in as.list(expression)[-1L]) {
+    nested <- find_prior_assignment_block(part, function_name, target_name)
+    if (!is.null(nested)) {
+      return(nested)
+    }
+  }
+
   if (identical(expression[[1L]], as.name("if"))) {
     expression_text <- paste(deparse(expression), collapse = "\n")
     assignment_text <- sprintf("%s <- %s()", target_name, function_name)
@@ -136,13 +143,6 @@ find_prior_assignment_block <- function(expression, function_name, target_name) 
         grepl(assignment_text, expression_text, fixed = TRUE)
     ) {
       return(expression)
-    }
-  }
-
-  for (part in as.list(expression)[-1L]) {
-    nested <- find_prior_assignment_block(part, function_name, target_name)
-    if (!is.null(nested)) {
-      return(nested)
     }
   }
 
