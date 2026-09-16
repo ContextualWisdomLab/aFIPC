@@ -19,3 +19,7 @@
 ## 2024-03-22 - R 언어에서 고유값 개수 산출 시 stats::na.omit() 오버헤드 최적화
 **Learning:** R에서 데이터 내 고유(unique) 비결측치(NA 제외) 값의 개수를 셀 때 `length(stats::na.omit(unique(x)))`를 사용하면 `stats::na.omit()` 함수의 내부 메소드 디스패치 및 `na.action` 속성 할당 오버헤드로 인해 성능 저하가 발생합니다.
 **Action:** `sum(!is.na(unique(x)))`와 같은 논리 인덱스 합산 방식을 사용하여 불필요한 속성 할당 및 함수 오버헤드를 제거함으로써 성능을 최적화해야 합니다.
+
+## 2024-03-22 - R 언어에서 고유값 개수 산출 시 stats::na.omit() 오버헤드 최적화
+**Learning:** R에서 데이터 내 고유(unique) 비결측치(NA 제외) 값의 개수를 셀 때 `length(stats::na.omit(unique(x)))`를 사용하면 `stats::na.omit()` 함수의 내부 메소드 디스패치 및 `na.action` 속성 할당 오버헤드로 인해 성능 저하가 발생합니다.
+**Action:** `sum(!is.na(unique(x)))`와 같은 논리 인덱스 합산 방식을 사용하여 불필요한 속성 할당 및 함수 오버헤드를 제거함으로써 성능을 최적화해야 합니다.
