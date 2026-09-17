@@ -116,6 +116,6 @@ test_that("autoFIPC securely restricts readline coercion limits", {
       oldformCommonItemNames = c('A'),
       confirmCommonItems = NULL # Trigger interactive loop
     ),
-    "no applicable method"
+    "no applicable method" # We expect the dummy mirt output to fail gracefully right after our tested readline interaction
   )
 })
