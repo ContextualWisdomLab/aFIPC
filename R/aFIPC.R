@@ -770,8 +770,9 @@ autoFIPC <-
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-          (length(stats::na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
-            length(stats::na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
+          # ⚡ Bolt: Use sum(!is.na()) instead of length(stats::na.omit()) to avoid method dispatch overhead
+          (sum(!is.na(unique(newFormModel@Data$data[, newFormItemName]))) ==
+            sum(!is.na(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
         message(
           'applying ',
