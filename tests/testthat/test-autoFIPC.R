@@ -89,3 +89,33 @@ test_that("autoFIPC validates input types securely", {
     "Security Error: tryEM must be a single non-NA logical value"
   )
 })
+
+test_that("autoFIPC securely restricts readline coercion limits", {
+  # Mock interactive to return TRUE
+  mockery::stub(aFIPC::autoFIPC, "interactive", function() TRUE)
+
+  # Mock readline to return a malicious large number then a valid "1"
+  m <- mockery::mock("invalid", "10000000000000000000", "1", cycle = TRUE)
+  mockery::stub(aFIPC::autoFIPC, "readline", m)
+
+  # Dummy mirt objects to bypass estimation
+  dummy_mirt <- function(data, ...) {
+    mod <- new("SingleGroupClass")
+    mod@OptimInfo$converged <- TRUE
+    mod@OptimInfo$secondordertest <- TRUE
+    mod@Data$data <- data
+    mod
+  }
+  mockery::stub(aFIPC::autoFIPC, "mirt::mirt", dummy_mirt)
+
+  expect_error(
+    aFIPC::autoFIPC(
+      newformXData = data.frame(A=c(1, 0)),
+      oldformYData = data.frame(A=c(0, 1)),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      confirmCommonItems = NULL # Trigger interactive loop
+    ),
+    "no applicable method"
+  )
+})
