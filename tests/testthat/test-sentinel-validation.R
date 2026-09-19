@@ -1,7 +1,7 @@
 test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGprior, and confirmCommonItems", {
   # newformBILOGprior
   expect_error(
-    aFIPC::autoFIPC(
+    autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = data.frame(A=2),
       newformCommonItemNames = c('A'),
@@ -13,7 +13,7 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
 
   # oldformBILOGprior
   expect_error(
-    aFIPC::autoFIPC(
+    autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = data.frame(A=2),
       newformCommonItemNames = c('A'),
@@ -25,7 +25,7 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
 
   # confirmCommonItems
   expect_error(
-    aFIPC::autoFIPC(
+    autoFIPC(
       newformXData = data.frame(A=1),
       oldformYData = data.frame(A=2),
       newformCommonItemNames = c('A'),
@@ -33,5 +33,21 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
       confirmCommonItems = NA
     ),
     "Security Error: confirmCommonItems must be a single non-NA logical value or NULL"
+  )
+})
+
+test_that("readline validates exact 1 or 2 to avoid integer overflows", {
+  mockery::stub(autoFIPC, 'readline', mockery::mock("3", "9999999999", "abc", cycle = TRUE))
+  mockery::stub(autoFIPC, 'interactive', function() TRUE)
+
+  expect_error(
+    autoFIPC(
+      newformXData = data.frame(A=1),
+      oldformYData = data.frame(A=2),
+      newformCommonItemNames = c('A'),
+      oldformCommonItemNames = c('A'),
+      confirmCommonItems = NULL
+    ),
+    "Too many invalid common item confirmation attempts"
   )
 })
