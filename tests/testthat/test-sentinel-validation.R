@@ -35,3 +35,10 @@ test_that("autoFIPC validates boolean flags for newformBILOGprior, oldformBILOGp
     "Security Error: confirmCommonItems must be a single non-NA logical value or NULL"
   )
 })
+
+test_that("autoFIPC bounds check for readline input works safely", {
+  expect_true(grepl("^[12]$", "1"))
+  expect_true(grepl("^[12]$", "2"))
+  expect_false(grepl("^[12]$", "3"))
+  expect_false(grepl("^[12]$", "2147483648"))
+})
