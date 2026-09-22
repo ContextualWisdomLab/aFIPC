@@ -80,12 +80,19 @@ surveyFA <- function(
     stop("surveyFA requires pThreshold to be in (0, 1].", call. = FALSE)
   }
 
-  response_data <- as.data.frame(data)
-  response_data <-
-    response_data[, vapply(response_data, function(column) {
+  response_data <- data
+  if (is.matrix(response_data)) {
+    valid_cols <- apply(response_data, 2, function(column) {
       nunique <- length(unique(stats::na.omit(column)))
       nunique >= 2L
-    }, logical(1L))]
+    })
+  } else {
+    valid_cols <- vapply(response_data, function(column) {
+      nunique <- length(unique(stats::na.omit(column)))
+      nunique >= 2L
+    }, logical(1L))
+  }
+  response_data <- response_data[, valid_cols, drop = FALSE]
 
   if (nrow(response_data) == 0L || ncol(response_data) < 2L) {
     stop("surveyFA needs at least two non-constant response columns.", call. = FALSE)
@@ -220,7 +227,7 @@ surveyFA <- function(
       return(NA_character_)
     }
 
-    active <- intersect(names(response_data), rownames(fit_df))
+    active <- intersect(colnames(response_data), rownames(fit_df))
     if (length(active) == 0L) {
       return(NA_character_)
     }
@@ -240,8 +247,10 @@ surveyFA <- function(
     }
 
     v <- vapply(
-      response_data[active],
-      function(x) stats::var(as.numeric(x), na.rm = TRUE),
+      active,
+      function(column_name) {
+        stats::var(as.numeric(response_data[, column_name]), na.rm = TRUE)
+      },
       numeric(1L)
     )
     names(v) <- active
@@ -278,7 +287,7 @@ surveyFA <- function(
       break
     }
 
-    response_data <- response_data[, names(response_data) != bad_item, drop = FALSE]
+    response_data <- response_data[, colnames(response_data) != bad_item, drop = FALSE]
     removed <- c(removed, bad_item)
   }
 
