@@ -16,9 +16,3 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
-## 2024-05-24 - Replace length(na.omit(unique(x))) with sum(!is.na(unique(x)))
-**Learning:** stats::na.omit carries overhead due to method dispatch and na.action attribute allocations. Using logical index summing approach sum(!is.na(unique(x))) avoids these overheads and is significantly faster when counting unique non-NA values.
-**Action:** Use sum(!is.na(unique(x))) instead of length(unique(stats::na.omit(x))) or length(stats::na.omit(unique(x))) for R performance optimization.
-## 2026-09-22 - Avoid capitalized folder names like `.Jules`
-**Learning:** Using capitalized folder names like `.Jules` when there is also a `.jules` folder leads to `R CMD check` throwing an error "Found the following files with duplicate lower-cased file names" because file paths must be portable across file systems (e.g., Windows/macOS where paths are often case-insensitive).
-**Action:** Always use lowercase letters for hidden folders (e.g., `.jules`) to ensure portability and avoid `R CMD check` errors on case-sensitivity.

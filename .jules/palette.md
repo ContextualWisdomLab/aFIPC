@@ -1,3 +1,7 @@
-## 2024-05-19 - Use logical subsetting instead of na.omit for single variable subsetting
-**Learning:** `na.omit` drops all rows if any column in the dataframe has an NA value, which can unintentionally drop valid data when subsetting based on a single variable or vector.
-**Action:** Always use logical subsetting like `x[!is.na(x)]` instead of `na.omit(x)` when filtering NAs for a single vector or variable to preserve valid data.
+## 2024-06-24 - Pure R Backend Package
+**Learning:** The aFIPC repository is a pure R backend package without any frontend web components or UI. Therefore, standard micro-UX enhancements such as ARIA labels, loading states, and CSS styling cannot be applied.
+**Action:** Stop and do not create a PR, as no suitable web UX enhancements can be identified.
+
+## 2026-06-30 - No Frontend Surface
+**Learning:** The package contains R calibration code and package metadata, not HTML, React, CSS, or other UI surfaces.
+**Action:** Palette tasks should stop after recording that no UX enhancement applies unless a future frontend artifact is introduced.
