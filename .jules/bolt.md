@@ -19,3 +19,6 @@
 ## 2024-05-24 - Replace length(na.omit(unique(x))) with sum(!is.na(unique(x)))
 **Learning:** stats::na.omit carries overhead due to method dispatch and na.action attribute allocations. Using logical index summing approach sum(!is.na(unique(x))) avoids these overheads and is significantly faster when counting unique non-NA values.
 **Action:** Use sum(!is.na(unique(x))) instead of length(unique(stats::na.omit(x))) or length(stats::na.omit(unique(x))) for R performance optimization.
+## 2026-09-22 - Avoid capitalized folder names like `.Jules`
+**Learning:** Using capitalized folder names like `.Jules` when there is also a `.jules` folder leads to `R CMD check` throwing an error "Found the following files with duplicate lower-cased file names" because file paths must be portable across file systems (e.g., Windows/macOS where paths are often case-insensitive).
+**Action:** Always use lowercase letters for hidden folders (e.g., `.jules`) to ensure portability and avoid `R CMD check` errors on case-sensitivity.
