@@ -16,3 +16,12 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2026-09-22 - R 언어에서 매트릭스를 데이터 프레임으로 형변환하여 ncol을 호출하는 비용 최적화
+**Learning:** R에서 단순 컬럼 수를 셀 때 매트릭스 타입임에도 불구하고 `as.data.frame()`으로 형변환을 한 뒤에 `ncol()`을 수행하면 `as.data.frame()` 내부에서 불필요한 O(N)의 메모리 복사 및 타입 캐스팅 오버헤드가 발생합니다. `ncol()`은 매트릭스 타입에 대해서도 직접 사용할 수 있으므로 이러한 변환은 완전히 불필요합니다.
+**Action:** `ncol(as.data.frame(mat))` 대신 매트릭스에 곧바로 `ncol(mat)`을 사용하여 불필요한 복사 오버헤드를 줄입니다. (이 최적화는 50라인 미만의 작지만 확실한 O(N) 복사 오버헤드 제거입니다.)
+## 2026-09-22 - R 언어에서 매트릭스 타입의 응답 데이터를 데이터 프레임으로 불필요하게 형변환하는 병목 최적화
+**Learning:** R에서 응답 데이터가 이미 매트릭스 또는 데이터 프레임 형식일 때, `surveyFA` 등에서 무조건 `as.data.frame()`으로 형변환하는 것은 메모리 복사와 O(N) 변환 오버헤드를 유발하여 큰 데이터셋에서 성능 저하를 초래합니다.
+**Action:** `surveyFA`에서 `response_data <- as.data.frame(data)`를 `response_data <- data`로 단순화하여 불필요한 O(N)의 데이터 복사를 제거합니다. 이는 이미 `!is.data.frame(data) && !is.matrix(data)`로 검증이 완료된 상황이므로 안전한 성능 최적화입니다.
+## 2026-09-22 - R 언어에서 매트릭스 타입의 응답 데이터를 데이터 프레임으로 불필요하게 형변환하는 병목 최적화 시 주의점
+**Learning:** R에서 응답 데이터가 매트릭스일 때 `as.data.frame(data)`를 피하려고 `response_data <- data`로 얕은 복사를 수행한 후 `vapply()` 등을 적용하면, 데이터 프레임은 열 단위로 적용되는 반면 매트릭스는 셀 단위로 순회하므로 로직이 완전히 깨질 수 있습니다.
+**Action:** `vapply()`와 같이 컬럼 단위 연산이 필수적인 경우, 매트릭스 구조를 그대로 유지한 채 `apply(data, 2, ...)`를 사용하거나 원래대로 `as.data.frame`을 유지하는 것이 안전합니다.
