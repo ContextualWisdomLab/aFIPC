@@ -1,1 +1,2 @@
-test_that("dummy", { expect_true(TRUE) })
+source("R/aFIPC.R")
+source("R/surveyFA.R")
