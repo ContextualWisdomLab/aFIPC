@@ -16,3 +16,7 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2024-07-20 - R 언어에서 factor 생성 및 데이터 프레임 재구성 줄이기
+
+**Learning:** `data.frame(df, col)`은 기존 프레임을 새 프레임으로 명시적으로 재구성하고, `as.factor(...)`는 레벨을 입력에서 추론합니다. 직접 열을 할당하고 고정 레벨을 선언하면 이 두 작업을 피할 수 있습니다. 다만 R의 copy-on-modify 의미론에 따라 열 할당도 복사를 유발할 수 있으므로 O(1)이나 고정 속도 향상을 보장하지 않습니다.
+**Action:** 결과 의미론이 고정된 경우에만 `factor(..., levels = ...)`와 직접 열 할당을 사용하고, 구체적인 성능 수치는 대표 입력을 사용한 재현 가능한 벤치마크가 있을 때만 기록하십시오.

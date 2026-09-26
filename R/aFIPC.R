@@ -1,3 +1,11 @@
+.build_ipd_group <- function(old_count, new_count) {
+  factor(
+    rep(c('oldForm', 'newForm'), c(old_count, new_count)),
+    levels = c('newForm', 'oldForm')
+  )
+}
+
+
 #' automated fixed item parameter linking
 #'
 #' @import mirt
@@ -612,11 +620,10 @@ autoFIPC <-
     #IPD
     if (checkIPD == T) {
       # config
-      IPDgroup <-
-        as.factor(c(
-          rep('oldForm', nrow(oldformYDataK)),
-          rep('newForm', nrow(newformXDataK))
-        ))
+      IPDgroup <- .build_ipd_group(
+        nrow(oldformYDataK),
+        nrow(newformXDataK)
+      )
       IPDItemCount <- 0
 
       # IPD target item checking
@@ -1044,7 +1051,9 @@ autoFIPC <-
     modelReturn$ThetaNewform <- ThetaNewform
     modelReturn$ThetaLinkedform <- ThetaLinkedform
     if (checkIPD) {
-      modelReturn$IPDData <- data.frame(IPDData, IPDgroup)
+      # ⚡ Bolt: Append column using direct list assignment instead of O(N) data.frame() concatenation
+      modelReturn$IPDData <- IPDData
+      modelReturn$IPDData$IPDgroup <- IPDgroup
       if (exists('CommonItemList_NOIPD', inherits = FALSE)) {
         modelReturn$IPDCommonItemList <- IPDItemList[CommonItemList_NOIPD]
       }
