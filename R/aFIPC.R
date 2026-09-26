@@ -141,9 +141,7 @@ autoFIPC <-
       }
       for (attempt in seq_len(3)) {
         n <- readline(prompt = "Is it correct? (1: Yes 2: No) : ")
-        if (grepl("^[0-9]+$", n)) {
-          return(as.integer(n))
-        }
+        if (n %in% c("1", "2")) return(as.integer(n))
       }
       stop("Too many invalid common item confirmation attempts")
     }
@@ -171,9 +169,7 @@ autoFIPC <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for oldform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
-              return(as.integer(n))
-            }
+            if (n %in% c("1", "2")) return(as.integer(n))
           }
           stop("Too many invalid oldform BILOG prior attempts")
         }
@@ -390,9 +386,7 @@ autoFIPC <-
               readline(
                 prompt = "Do you want to use default BILOG-MG priors for newform Data? (1: Yes 2: No) : "
               )
-            if (grepl("^[0-9]+$", n)) {
-              return(as.integer(n))
-            }
+            if (n %in% c("1", "2")) return(as.integer(n))
           }
           stop("Too many invalid newform BILOG prior attempts")
         }
