@@ -83,9 +83,10 @@ surveyFA <- function(
   response_data <- as.data.frame(data)
   response_data <-
     response_data[, vapply(response_data, function(column) {
-      nunique <- length(unique(stats::na.omit(column)))
-      nunique >= 2L
-    }, logical(1L))]
+      col <- column[!is.na(column)]
+      if (length(col) == 0L) return(FALSE)
+      any(col != col[1L])
+    }, logical(1L)), drop = FALSE]
 
   if (nrow(response_data) == 0L || ncol(response_data) < 2L) {
     stop("surveyFA needs at least two non-constant response columns.", call. = FALSE)
@@ -241,7 +242,7 @@ surveyFA <- function(
 
     v <- vapply(
       response_data[active],
-      function(x) stats::var(as.numeric(x), na.rm = TRUE),
+      function(x) stats::var(x, na.rm = TRUE),
       numeric(1L)
     )
     names(v) <- active

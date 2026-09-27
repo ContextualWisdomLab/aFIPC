@@ -16,3 +16,6 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2026-09-27 - R 언어에서 컬럼 내 유일값 검사(Unique Check) 및 불필요한 as.numeric() 형변환 오버헤드 제거
+**Learning:** R에서 데이터프레임의 모든 컬럼에 대해 값이 단일한지 판단하기 위해 `length(unique(na.omit(x))) >= 2`를 반복적으로 수행하면 `unique()` 계산이 각 컬럼 전체를 탐색하므로 불필요한 O(N) 연산 및 메모리 할당 병목이 발생합니다. 또한 `vapply` 루프 내에서 분산 계산 등을 위해 매번 `as.numeric(x)` 형변환을 호출하는 것도 매우 큰 오버헤드를 유발합니다.
+**Action:** 조건부 검증 로직은 `col <- x[!is.na(x)]`로 필터 후 `any(col != col[1])`와 같이 첫 번째 요소와 다른 값이 존재하는지 확인하는 방식으로 최적화해야 합니다(Early-exit 성격). 또한 이미 numeric 형태임이 보장되는 데이터의 경우 `as.numeric()` 강제 형변환 코드를 제거하여 루프 내부 오버헤드를 최소화합니다.
