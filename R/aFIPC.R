@@ -612,11 +612,11 @@ autoFIPC <-
     #IPD
     if (checkIPD == T) {
       # config
-      IPDgroup <-
-        as.factor(c(
-          rep('oldForm', nrow(oldformYDataK)),
-          rep('newForm', nrow(newformXDataK))
-        ))
+      # ⚡ Bolt: Bypass O(N) factor level inference and dynamic string array allocation
+      IPDgroup <- factor(
+        rep(c('oldForm', 'newForm'), c(nrow(oldformYDataK), nrow(newformXDataK))),
+        levels = c('newForm', 'oldForm')
+      )
       IPDItemCount <- 0
 
       # IPD target item checking
