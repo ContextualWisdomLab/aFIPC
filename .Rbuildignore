@@ -5,6 +5,8 @@
 ^\.Rprofile$
 ^\.github$
 ^\.github/.*
+^\.cursor$
+^\.cursor/.*
 ^\.codegraph$
 ^\.codegraph/.*
 ^.*\.Rcheck$
