@@ -80,12 +80,19 @@ surveyFA <- function(
     stop("surveyFA requires pThreshold to be in (0, 1].", call. = FALSE)
   }
 
-  response_data <- as.data.frame(data)
-  response_data <-
-    response_data[, vapply(response_data, function(column) {
-      nunique <- length(unique(stats::na.omit(column)))
-      nunique >= 2L
-    }, logical(1L))]
+  if (is.matrix(data)) {
+    response_data <- data[, apply(data, 2, function(column) {
+      c_no_na <- column[!is.na(column)]
+      if (length(c_no_na) == 0L) FALSE else any(c_no_na != c_no_na[1L])
+    }), drop = FALSE]
+    response_data <- as.data.frame(response_data)
+  } else {
+    response_data <- as.data.frame(data)
+    response_data <- response_data[, vapply(response_data, function(column) {
+      c_no_na <- column[!is.na(column)]
+      if (length(c_no_na) == 0L) FALSE else any(c_no_na != c_no_na[1L])
+    }, logical(1L)), drop = FALSE]
+  }
 
   if (nrow(response_data) == 0L || ncol(response_data) < 2L) {
     stop("surveyFA needs at least two non-constant response columns.", call. = FALSE)
