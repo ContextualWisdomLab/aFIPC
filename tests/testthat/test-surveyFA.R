@@ -82,3 +82,14 @@ test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
     "could not estimate a valid model after bounded recovery attempts"
   )
 })
+
+test_that('surveyFA branching apply logic works', {
+  m <- matrix(rbinom(200, 1, 0.5), ncol = 2)
+  df <- as.data.frame(m)
+  m[,1] <- NA
+  df[,1] <- NA
+  m[,2] <- 1
+  df[,2] <- 1
+  expect_error(aFIPC::surveyFA(m, forceUIRT = TRUE), 'surveyFA needs at least two non-constant response columns.')
+  expect_error(aFIPC::surveyFA(df, forceUIRT = TRUE), 'surveyFA needs at least two non-constant response columns.')
+})

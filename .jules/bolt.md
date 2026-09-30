@@ -16,3 +16,6 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2026-09-30 - R 언어에서 apply 계열 함수 사용 시 매트릭스와 데이터프레임 분기 처리 및 중복 형변환 제거
+**Learning:** R에서 데이터프레임에 `apply(x, 2, ...)`를 사용하면 전체 데이터가 내부적으로 `as.matrix()`를 통해 복사되어 변환되므로 심각한 메모리 및 성능 오버헤드(O(N))가 발생합니다. 반대로 데이터 타입에 따라 분기하지 않으면 비효율적입니다. 또한, 불필요한 `as.numeric()` 형변환도 성능 저하를 초래합니다.
+**Action:** 입력 데이터가 매트릭스인지(`is.matrix(x)`) 검사하여 매트릭스인 경우 `apply()`를 사용하고, 데이터프레임인 경우 `vapply()` 또는 `lapply()`를 사용하여 불필요한 강제 형변환(coercion) 오버헤드를 방지해야 합니다. 또한, 불필요한 `as.numeric()` 형변환을 피해야 합니다.
