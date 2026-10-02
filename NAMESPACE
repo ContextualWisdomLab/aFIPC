@@ -3,3 +3,4 @@
 export(autoFIPC)
 export(surveyFA)
 import(mirt)
+export(get_confirmation)
