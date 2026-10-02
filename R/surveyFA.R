@@ -80,12 +80,28 @@ surveyFA <- function(
     stop("surveyFA requires pThreshold to be in (0, 1].", call. = FALSE)
   }
 
-  response_data <- as.data.frame(data)
-  response_data <-
-    response_data[, vapply(response_data, function(column) {
-      nunique <- length(unique(stats::na.omit(column)))
-      nunique >= 2L
-    }, logical(1L))]
+  # ⚡ Bolt: Avoid coercive as.data.frame() on matrices prior to subsetting to prevent O(N) memory copies.
+  # Optimize unique element validation by replacing expensive unique() scans with early-exit any(x != x[1]).
+  col_valid <- if (is.matrix(data)) {
+    apply(data, 2, function(x) {
+      x <- x[!is.na(x)]
+      if (length(x) == 0) return(FALSE)
+      any(x != x[1])
+    })
+  } else {
+    vapply(as.data.frame(data), function(x) {
+      x <- x[!is.na(x)]
+      if (length(x) == 0) return(FALSE)
+      any(x != x[1])
+    }, logical(1L))
+  }
+
+  # Force conversion to base data.frame *after* subsetting to reduce casting overhead while preserving compatibility
+  response_data <- as.data.frame(if (is.matrix(data)) {
+    data[, col_valid, drop = FALSE]
+  } else {
+    as.data.frame(data)[, col_valid, drop = FALSE]
+  })
 
   if (nrow(response_data) == 0L || ncol(response_data) < 2L) {
     stop("surveyFA needs at least two non-constant response columns.", call. = FALSE)
