@@ -16,3 +16,6 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2024-07-13 - R 언어에서 매트릭스를 데이터 프레임으로 강제 변환 후 vapply 수행 시 성능 저하 및 고유값 검사 병목 최적화
+**Learning:** R에서 데이터가 매트릭스인지 데이터 프레임인지 확인하지 않고 무조건 `as.data.frame()`으로 강제 변환한 뒤 `vapply()`를 수행하면 매트릭스의 경우 불필요하고 값비싼 복사와 캐스팅 오버헤드(O(N))가 발생합니다. 또한, 각 열(column)이 여러 개의 고유값을 가지는지 판별하기 위해 `length(unique(stats::na.omit(x))) >= 2`를 사용하는 것은 매번 고유값을 모두 추출하는 비용을 지불해야 하므로 배열이 클 때 불필요하게 느립니다.
+**Action:** 입력 객체가 매트릭스인지 확인(`is.matrix(x)`)하여 매트릭스일 때는 `apply(..., 2, ...)`를, 데이터 프레임일 때는 `vapply()`를 사용하는 분기 로직(branching logic)을 작성하여 불필요한 강제 변환과 오버헤드를 막습니다. 또한 고유값 존재 여부 검사는 `x <- x[!is.na(x)]; if (length(x) == 0) return(FALSE); any(x != x[1])`와 같이 첫 번째 유효값과 다른 값이 존재하는지만 확인(early exit)하도록 개선하여 성능을 O(1) ~ O(N)으로 최적화합니다.
