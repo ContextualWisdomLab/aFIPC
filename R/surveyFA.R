@@ -83,8 +83,8 @@ surveyFA <- function(
   response_data <- as.data.frame(data)
   response_data <-
     response_data[, vapply(response_data, function(column) {
-      nunique <- length(unique(stats::na.omit(column)))
-      nunique >= 2L
+      x <- column[!is.na(column)]
+      if (length(x) == 0) return(FALSE) else any(x != x[1])
     }, logical(1L))]
 
   if (nrow(response_data) == 0L || ncol(response_data) < 2L) {
