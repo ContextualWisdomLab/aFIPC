@@ -770,8 +770,10 @@ autoFIPC <-
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
-          (length(stats::na.omit(unique(newFormModel@Data$data[, newFormItemName]))) ==
-            length(stats::na.omit(unique(oldFormModel@Data$data[, oldFormItemName]))))
+          # ⚡ Bolt: length(stats::na.omit()) incurs S3 method dispatch & allocation overhead.
+          # Replaced with faster vectorized logical sum(!is.na()) to count unique non-NA values efficiently.
+          (sum(!is.na(unique(newFormModel@Data$data[, newFormItemName]))) ==
+            sum(!is.na(unique(oldFormModel@Data$data[, oldFormItemName]))))
       ) {
         message(
           'applying ',
