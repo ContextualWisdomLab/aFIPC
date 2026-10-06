@@ -83,7 +83,8 @@ surveyFA <- function(
   response_data <- as.data.frame(data)
   response_data <-
     response_data[, vapply(response_data, function(column) {
-      nunique <- length(unique(stats::na.omit(column)))
+      # ⚡ Bolt: Replace length(unique(na.omit())) with sum(!is.na(unique())) to avoid S3 dispatch and allocation overhead
+      nunique <- sum(!is.na(unique(column)))
       nunique >= 2L
     }, logical(1L))]
 
