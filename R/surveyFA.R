@@ -83,7 +83,7 @@ surveyFA <- function(
   response_data <- as.data.frame(data)
   response_data <-
     response_data[, vapply(response_data, function(column) {
-      nunique <- length(unique(stats::na.omit(column)))
+      nunique <- sum(!is.na(unique(column)))
       nunique >= 2L
     }, logical(1L))]
 
@@ -232,7 +232,7 @@ surveyFA <- function(
       names(p_values) <- rownames(fit_df)
       if (any(!is.na(p_values))) {
         p_values[is.na(p_values)] <- 1
-        candidate <- names(sort(p_values, decreasing = FALSE))[1L]
+        candidate <- names(p_values)[which.min(p_values)]
         if (!is.na(candidate) && p_values[[candidate]] < pThreshold) {
           return(candidate)
         }
