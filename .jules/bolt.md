@@ -16,3 +16,6 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2025-02-13 - R 언어에서 고유 NA가 아닌 값 개수 계산 시 stats::na.omit 오버헤드 최적화
+**Learning:** R에서 `length(stats::na.omit(unique(x)))` 또는 `length(unique(stats::na.omit(x)))`를 사용하여 NA가 아닌 고유 값의 개수를 세는 방식은 `stats::na.omit`의 메서드 디스패치(method dispatch)와 `na.action` 속성 할당으로 인해 불필요한 오버헤드가 발생합니다.
+**Action:** 논리 인덱스 합산을 활용하여 `sum(!is.na(unique(x)))`로 대체함으로써 함수 오버헤드를 줄이고 성능을 개선해야 합니다.
