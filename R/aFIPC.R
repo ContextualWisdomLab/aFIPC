@@ -612,11 +612,12 @@ autoFIPC <-
     #IPD
     if (checkIPD == T) {
       # config
+      # ⚡ Bolt: Optimize factor creation by avoiding automatic level inference overhead and using vectorized rep()
       IPDgroup <-
-        as.factor(c(
-          rep('oldForm', nrow(oldformYDataK)),
-          rep('newForm', nrow(newformXDataK))
-        ))
+        factor(
+          rep(c('oldForm', 'newForm'), c(nrow(oldformYDataK), nrow(newformXDataK))),
+          levels = c('newForm', 'oldForm')
+        )
       IPDItemCount <- 0
 
       # IPD target item checking
