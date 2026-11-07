@@ -58,8 +58,32 @@ test_that("surveyFA validates boolean control flags before estimator dispatch", 
   )
 })
 
+test_that("minimum named selection preserves prior sort semantics", {
+  normalized_cases <- list(
+    c(item_a = 0.40, item_b = 0.10, item_c = 0.30),
+    c(item_a = 0.10, item_b = 0.10, item_c = 0.20),
+    c(item_a = -0.50, item_b = 0.00, item_c = 0.50)
+  )
+  missing_case <- c(item_a = NA_real_, item_b = 0.20, item_c = 0.30)
+  missing_case[is.na(missing_case)] <- 1
+  normalized_cases[[length(normalized_cases) + 1L]] <- missing_case
+
+  for (p_values in normalized_cases) {
+    prior_candidate <- names(sort(p_values, decreasing = FALSE))[1L]
+    expect_identical(
+      aFIPC:::.minimum_named_value(p_values),
+      prior_candidate
+    )
+  }
+  expect_identical(
+    aFIPC:::.minimum_named_value(setNames(numeric(), character())),
+    NA_character_
+  )
+})
+
 test_that("surveyFA reports bounded recovery exhaustion when unrecoverable", {
   skip_if_not_installed("mirt")
+  set.seed(20260726)
 
   raw <- as.data.frame(
     matrix(
