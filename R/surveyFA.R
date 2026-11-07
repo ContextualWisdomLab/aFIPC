@@ -83,7 +83,8 @@ surveyFA <- function(
   response_data <- as.data.frame(data)
   response_data <-
     response_data[, vapply(response_data, function(column) {
-      nunique <- length(unique(stats::na.omit(column)))
+      # Use vectorized logical approach instead of na.omit for performance
+      nunique <- sum(!is.na(unique(column)))
       nunique >= 2L
     }, logical(1L))]
 
