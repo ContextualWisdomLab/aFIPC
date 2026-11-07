@@ -110,3 +110,16 @@ Applies to every agent (Claude, Codex, Cursor, opencode, ...) working in this re
   psychometrics literature. Commit paper PDFs only when redistribution is
   permitted; otherwise cite, link, and summarize.
 <!-- END cwl-agent-guidance -->
+
+## Independent review gate
+
+- Do not add a human-only CODEOWNERS approval requirement while this repository
+  has one human maintainer; that configuration creates an unsatisfiable gate.
+- The organization ruleset still requires at least one approval from an actor
+  other than the last pusher. Satisfy it through an authenticated independent
+  review app or another qualified maintainer; never self-approve or bypass it.
+- Treat approval as current-head evidence. A new commit invalidates the previous
+  approval and requires review of the new head together with all required checks.
+- The central PR scheduler may request review, update stale branches, and enable
+  auto-merge, but it must not weaken required checks, dismiss valid findings, or
+  merge with unresolved review threads.
