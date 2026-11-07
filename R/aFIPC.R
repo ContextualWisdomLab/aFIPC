@@ -767,6 +767,8 @@ autoFIPC <-
       newFormItemName <- newFormColNames[idxNew_all[i]]
       oldFormItemName <- oldFormColNames[idxOld_all[i]]
 
+      # ⚡ Bolt: Use vectorized logical approach sum(!is.na(...)) instead of length(stats::na.omit(...))
+      # to avoid S3 method dispatch and attribute allocation overhead during item match check
       if (
         !is.na(newFormItemName) &&
         !is.na(oldFormItemName) &&
