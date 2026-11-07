@@ -12,6 +12,9 @@ over feature velocity.
 2. Prefer small, auditable pull requests.
 3. Keep CI/security/docs healthy (`.github/workflows/`, `README.md`,
    `ARCHITECTURE.md`, `AGENTS.md`).
+4. Methodological decisions (linking contract, estimation engine) are
+   recorded in `docs/adr/`. Cite verified sources from
+   `docs/papers/README.md`; do not invent bibliographic records.
 
 ## Development Setup
 
