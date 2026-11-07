@@ -86,8 +86,9 @@ autoFIPC <-
 
     if (!is.character(itemtype)) stop('Security Error: itemtype must be a character vector')
     nItems <- NA_integer_
-    if (is.data.frame(newformXData) || is.matrix(newformXData)) nItems <- ncol(as.data.frame(newformXData))
-    else if (is.data.frame(oldformYData) || is.matrix(oldformYData)) nItems <- ncol(as.data.frame(oldformYData))
+    # ⚡ Bolt: Remove as.data.frame() for simple ncol() check to prevent O(N) memory copy overhead
+    if (is.data.frame(newformXData) || is.matrix(newformXData)) nItems <- ncol(newformXData)
+    else if (is.data.frame(oldformYData) || is.matrix(oldformYData)) nItems <- ncol(oldformYData)
     if (!is.na(nItems) && !(length(itemtype) == 1 || length(itemtype) == nItems)) stop(sprintf('Security Error: itemtype must be length 1 or length %d (number of items).', nItems))
 
     # boolean parameter validation
