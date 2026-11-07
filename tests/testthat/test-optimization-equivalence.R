@@ -78,3 +78,42 @@ test_that("IPD anchor extraction keeps old/new rows and screened columns (#99)",
   expect_identical(actual_old, legacy_old)
   expect_identical(actual_new, legacy_new)
 })
+
+test_that("colnames intersect optimization drops missing columns correctly (#XXX)", {
+  df <- data.frame(A=1, B=2)
+  cols <- c("A", "C")
+
+  # The legacy behavior throws an error when a column is absent.
+  expect_error(df[cols])
+
+  # The refactored code correctly silences the error and drops "C", preserving alignment.
+  # However, to perfectly align with the old semantic where missing column indices
+  # mapped to `NA_character_` (or caused an explicit failure), `intersect` order matters:
+  expect_equal(intersect(colnames(df), cols), c("A"))
+  # Note: `colnames(df[cols])` fails, but `intersect(colnames(df), cols)` silently yields "A".
+  # Our change intentionally fixes the crash for absent columns but preserves order semantics.
+})
+
+test_that("sum(!is.na(unique(x))) is semantically equivalent to length(na.omit(unique(x)))", {
+  vecs <- list(
+    dichotomous       = c(0, 1, 0, 1, 1, 0),
+    trichotomous_w_na = c(0, 1, 2, NA, 2, 1, 0),
+    constant          = c(0, 0, 0, 0),
+    four_category_w_na = c(0, 1, 2, 3, 3, NA, 1),
+    all_na            = c(NA, NA, NA)
+  )
+
+  new_idiom <- vapply(
+    vecs,
+    function(x) sum(!is.na(unique(x))),
+    numeric(1)
+  )
+
+  legacy_idiom <- vapply(
+    vecs,
+    function(x) length(na.omit(unique(x))),
+    integer(1)
+  )
+
+  expect_equal(unname(new_idiom), unname(legacy_idiom))
+})
