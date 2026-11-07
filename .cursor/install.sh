@@ -30,15 +30,19 @@ if ! toolchain_ready; then
   sudo apt-get update -qq
   sudo apt-get install -y --no-install-recommends wget ca-certificates gnupg dirmngr
 
+  # Store each repository key in its own keyring and bind it to that repo with
+  # signed-by, so a key can only vouch for its own source (no global trust).
+  sudo install -d -m 0755 /etc/apt/keyrings
+
   wget -q -O- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc \
-    | sudo tee /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc >/dev/null
-  echo "deb [arch=${ARCH}] https://cloud.r-project.org/bin/linux/ubuntu ${CRAN_SUITE}/" \
-    | sudo tee /etc/apt/sources.list.d/cran_r.list
+    | sudo gpg --dearmor -o /etc/apt/keyrings/cran_r.gpg
+  echo "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/cran_r.gpg] https://cloud.r-project.org/bin/linux/ubuntu ${CRAN_SUITE}/" \
+    | sudo tee /etc/apt/sources.list.d/cran_r.list >/dev/null
 
   wget -q -O- https://eddelbuettel.github.io/r2u/assets/dirk_eddelbuettel_key.asc \
-    | sudo tee /etc/apt/trusted.gpg.d/cranapt_key.asc >/dev/null
-  echo "deb [arch=${ARCH}] https://r2u.stat.illinois.edu/ubuntu ${VERSION_CODENAME} main" \
-    | sudo tee /etc/apt/sources.list.d/cranapt.list
+    | sudo gpg --dearmor -o /etc/apt/keyrings/cranapt.gpg
+  echo "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/cranapt.gpg] https://r2u.stat.illinois.edu/ubuntu ${VERSION_CODENAME} main" \
+    | sudo tee /etc/apt/sources.list.d/cranapt.list >/dev/null
   printf 'Package: *\nPin: release o=CRAN-Apt Project\nPin: release l=CRAN-Apt Packages\nPin-Priority: 700\n' \
     | sudo tee /etc/apt/preferences.d/99cranapt >/dev/null
 
@@ -47,4 +51,12 @@ if ! toolchain_ready; then
     r-base-core r-cran-mirt r-cran-testthat r-cran-roxygen2 r-cran-rcmdcheck pandoc
 fi
 
-echo "aFIPC toolchain ready: R=$(R --version | head -1)"
+# Report resolved versions. Reproducibility across agents comes from the
+# environment-build snapshot, which pins this toolchain at build time; this
+# block only reprovisions on a bare image.
+R_PROFILE_USER=/dev/null Rscript -e '
+  cat(sprintf("aFIPC toolchain ready: R %s\n", getRversion()))
+  for (p in c("mirt", "testthat", "roxygen2", "rcmdcheck")) {
+    cat(sprintf("  %-10s %s\n", p, as.character(packageVersion(p))))
+  }
+'
