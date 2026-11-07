@@ -16,3 +16,6 @@
 ## 2025-02-12 - R 언어에서 반복적인 mirt 모델 생성 시 불필요한 데이터프레임 부분집합 추출 최적화
 **Learning:** R에서 데이터프레임의 특정 열을 추출하는 작업(`df[cols]`)은 O(N)의 메모리 복사를 수반합니다. `autoFIPC`에서 `mirt` 모델의 파라미터를 설정하거나 호출하는 과정 중에 `newformXDataK[colnames(newFormModel@Data$data)]` 코드가 반복해서 사용되었고, 심지어 `ncol()`을 위해 단순히 개수를 구할 때도 사용되어 불필요한 메모리 할당과 오버헤드를 초래했습니다.
 **Action:** 조건문이나 반복문 내부에서 불필요하게 데이터프레임 부분집합 연산이 반복되지 않도록 외부에서 한 번만 `linkedFormData <- newformXDataK[colnames(newFormModel@Data$data)]`로 캐싱(caching)한 뒤, `ncol(linkedFormData)`와 `data = linkedFormData` 형태로 재사용하여 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
+## 2026-09-16 - R 언어에서 ncol() 사용 시 불필요한 as.data.frame() 형변환 제거
+**Learning:** R에서 단순히 열 개수를 세기 위해 행렬을 데이터프레임으로 변환(`ncol(as.data.frame(matrix))`)하는 것은 불필요한 O(N) 메모리 할당과 복사 오버헤드를 유발하여 성능을 크게 저하시킵니다. `ncol()` 함수는 기본적으로 행렬(matrix)을 기본 지원합니다.
+**Action:** 열 개수를 계산할 때 대상이 행렬이거나 데이터프레임일 수 있는 경우, 불필요한 형변환 없이 `ncol(target_object)`와 같이 직접 호출하여 불필요한 메모리 복사와 O(N) 오버헤드를 방지해야 합니다.
