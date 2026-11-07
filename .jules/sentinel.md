@@ -1,4 +1,4 @@
-## 2024-07-12 - Fix missing parameter validations
-**Vulnerability:** Unvalidated inputs passed to `if()` statements can cause process crashes (`condition has length > 1`) or unexpected coercion vulnerabilities.
-**Learning:** In R, optional boolean parameters that default to `NULL` should be validated using explicit runtime type validation (e.g., `if (!is.null(flag) && (!is.logical(flag) || length(flag) != 1 || is.na(flag)))`).
-**Prevention:** Always implement explicit runtime type validation for optional boolean parameters.
+## 2024-09-28 - Integer Overflow DoS in R's readline() validation
+**Vulnerability:** A DoS risk was present where interactive numeric prompts (`readline()`) were validated against the regex `grepl("^[0-9]+$", n)`. When a very large numeric string is passed, it passes the regex but causes an integer overflow when coerced with `as.integer()`, resulting in `NA`. Evaluating `NA` in logical checks later on would crash the application.
+**Learning:** R handles large numeric string coercion to integer differently from what basic numeric regex checks account for, making regex alone an insecure validation method for strictly predefined input choices.
+**Prevention:** For strictly predefined input options (like "1" and "2"), always validate input using exact string matching (`n %in% c("1", "2")`) instead of relying on broad numeric regex checks.
